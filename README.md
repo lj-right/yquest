@@ -1,4 +1,4 @@
-# yquest
+# YQuest—(Your Quest,our refer)
 
 #### 介绍
 YQuest平台致力于为求职者提供最新、最全的内推码信息，帮助开发者找到理想的工作机会。
