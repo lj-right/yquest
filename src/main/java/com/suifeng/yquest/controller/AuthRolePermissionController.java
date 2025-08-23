@@ -1,5 +1,6 @@
 package com.suifeng.yquest.controller;
 
+import com.suifeng.yquest.api.common.Result;
 import com.suifeng.yquest.entity.AuthRolePermission;
 import com.suifeng.yquest.service.AuthRolePermissionService;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +12,7 @@ import javax.annotation.Resource;
  * 角色权限关联表(AuthRolePermission)表控制层
  */
 @RestController
-@RequestMapping("authRolePermission")
+@RequestMapping("/authRolePermission")
 public class AuthRolePermissionController {
     /**
      * 服务对象
@@ -26,7 +27,7 @@ public class AuthRolePermissionController {
      * @return 单条数据
      */
     @GetMapping("{id}")
-    public ResponseEntity<AuthRolePermission> queryById(@PathVariable("id") Integer id) {
+    public ResponseEntity<AuthRolePermission> queryById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(this.authRolePermissionService.queryById(id));
     }
 
@@ -36,9 +37,9 @@ public class AuthRolePermissionController {
      * @param authRolePermission 实体
      * @return 新增结果
      */
-    @PostMapping
-    public ResponseEntity<AuthRolePermission> add(AuthRolePermission authRolePermission) {
-        return ResponseEntity.ok(this.authRolePermissionService.insert(authRolePermission));
+    @PostMapping("/add")
+    public Result<Boolean> add(@RequestBody  AuthRolePermission authRolePermission) {
+        return Result.ok(this.authRolePermissionService.insert(authRolePermission));
     }
 }
 

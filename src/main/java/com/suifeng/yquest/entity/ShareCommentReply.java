@@ -70,11 +70,11 @@ public class ShareCommentReply implements Serializable {
     /**
      * 更新人
      */
-    private String updateBy;
+    private String updatedBy;
     /**
      * 更新时间
      */
-    private Date updateTime;
+    private Date updatedTime;
     /**
      * 是否删除
      */

@@ -11,7 +11,7 @@ import javax.annotation.Resource;
  * 信息提醒表(ShareMessage)表控制层
  */
 @RestController
-@RequestMapping("shareMessage")
+@RequestMapping("/shareMessage")
 public class ShareMessageController {
     /**
      * 服务对象
@@ -37,8 +37,8 @@ public class ShareMessageController {
      * @param shareMessage 实体
      * @return 新增结果
      */
-    @PostMapping
-    public ResponseEntity<ShareMessage> add(ShareMessage shareMessage) {
+    @PostMapping("/add")
+    public ResponseEntity<ShareMessage> add(@RequestBody ShareMessage shareMessage) {
         return ResponseEntity.ok(this.shareMessageService.insert(shareMessage));
     }
 

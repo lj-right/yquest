@@ -1,5 +1,7 @@
 package com.suifeng.yquest.service;
 
+import cn.dev33.satoken.stp.SaTokenInfo;
+import cn.dev33.satoken.util.SaResult;
 import com.suifeng.yquest.entity.AuthUser;
 
 /**
@@ -13,7 +15,7 @@ public interface AuthUserService {
      * @param id 主键
      * @return 实例对象
      */
-    AuthUser queryById(Integer id);
+    AuthUser queryById(Long id);
 
 
     /**
@@ -22,7 +24,7 @@ public interface AuthUserService {
      * @param authUser 实例对象
      * @return 实例对象
      */
-    AuthUser insert(AuthUser authUser);
+    Boolean insert(AuthUser authUser);
 
     /**
      * 修改数据
@@ -30,7 +32,7 @@ public interface AuthUserService {
      * @param authUser 实例对象
      * @return 实例对象
      */
-    AuthUser update(AuthUser authUser);
+    Boolean update(AuthUser authUser);
 
     /**
      * 通过主键删除数据
@@ -38,6 +40,19 @@ public interface AuthUserService {
      * @param id 主键
      * @return 是否成功
      */
-    boolean deleteById(Integer id);
+    Boolean deleteById(Long id);
 
+    AuthUser queryByEmail(AuthUser authUser);
+
+    SaTokenInfo doLogin(String validCode);
+
+    Boolean sendEmail(AuthUser user);
+
+    String getEmailcaptcha(AuthUser user);
+
+    SaTokenInfo namelogin(AuthUser user);
+
+    SaTokenInfo emaillogin(AuthUser user);
+
+    AuthUser queryByName(AuthUser authUser);
 }

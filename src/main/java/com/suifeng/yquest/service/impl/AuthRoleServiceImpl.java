@@ -1,5 +1,6 @@
 package com.suifeng.yquest.service.impl;
 
+import com.suifeng.yquest.api.enums.IsDeletedFlagEnum;
 import com.suifeng.yquest.entity.AuthRole;
 import com.suifeng.yquest.dao.AuthRoleDao;
 import com.suifeng.yquest.service.AuthRoleService;
@@ -22,7 +23,7 @@ public class AuthRoleServiceImpl implements AuthRoleService {
      * @return 实例对象
      */
     @Override
-    public AuthRole queryById(Integer id) {
+    public AuthRole queryById(Long id) {
         return this.authRoleDao.queryById(id);
     }
 
@@ -34,8 +35,14 @@ public class AuthRoleServiceImpl implements AuthRoleService {
      * @return 实例对象
      */
     @Override
-    public AuthRole insert(AuthRole authRole) {
-        this.authRoleDao.insert(authRole);
-        return authRole;
+    public Boolean insert(AuthRole authRole) {
+        authRole.setStatus(0);
+        authRole.setIsDeleted(IsDeletedFlagEnum.UN_DELETED.getCode());
+        return this.authRoleDao.insert(authRole) > 0;
+    }
+
+    @Override
+    public AuthRole queryByCondition(AuthRole authRole) {
+        return this.authRoleDao.queryByCondition(authRole);
     }
 }

@@ -1,6 +1,7 @@
 package com.suifeng.yquest.dao;
 
 import com.suifeng.yquest.entity.AuthPermission;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.domain.Pageable;
 
@@ -9,6 +10,7 @@ import java.util.List;
 /**
  * 权限表(AuthPermission)表数据库访问层
  */
+@Mapper
 public interface AuthPermissionDao {
 
     /**
@@ -17,7 +19,7 @@ public interface AuthPermissionDao {
      * @param id 主键
      * @return 实例对象
      */
-    AuthPermission queryById(Integer id);
+    AuthPermission queryById(Long id);
 
     /**
      * 查询指定行数据
@@ -61,5 +63,7 @@ public interface AuthPermissionDao {
      */
     int insertOrUpdateBatch(@Param("entities") List<AuthPermission> entities);
 
+
+    List<AuthPermission> queryByRoleList(List<Long> permissionIdList);
 }
 

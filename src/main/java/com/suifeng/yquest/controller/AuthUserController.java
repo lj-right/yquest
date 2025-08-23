@@ -1,9 +1,18 @@
 package com.suifeng.yquest.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
+import cn.dev33.satoken.util.SaResult;
+import com.alibaba.fastjson.JSON;
+import com.google.common.base.Preconditions;
+import com.suifeng.yquest.api.common.Result;
 import com.suifeng.yquest.entity.AuthUser;
 import com.suifeng.yquest.service.AuthUserService;
+import com.suifeng.yquest.service.impl.FileService;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 
@@ -12,6 +21,7 @@ import javax.annotation.Resource;
  */
 @RestController
 @RequestMapping("/authUser")
+@Slf4j
 public class AuthUserController {
     /**
      * 服务对象
@@ -19,49 +29,191 @@ public class AuthUserController {
     @Resource
     private AuthUserService authUserService;
 
+    @Resource
+    private FileService fileService;
+
     /**
-     * 通过主键查询单条数据
-     *
-     * @param id 主键
-     * @return 单条数据
+     * 通过email查询单条数据
      */
-    @GetMapping("{id}")
-    public ResponseEntity<AuthUser> queryById(@PathVariable("id") Integer id) {
-        return ResponseEntity.ok(this.authUserService.queryById(id));
+    @PostMapping("/queryByEmail")
+    public Result<AuthUser> queryByEmail(@RequestBody AuthUser authUser) {
+        return Result.ok(authUserService.queryByEmail(authUser));
+    }
+    /**
+     * 通过name查询单条数据
+     */
+    @PostMapping("/queryByUserName")
+    public Result<AuthUser> queryByName(@RequestBody AuthUser authUser) {
+        return Result.ok(authUserService.queryByName(authUser));
     }
 
     /**
-     * 新增数据
-     *
-     * @param authUser 实体
-     * @return 新增结果
+     * 注册用户
      */
-    @PostMapping
-    public ResponseEntity<AuthUser> add(AuthUser authUser) {
-        return ResponseEntity.ok(this.authUserService.insert(authUser));
+    @PostMapping("/no-auth/register")
+    public Result<Boolean> add(@RequestBody AuthUser user) {
+        try {
+            if (log.isInfoEnabled()) {
+                log.info("新增用户入参{}", JSON.toJSONString(user));
+            }
+            Preconditions.checkArgument(!StringUtils.isBlank(user.getNickName()), "别名不能为空");
+            Preconditions.checkArgument(!StringUtils.isBlank(user.getPassword()), "密码不能为空");
+            return Result.ok(authUserService.insert(user));
+        } catch (IllegalArgumentException e) {
+            log.error("参数异常！错误原因{}", e.getMessage(), e);
+            return Result.fail(e.getMessage());
+        } catch (Exception e) {
+            log.error("新增用户异常！错误原因{}", e.getMessage(), e);
+            return Result.fail(e.getMessage());
+        }
     }
 
     /**
      * 编辑数据
-     *
-     * @param authUser 实体
-     * @return 编辑结果
      */
-    @PutMapping
-    public ResponseEntity<AuthUser> edit(AuthUser authUser) {
-        return ResponseEntity.ok(this.authUserService.update(authUser));
+    @PutMapping("/edit")
+    public ResponseEntity<Boolean> edit(@RequestBody AuthUser authUser) {
+        return ResponseEntity.ok(authUserService.update(authUser));
     }
 
     /**
      * 删除数据
-     *
-     * @param id 主键
-     * @return 删除是否成功
      */
-    @DeleteMapping
-    public ResponseEntity<Boolean> deleteById(Integer id) {
-        return ResponseEntity.ok(this.authUserService.deleteById(id));
+    @DeleteMapping("/deleteById/{id}")
+    public ResponseEntity<Boolean> deleteById(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(authUserService.deleteById(id));
+    }
+    @RequestMapping("doLogin")
+    public Result<SaResult> doLogin(@RequestParam("validCode") String validCode) {
+        try {
+            Preconditions.checkArgument(!StringUtils.isBlank(validCode),"验证码不能为空！");
+            return Result.ok(authUserService.doLogin(validCode));
+        } catch (Exception e) {
+            log.error("UserController.doLogin.error:{}", e.getMessage(), e);
+            return Result.fail("用户登录失败");
+        }
     }
 
+    /**
+     * 发送邮箱验证码
+     */
+    @PostMapping("/email/send")
+    public Result<Boolean> sendEmail(@RequestBody AuthUser user) {
+        try {
+            if (log.isInfoEnabled()) {
+                log.info("发送邮箱验证码{}", JSON.toJSONString(user));
+            }
+            Preconditions.checkArgument(!StringUtils.isBlank(user.getEmail()), "邮箱不能为空");
+            return Result.ok(authUserService.sendEmail(user));
+        } catch (IllegalArgumentException e) {
+            log.error("参数异常！错误原因{}", e.getMessage(), e);
+            return Result.fail(e.getMessage());
+        } catch (Exception e) {
+            log.error("发送邮箱验证码！错误原因{}", e.getMessage(), e);
+            return Result.fail(e.getMessage());
+        }
+    }
+
+    /**
+     * 获取邮箱验证码(用于校验用户输入)
+     */
+    @PostMapping("/auth/captcha")
+    public Result<String> getEmailcaptcha(@RequestBody AuthUser user) {
+        try {
+            if (log.isInfoEnabled()) {
+                log.info("获取邮箱验证码{}", JSON.toJSONString(user));
+            }
+            Preconditions.checkArgument(!StringUtils.isBlank(user.getEmail()), "邮箱不能为空");
+            return Result.ok(authUserService.getEmailcaptcha(user));
+        } catch (IllegalArgumentException e) {
+            log.error("参数异常！错误原因{}", e.getMessage(), e);
+            return Result.fail(e.getMessage());
+        } catch (Exception e) {
+            log.error("获取邮箱验证码！错误原因{}", e.getMessage(), e);
+            return Result.fail(e.getMessage());
+        }
+    }
+    /**
+     * 上传文件
+     */
+    @PostMapping("/user/uploadFile")
+    public Result<String> uploadFile(@RequestBody MultipartFile uploadFile) {
+        try {
+            return Result.ok(fileService.uploadFile(uploadFile,"yquest","avator"));
+        } catch (IllegalArgumentException e) {
+            log.error("参数异常！错误原因{}", e.getMessage(), e);
+            return Result.fail(e.getMessage());
+        } catch (Exception e) {
+            log.error("发送邮箱验证码错误原因{}", e.getMessage(), e);
+            return Result.fail(e.getMessage());
+        }
+    }
+    /**
+     * 删除oss指定文件
+     */
+    @DeleteMapping("/oss/deletefile")
+    public Result deletefile(@RequestBody AuthUser assets) {
+        try {
+            fileService.deletefile(assets);
+            return Result.ok();
+        } catch (IllegalArgumentException e) {
+            log.error("参数异常！错误原因{}", e.getMessage(), e);
+            return Result.fail(e.getMessage());
+        } catch (Exception e) {
+            log.error("删除oss指定文件错误原因{}", e.getMessage(), e);
+            return Result.fail(e.getMessage());
+        }
+    }
+    /**
+     * 用户名登录
+     */
+    @PostMapping("/auth/login")
+    public Result<SaResult> namelogin(@RequestBody AuthUser user) {
+        try {
+            Preconditions.checkArgument(!StringUtils.isBlank(user.getUserName()), "用户名不能为空");
+            return Result.ok( authUserService.namelogin(user));
+        } catch (IllegalArgumentException e) {
+            log.error("参数异常！错误原因{}", e.getMessage(), e);
+            return Result.fail(e.getMessage());
+        } catch (Exception e) {
+            log.error("用户名登录错误原因{}", e.getMessage(), e);
+            return Result.fail(e.getMessage());
+        }
+    }
+    /**
+     * 邮件登录
+     */
+    @PostMapping("/no-auth/email-login")
+    public Result<SaResult> emaillogin(@RequestBody AuthUser user) {
+        try {
+            log.info("UserController.emaillogin.userEmail:{}", user.getEmail());
+            Preconditions.checkArgument(!StringUtils.isBlank(user.getEmail()), "邮件名不能为空");
+            return Result.ok( authUserService.emaillogin(user));
+        } catch (IllegalArgumentException e) {
+            log.error("参数异常！错误原因{}", e.getMessage(), e);
+            return Result.fail(e.getMessage());
+        } catch (Exception e) {
+            log.error("邮件名登录错误原因{}", e.getMessage(), e);
+            return Result.fail(e.getMessage());
+        }
+    }
+    /**
+     * 退出登录
+     */
+    @PostMapping("/auth/exit-login")
+    public Result exitlogin(@RequestBody AuthUser user) {
+        try {
+            log.info("UserController.exitlogin.userEmail:{}", user.getEmail());
+            Preconditions.checkArgument(!StringUtils.isBlank(user.getEmail()), "邮箱不能为空");
+            StpUtil.logout(user.getEmail());
+            return Result.ok();
+        } catch (IllegalArgumentException e) {
+            log.error("参数异常！错误原因{}", e.getMessage(), e);
+            return Result.fail(e.getMessage());
+        } catch (Exception e) {
+            log.error("邮件名登录错误原因{}", e.getMessage(), e);
+            return Result.fail(e.getMessage());
+        }
+    }
 }
 

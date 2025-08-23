@@ -1,5 +1,6 @@
 package com.suifeng.yquest.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.Date;
@@ -14,15 +15,15 @@ public class AuthRolePermission implements Serializable {
     /**
      * 主键id
      */
-    private Integer id;
+    private Long id;
     /**
      * 角色id
      */
-    private Integer roleId;
+    private Long roleId;
     /**
      * 权限id
      */
-    private Integer permissionId;
+    private Long permissionId;
     /**
      * 创建人
      */

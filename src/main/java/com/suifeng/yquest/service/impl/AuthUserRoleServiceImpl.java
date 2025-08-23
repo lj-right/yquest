@@ -1,11 +1,13 @@
 package com.suifeng.yquest.service.impl;
 
+import com.suifeng.yquest.api.enums.IsDeletedFlagEnum;
 import com.suifeng.yquest.entity.AuthUserRole;
 import com.suifeng.yquest.dao.AuthUserRoleDao;
 import com.suifeng.yquest.service.AuthUserRoleService;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+
 import javax.annotation.Resource;
 
 /**
@@ -23,10 +25,9 @@ public class AuthUserRoleServiceImpl implements AuthUserRoleService {
      * @return 实例对象
      */
     @Override
-    public AuthUserRole queryById(Integer id) {
+    public AuthUserRole queryById(Long id) {
         return this.authUserRoleDao.queryById(id);
     }
-
 
 
     /**
@@ -36,9 +37,26 @@ public class AuthUserRoleServiceImpl implements AuthUserRoleService {
      * @return 实例对象
      */
     @Override
-    public AuthUserRole insert(AuthUserRole authUserRole) {
-        this.authUserRoleDao.insert(authUserRole);
-        return authUserRole;
+    public Boolean insert(AuthUserRole authUserRole) {
+        authUserRole.setIsDeleted(IsDeletedFlagEnum.UN_DELETED.getCode());
+        return this.authUserRoleDao.insert(authUserRole) > 0;
     }
 
+    @Override
+    public Boolean deleteById(Long id) {
+        AuthUserRole authUserRole = new AuthUserRole();
+        authUserRole.setId(id);
+        authUserRole.setIsDeleted(IsDeletedFlagEnum.DELETED.getCode());
+        return this.authUserRoleDao.update(authUserRole) > 0;
+    }
+
+    @Override
+    public AuthUserRole queryByUserId(Long userId) {
+        return this.authUserRoleDao.queryByUserId(userId);
+    }
+
+    @Override
+    public Boolean update(AuthUserRole userRole) {
+        return this.authUserRoleDao.update(userRole)>0;
+    }
 }

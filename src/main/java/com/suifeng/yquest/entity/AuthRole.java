@@ -1,6 +1,8 @@
 package com.suifeng.yquest.entity;
 
 import lombok.Data;
+import lombok.Getter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 import java.io.Serializable;
@@ -14,7 +16,7 @@ public class AuthRole implements Serializable {
     /**
      * 主键id
      */
-    private Integer id;
+    private Long id;
     /**
      * 角色名称
      */
@@ -28,16 +30,13 @@ public class AuthRole implements Serializable {
      */
     private Integer status;
     /**
-     * 1 符合部门权限的所有数据 2本部门 3部门级以下
-     */
-    private Integer dataRange;
-    /**
      * 创建人
      */
     private String createdBy;
     /**
      * 创建时间
      */
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createdTime;
     /**
      * 更新人
@@ -46,6 +45,7 @@ public class AuthRole implements Serializable {
     /**
      * 更新时间
      */
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updatedTime;
     /**
      * 是否删除

@@ -11,7 +11,7 @@ import javax.annotation.Resource;
  * (Refer)表控制层
  */
 @RestController
-@RequestMapping("refer")
+@RequestMapping("/refer")
 public class ReferController {
     /**
      * 服务对象
@@ -37,8 +37,8 @@ public class ReferController {
      * @param refer 实体
      * @return 新增结果
      */
-    @PostMapping
-    public ResponseEntity<Refer> add(Refer refer) {
+    @PostMapping("/add")
+    public ResponseEntity<Refer> add(@RequestBody Refer refer) {
         return ResponseEntity.ok(this.referService.insert(refer));
     }
 
@@ -48,8 +48,8 @@ public class ReferController {
      * @param refer 实体
      * @return 编辑结果
      */
-    @PutMapping
-    public ResponseEntity<Refer> edit(Refer refer) {
+    @PutMapping("/edit")
+    public ResponseEntity<Refer> edit(@RequestBody Refer refer) {
         return ResponseEntity.ok(this.referService.update(refer));
     }
 
@@ -59,7 +59,7 @@ public class ReferController {
      * @param id 主键
      * @return 删除是否成功
      */
-    @DeleteMapping
+    @DeleteMapping("/deleteById")
     public ResponseEntity<Boolean> deleteById(Long id) {
         return ResponseEntity.ok(this.referService.deleteById(id));
     }

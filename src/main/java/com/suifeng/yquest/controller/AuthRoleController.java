@@ -1,5 +1,6 @@
 package com.suifeng.yquest.controller;
 
+import com.suifeng.yquest.api.common.Result;
 import com.suifeng.yquest.entity.AuthRole;
 import com.suifeng.yquest.service.AuthRoleService;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +12,7 @@ import javax.annotation.Resource;
  * 角色表(AuthRole)表控制层
  */
 @RestController
-@RequestMapping("authRole")
+@RequestMapping("/authRole")
 public class AuthRoleController {
     /**
      * 服务对象
@@ -27,7 +28,7 @@ public class AuthRoleController {
      * @return 单条数据
      */
     @GetMapping("{id}")
-    public ResponseEntity<AuthRole> queryById(@PathVariable("id") Integer id) {
+    public ResponseEntity<AuthRole> queryById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(this.authRoleService.queryById(id));
     }
 
@@ -37,9 +38,9 @@ public class AuthRoleController {
      * @param authRole 实体
      * @return 新增结果
      */
-    @PostMapping
-    public ResponseEntity<AuthRole> add(AuthRole authRole) {
-        return ResponseEntity.ok(this.authRoleService.insert(authRole));
+    @PostMapping("/add")
+    public Result<Boolean> add(@RequestBody AuthRole authRole) {
+        return Result.ok(this.authRoleService.insert(authRole));
     }
 
 }

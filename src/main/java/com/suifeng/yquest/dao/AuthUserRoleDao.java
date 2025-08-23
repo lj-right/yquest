@@ -1,6 +1,7 @@
 package com.suifeng.yquest.dao;
 
 import com.suifeng.yquest.entity.AuthUserRole;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.domain.Pageable;
 
@@ -9,6 +10,7 @@ import java.util.List;
 /**
  * 用户角色表(AuthUserRole)表数据库访问层
  */
+@Mapper
 public interface AuthUserRoleDao {
 
     /**
@@ -17,7 +19,7 @@ public interface AuthUserRoleDao {
      * @param id 主键
      * @return 实例对象
      */
-    AuthUserRole queryById(Integer id);
+    AuthUserRole queryById(Long id);
 
     /**
      * 查询指定行数据
@@ -77,5 +79,6 @@ public interface AuthUserRoleDao {
      */
     int deleteById(Integer id);
 
+    AuthUserRole queryByUserId(Long userId);
 }
 

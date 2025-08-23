@@ -1,5 +1,7 @@
 package com.suifeng.yquest.config.mybatis;
+import com.suifeng.yquest.utils.LoginUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
@@ -7,7 +9,6 @@ import org.apache.ibatis.plugin.*;
 import org.springframework.stereotype.Component;
 import java.lang.reflect.Field;
 import java.util.*;
-
 /**
  * 填充createBy，createTime等公共字段的拦截器
  */
@@ -25,36 +26,41 @@ public class MybatisInterceptor implements Interceptor {
         if (parameter == null) {
             return invocation.proceed();
         }
+        //获取当前登录用户的id
+        String loginId = LoginUtil.getLoginId();
+        if (StringUtils.isBlank(loginId)) {
+            return invocation.proceed();
+        }
         if (sqlCommandType == SqlCommandType.INSERT || sqlCommandType == SqlCommandType.UPDATE) {
-            replaceEntityProperty(parameter, sqlCommandType);
+            replaceEntityProperty(parameter, loginId, sqlCommandType);
         }
 
         return invocation.proceed();
     }
 
-    private void replaceEntityProperty(Object parameter, SqlCommandType sqlCommandType) {
+    private void replaceEntityProperty(Object parameter, String loginId, SqlCommandType sqlCommandType) {
         if (parameter instanceof Map) {
-            replaceMap((Map) parameter, sqlCommandType);
+            replaceMap((Map) parameter, loginId, sqlCommandType);
         } else {
-            replace(parameter, sqlCommandType);
+            replace(parameter, loginId, sqlCommandType);
         }
     }
 
-    private void replaceMap(Map parameter, SqlCommandType sqlCommandType) {
+    private void replaceMap(Map parameter, String loginId, SqlCommandType sqlCommandType) {
         for (Object val : parameter.values()) {
-            replace(val, sqlCommandType);
+            replace(val, loginId, sqlCommandType);
         }
     }
 
-    private void replace(Object parameter, SqlCommandType sqlCommandType) {
+    private void replace(Object parameter, String loginId, SqlCommandType sqlCommandType) {
         if (sqlCommandType == SqlCommandType.INSERT) {
-            dealInsert(parameter);
+            dealInsert(parameter, loginId);
         } else {
-            dealUpdate(parameter);
+            dealUpdate(parameter, loginId);
         }
     }
 
-    private void dealUpdate(Object parameter) {
+    private void dealUpdate(Object parameter, String loginId) {
         Field[] fields = getAllFields(parameter);
         for (Field field : fields) {
             try {
@@ -65,7 +71,10 @@ public class MybatisInterceptor implements Interceptor {
                     continue;
                 }
                 //填充数据
-                if ("updatetime".equals(field.getName())) {
+                if ("updatedBy".equals(field.getName())) {
+                    field.set(parameter, loginId);
+                    field.setAccessible(false);
+                } else if ("updatedTime".equals(field.getName())) {
                     field.set(parameter, new Date());
                     field.setAccessible(false);
                 } else {
@@ -77,7 +86,7 @@ public class MybatisInterceptor implements Interceptor {
         }
     }
 
-    private void dealInsert(Object parameter) {
+    private void dealInsert(Object parameter, String loginId) {
         Field[] fields = getAllFields(parameter);
         for (Field field : fields) {
             try {
@@ -88,10 +97,13 @@ public class MybatisInterceptor implements Interceptor {
                     continue;
                 }
                 //填充数据
-                if ("createtime".equals(field.getName())) {
-                    field.set(parameter, new Date());
+                if ("isDeleted".equals(field.getName())) {
+                    field.set(parameter, 0);
                     field.setAccessible(false);
-                } else if ("updatetime".equals(field.getName())) {
+                } else if ("createdBy".equals(field.getName())) {
+                    field.set(parameter, loginId);
+                    field.setAccessible(false);
+                } else if ("createdTime".equals(field.getName())) {
                     field.set(parameter, new Date());
                     field.setAccessible(false);
                 } else {

@@ -1,6 +1,7 @@
 package com.suifeng.yquest.dao;
 
 import com.suifeng.yquest.entity.ShareCommentReply;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.domain.Pageable;
 
@@ -9,6 +10,7 @@ import java.util.List;
 /**
  * 评论回复表(ShareCommentReply)表数据库访问层
  */
+@Mapper
 public interface ShareCommentReplyDao {
 
     /**

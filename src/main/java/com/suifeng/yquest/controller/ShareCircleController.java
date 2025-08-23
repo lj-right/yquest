@@ -13,7 +13,7 @@ import javax.annotation.Resource;
  * 圈子表(ShareCircle)表控制层
  */
 @RestController
-@RequestMapping("shareCircle")
+@RequestMapping("/shareCircle")
 public class ShareCircleController {
     /**
      * 服务对象
@@ -38,8 +38,8 @@ public class ShareCircleController {
      * @param shareCircle 实体
      * @return 新增结果
      */
-    @PostMapping
-    public ResponseEntity<ShareCircle> add(ShareCircle shareCircle) {
+    @PostMapping("/add")
+    public ResponseEntity<ShareCircle> add(@RequestBody ShareCircle shareCircle) {
         return ResponseEntity.ok(this.shareCircleService.insert(shareCircle));
     }
 
@@ -49,8 +49,8 @@ public class ShareCircleController {
      * @param shareCircle 实体
      * @return 编辑结果
      */
-    @PutMapping
-    public ResponseEntity<ShareCircle> edit(ShareCircle shareCircle) {
+    @PutMapping("/edit")
+    public ResponseEntity<ShareCircle> edit(@RequestBody ShareCircle shareCircle) {
         return ResponseEntity.ok(this.shareCircleService.update(shareCircle));
     }
 
@@ -60,7 +60,7 @@ public class ShareCircleController {
      * @param id 主键
      * @return 删除是否成功
      */
-    @DeleteMapping
+    @DeleteMapping("/deleteById")
     public ResponseEntity<Boolean> deleteById(Long id) {
         return ResponseEntity.ok(this.shareCircleService.deleteById(id));
     }

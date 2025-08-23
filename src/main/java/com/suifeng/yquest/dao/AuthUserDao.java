@@ -1,6 +1,7 @@
 package com.suifeng.yquest.dao;
 
 import com.suifeng.yquest.entity.AuthUser;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.domain.Pageable;
 
@@ -9,6 +10,7 @@ import java.util.List;
 /**
  * 用户信息表(AuthUser)表数据库访问层
  */
+@Mapper
 public interface AuthUserDao {
 
     /**
@@ -17,7 +19,7 @@ public interface AuthUserDao {
      * @param id 主键
      * @return 实例对象
      */
-    AuthUser queryById(Integer id);
+    AuthUser queryById(Long id);
 
     /**
      * 查询指定行数据
@@ -75,7 +77,10 @@ public interface AuthUserDao {
      * @param id 主键
      * @return 影响行数
      */
-    int deleteById(Integer id);
+    int deleteById(Long id);
 
+    AuthUser queryByEmail(AuthUser authUser);
+
+    AuthUser queryByName(AuthUser authUser);
 }
 

@@ -11,7 +11,7 @@ import javax.annotation.Resource;
  * 敏感词表(SensitiveWords)表控制层
  */
 @RestController
-@RequestMapping("sensitiveWords")
+@RequestMapping("/sensitiveWords")
 public class SensitiveWordsController {
     /**
      * 服务对象
@@ -36,8 +36,8 @@ public class SensitiveWordsController {
      * @param sensitiveWords 实体
      * @return 新增结果
      */
-    @PostMapping
-    public ResponseEntity<SensitiveWords> add(SensitiveWords sensitiveWords) {
+    @PostMapping("/add")
+    public ResponseEntity<SensitiveWords> add(@RequestBody SensitiveWords sensitiveWords) {
         return ResponseEntity.ok(this.sensitiveWordsService.insert(sensitiveWords));
     }
 
@@ -47,8 +47,8 @@ public class SensitiveWordsController {
      * @param sensitiveWords 实体
      * @return 编辑结果
      */
-    @PutMapping
-    public ResponseEntity<SensitiveWords> edit(SensitiveWords sensitiveWords) {
+    @PutMapping("/edit")
+    public ResponseEntity<SensitiveWords> edit(@RequestBody SensitiveWords sensitiveWords) {
         return ResponseEntity.ok(this.sensitiveWordsService.update(sensitiveWords));
     }
 
@@ -58,7 +58,7 @@ public class SensitiveWordsController {
      * @param id 主键
      * @return 删除是否成功
      */
-    @DeleteMapping
+    @DeleteMapping("/deleteById")
     public ResponseEntity<Boolean> deleteById(Long id) {
         return ResponseEntity.ok(this.sensitiveWordsService.deleteById(id));
     }

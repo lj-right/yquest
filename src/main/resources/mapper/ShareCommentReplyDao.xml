@@ -17,16 +17,15 @@
         <result property="picUrls" column="pic_urls" jdbcType="VARCHAR"/>
         <result property="createdBy" column="created_by" jdbcType="VARCHAR"/>
         <result property="createdTime" column="created_time" jdbcType="TIMESTAMP"/>
-        <result property="updateBy" column="update_by" jdbcType="VARCHAR"/>
-        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="updatedBy" column="updated_by" jdbcType="VARCHAR"/>
+        <result property="updatedTime" column="updated_time" jdbcType="TIMESTAMP"/>
         <result property="isDeleted" column="is_deleted" jdbcType="INTEGER"/>
     </resultMap>
 
     <!--查询单个-->
     <select id="queryById" resultMap="ShareCommentReplyMap">
         select
-        id, moment_id, reply_type, to_id, parent_id, to_user, to_user_author, reply_id, reply_user, reply_author,
-        content, pic_urls, created_by, created_time, update_by, update_time, is_deleted
+          id, moment_id, reply_type, to_id, parent_id, to_user, to_user_author, reply_id, reply_user, reply_author, content, pic_urls, created_by, created_time, updated_by, updated_time, is_deleted
         from share_comment_reply
         where id = #{id}
     </select>
@@ -34,8 +33,7 @@
     <!--查询指定行数据-->
     <select id="queryAllByLimit" resultMap="ShareCommentReplyMap">
         select
-        id, moment_id, reply_type, to_id, parent_id, to_user, to_user_author, reply_id, reply_user, reply_author,
-        content, pic_urls, created_by, created_time, update_by, update_time, is_deleted
+          id, moment_id, reply_type, to_id, parent_id, to_user, to_user_author, reply_id, reply_user, reply_author, content, pic_urls, created_by, created_time, updated_by, updated_time, is_deleted
         from share_comment_reply
         <where>
             <if test="id != null">
@@ -80,11 +78,11 @@
             <if test="createdTime != null">
                 and created_time = #{createdTime}
             </if>
-            <if test="updateBy != null and updateBy != ''">
-                and update_by = #{updateBy}
+            <if test="updatedBy != null and updatedBy != ''">
+                and updated_by = #{updatedBy}
             </if>
-            <if test="updateTime != null">
-                and update_time = #{updateTime}
+            <if test="updatedTime != null">
+                and updated_time = #{updatedTime}
             </if>
             <if test="isDeleted != null">
                 and is_deleted = #{isDeleted}
@@ -140,11 +138,11 @@
             <if test="createdTime != null">
                 and created_time = #{createdTime}
             </if>
-            <if test="updateBy != null and updateBy != ''">
-                and update_by = #{updateBy}
+            <if test="updatedBy != null and updatedBy != ''">
+                and updated_by = #{updatedBy}
             </if>
-            <if test="updateTime != null">
-                and update_time = #{updateTime}
+            <if test="updatedTime != null">
+                and updated_time = #{updatedTime}
             </if>
             <if test="isDeleted != null">
                 and is_deleted = #{isDeleted}
@@ -154,33 +152,23 @@
 
     <!--新增所有列-->
     <insert id="insert" keyProperty="id" useGeneratedKeys="true">
-        insert into share_comment_reply(moment_id, reply_type, to_id, parent_id, to_user, to_user_author, reply_id,
-        reply_user, reply_author, content, pic_urls, created_by, created_time, update_by, update_time, is_deleted)
-        values (#{momentId}, #{replyType}, #{toId}, #{parentId}, #{toUser}, #{toUserAuthor}, #{replyId}, #{replyUser},
-        #{replyAuthor}, #{content}, #{picUrls}, #{createdBy}, #{createdTime}, #{updateBy}, #{updateTime}, #{isDeleted})
+        insert into share_comment_reply(moment_id, reply_type, to_id, parent_id, to_user, to_user_author, reply_id, reply_user, reply_author, content, pic_urls, created_by, created_time, updated_by, updated_time, is_deleted)
+        values (#{momentId}, #{replyType}, #{toId}, #{parentId}, #{toUser}, #{toUserAuthor}, #{replyId}, #{replyUser}, #{replyAuthor}, #{content}, #{picUrls}, #{createdBy}, #{createdTime}, #{updatedBy}, #{updatedTime}, #{isDeleted})
     </insert>
 
     <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
-        insert into share_comment_reply(moment_id, reply_type, to_id, parent_id, to_user, to_user_author, reply_id,
-        reply_user, reply_author, content, pic_urls, created_by, created_time, update_by, update_time, is_deleted)
+        insert into share_comment_reply(moment_id, reply_type, to_id, parent_id, to_user, to_user_author, reply_id, reply_user, reply_author, content, pic_urls, created_by, created_time, updated_by, updated_time, is_deleted)
         values
         <foreach collection="entities" item="entity" separator=",">
-            (#{entity.momentId}, #{entity.replyType}, #{entity.toId}, #{entity.parentId}, #{entity.toUser},
-            #{entity.toUserAuthor}, #{entity.replyId}, #{entity.replyUser}, #{entity.replyAuthor}, #{entity.content},
-            #{entity.picUrls}, #{entity.createdBy}, #{entity.createdTime}, #{entity.updateBy}, #{entity.updateTime},
-            #{entity.isDeleted})
+        (#{entity.momentId}, #{entity.replyType}, #{entity.toId}, #{entity.parentId}, #{entity.toUser}, #{entity.toUserAuthor}, #{entity.replyId}, #{entity.replyUser}, #{entity.replyAuthor}, #{entity.content}, #{entity.picUrls}, #{entity.createdBy}, #{entity.createdTime}, #{entity.updatedBy}, #{entity.updatedTime}, #{entity.isDeleted})
         </foreach>
     </insert>
 
     <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
-        insert into share_comment_reply(moment_id, reply_type, to_id, parent_id, to_user, to_user_author, reply_id,
-        reply_user, reply_author, content, pic_urls, created_by, created_time, update_by, update_time, is_deleted)
+        insert into share_comment_reply(moment_id, reply_type, to_id, parent_id, to_user, to_user_author, reply_id, reply_user, reply_author, content, pic_urls, created_by, created_time, updated_by, updated_time, is_deleted)
         values
         <foreach collection="entities" item="entity" separator=",">
-            (#{entity.momentId}, #{entity.replyType}, #{entity.toId}, #{entity.parentId}, #{entity.toUser},
-            #{entity.toUserAuthor}, #{entity.replyId}, #{entity.replyUser}, #{entity.replyAuthor}, #{entity.content},
-            #{entity.picUrls}, #{entity.createdBy}, #{entity.createdTime}, #{entity.updateBy}, #{entity.updateTime},
-            #{entity.isDeleted})
+            (#{entity.momentId}, #{entity.replyType}, #{entity.toId}, #{entity.parentId}, #{entity.toUser}, #{entity.toUserAuthor}, #{entity.replyId}, #{entity.replyUser}, #{entity.replyAuthor}, #{entity.content}, #{entity.picUrls}, #{entity.createdBy}, #{entity.createdTime}, #{entity.updatedBy}, #{entity.updatedTime}, #{entity.isDeleted})
         </foreach>
         on duplicate key update
         moment_id = values(moment_id),
@@ -196,8 +184,8 @@
         pic_urls = values(pic_urls),
         created_by = values(created_by),
         created_time = values(created_time),
-        update_by = values(update_by),
-        update_time = values(update_time),
+        updated_by = values(updated_by),
+        updated_time = values(updated_time),
         is_deleted = values(is_deleted)
     </insert>
 
@@ -244,11 +232,11 @@
             <if test="createdTime != null">
                 created_time = #{createdTime},
             </if>
-            <if test="updateBy != null and updateBy != ''">
-                update_by = #{updateBy},
+            <if test="updatedBy != null and updatedBy != ''">
+                updated_by = #{updatedBy},
             </if>
-            <if test="updateTime != null">
-                update_time = #{updateTime},
+            <if test="updatedTime != null">
+                updated_time = #{updatedTime},
             </if>
             <if test="isDeleted != null">
                 is_deleted = #{isDeleted},

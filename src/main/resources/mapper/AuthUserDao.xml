@@ -29,6 +29,24 @@
         from auth_user
         where id = #{id}
     </select>
+    <!--查询单个-->
+    <select id="queryByEmail" resultMap="AuthUserMap">
+        select
+        id, user_name, nick_name, email, phone, password, sex, avatar, status, introduce, ext_json, created_by,
+        created_time, updated_by, updated_time, is_deleted
+        from auth_user
+        where email = #{email}
+        and is_deleted = 0
+    </select>
+    <!--查询单个-->
+    <select id="queryByName" resultMap="AuthUserMap">
+        select
+        id, user_name, nick_name, email, phone, password, sex, avatar, status, introduce, ext_json, created_by,
+        created_time, updated_by, updated_time, is_deleted
+        from auth_user
+        where user_name = #{userName}
+        and is_deleted = 0
+    </select>
 
     <!--查询指定行数据-->
     <select id="queryAllByLimit" resultMap="AuthUserMap">
@@ -86,7 +104,6 @@
                 and is_deleted = #{isDeleted}
             </if>
         </where>
-        limit #{pageable.offset}, #{pageable.pageSize}
     </select>
 
     <!--统计总行数-->
@@ -147,6 +164,9 @@
 
     <!--新增所有列-->
     <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
         insert into auth_user(user_name, nick_name, email, phone, password, sex, avatar, status, introduce, ext_json,
         created_by, created_time, updated_by, updated_time, is_deleted)
         values (#{userName}, #{nickName}, #{email}, #{phone}, #{password}, #{sex}, #{avatar}, #{status}, #{introduce},

@@ -2,6 +2,8 @@ package com.suifeng.yquest.service;
 
 import com.suifeng.yquest.entity.AuthRolePermission;
 
+import java.util.List;
+
 /**
  * 角色权限关联表(AuthRolePermission)表服务接口
  */
@@ -13,7 +15,7 @@ public interface AuthRolePermissionService {
      * @param id 主键
      * @return 实例对象
      */
-    AuthRolePermission queryById(Integer id);
+    AuthRolePermission queryById(Long id);
 
 
     /**
@@ -22,7 +24,8 @@ public interface AuthRolePermissionService {
      * @param authRolePermission 实例对象
      * @return 实例对象
      */
-    AuthRolePermission insert(AuthRolePermission authRolePermission);
+    Boolean insert(AuthRolePermission authRolePermission);
 
 
+    List<AuthRolePermission> queryByCondition(AuthRolePermission authRolePermission);
 }

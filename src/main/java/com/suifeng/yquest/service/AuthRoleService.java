@@ -13,7 +13,7 @@ public interface AuthRoleService {
      * @param id 主键
      * @return 实例对象
      */
-    AuthRole queryById(Integer id);
+    AuthRole queryById(Long id);
 
 
     /**
@@ -22,7 +22,8 @@ public interface AuthRoleService {
      * @param authRole 实例对象
      * @return 实例对象
      */
-    AuthRole insert(AuthRole authRole);
+    Boolean insert(AuthRole authRole);
 
 
+    AuthRole queryByCondition(AuthRole authRole);
 }

@@ -14,7 +14,7 @@ public class AuthUser implements Serializable {
     /**
      * 主键id
      */
-    private Integer id;
+    private Long id;
     /**
      * 用户名称
      */
@@ -46,13 +46,13 @@ public class AuthUser implements Serializable {
     /**
      * 状态 0启用 1禁用
      */
-    private String status;
+    private Integer status;
     /**
      * 个人介绍
      */
     private String introduce;
     /**
-     * 特殊字段
+     * 验证码
      */
     private String extJson;
     /**

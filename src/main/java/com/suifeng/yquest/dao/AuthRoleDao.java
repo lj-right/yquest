@@ -1,6 +1,7 @@
 package com.suifeng.yquest.dao;
 
 import com.suifeng.yquest.entity.AuthRole;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.domain.Pageable;
 
@@ -9,6 +10,7 @@ import java.util.List;
 /**
  * 角色表(AuthRole)表数据库访问层
  */
+@Mapper
 public interface AuthRoleDao {
 
     /**
@@ -17,7 +19,7 @@ public interface AuthRoleDao {
      * @param id 主键
      * @return 实例对象
      */
-    AuthRole queryById(Integer id);
+    AuthRole queryById(Long id);
 
     /**
      * 查询指定行数据
@@ -62,5 +64,6 @@ public interface AuthRoleDao {
     int insertOrUpdateBatch(@Param("entities") List<AuthRole> entities);
 
 
+    AuthRole queryByCondition(AuthRole authRole);
 }
 

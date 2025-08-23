@@ -1,8 +1,10 @@
 package com.suifeng.yquest.controller;
 
+import com.suifeng.yquest.api.common.Result;
 import com.suifeng.yquest.entity.AuthUserRole;
 import com.suifeng.yquest.service.AuthUserRoleService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -11,7 +13,7 @@ import javax.annotation.Resource;
  * 用户角色表(AuthUserRole)表控制层
  */
 @RestController
-@RequestMapping("authUserRole")
+@RequestMapping("/authUserRole")
 public class AuthUserRoleController {
     /**
      * 服务对象
@@ -26,7 +28,7 @@ public class AuthUserRoleController {
      * @return 单条数据
      */
     @GetMapping("{id}")
-    public ResponseEntity<AuthUserRole> queryById(@PathVariable("id") Integer id) {
+    public ResponseEntity<AuthUserRole> queryById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(this.authUserRoleService.queryById(id));
     }
 
@@ -36,9 +38,18 @@ public class AuthUserRoleController {
      * @param authUserRole 实体
      * @return 新增结果
      */
-    @PostMapping
-    public ResponseEntity<AuthUserRole> add(AuthUserRole authUserRole) {
-        return ResponseEntity.ok(this.authUserRoleService.insert(authUserRole));
+    @PostMapping("/add")
+    public Result<Boolean> add(@RequestBody AuthUserRole authUserRole) {
+        return Result.ok(this.authUserRoleService.insert(authUserRole));
+    }
+
+    /**
+     * 删除数据
+     */
+    @DeleteMapping("/deleteById/{id}")
+    @Transactional
+    public ResponseEntity<Boolean> deleteById(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(authUserRoleService.deleteById(id));
     }
 }
 

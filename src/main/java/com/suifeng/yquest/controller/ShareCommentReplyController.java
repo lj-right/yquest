@@ -11,7 +11,7 @@ import javax.annotation.Resource;
  * 评论回复表(ShareCommentReply)表控制层
  */
 @RestController
-@RequestMapping("shareCommentReply")
+@RequestMapping("/shareCommentReply")
 public class ShareCommentReplyController {
     /**
      * 服务对象
@@ -36,8 +36,8 @@ public class ShareCommentReplyController {
      * @param shareCommentReply 实体
      * @return 新增结果
      */
-    @PostMapping
-    public ResponseEntity<ShareCommentReply> add(ShareCommentReply shareCommentReply) {
+    @PostMapping("/add")
+    public ResponseEntity<ShareCommentReply> add(@RequestBody ShareCommentReply shareCommentReply) {
         return ResponseEntity.ok(this.shareCommentReplyService.insert(shareCommentReply));
     }
 
@@ -47,8 +47,8 @@ public class ShareCommentReplyController {
      * @param shareCommentReply 实体
      * @return 编辑结果
      */
-    @PutMapping
-    public ResponseEntity<ShareCommentReply> edit(ShareCommentReply shareCommentReply) {
+    @PutMapping("/edit")
+    public ResponseEntity<ShareCommentReply> edit(@RequestBody ShareCommentReply shareCommentReply) {
         return ResponseEntity.ok(this.shareCommentReplyService.update(shareCommentReply));
     }
 
@@ -58,7 +58,7 @@ public class ShareCommentReplyController {
      * @param id 主键
      * @return 删除是否成功
      */
-    @DeleteMapping
+    @DeleteMapping("/deleteById")
     public ResponseEntity<Boolean> deleteById(Long id) {
         return ResponseEntity.ok(this.shareCommentReplyService.deleteById(id));
     }
