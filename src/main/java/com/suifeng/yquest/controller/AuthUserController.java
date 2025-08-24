@@ -83,16 +83,6 @@ public class AuthUserController {
     public ResponseEntity<Boolean> deleteById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(authUserService.deleteById(id));
     }
-    @RequestMapping("doLogin")
-    public Result<SaResult> doLogin(@RequestParam("validCode") String validCode) {
-        try {
-            Preconditions.checkArgument(!StringUtils.isBlank(validCode),"验证码不能为空！");
-            return Result.ok(authUserService.doLogin(validCode));
-        } catch (Exception e) {
-            log.error("UserController.doLogin.error:{}", e.getMessage(), e);
-            return Result.fail("用户登录失败");
-        }
-    }
 
     /**
      * 发送邮箱验证码
@@ -165,35 +155,17 @@ public class AuthUserController {
         }
     }
     /**
-     * 用户名登录
+     * 统一的登录
      */
     @PostMapping("/auth/login")
-    public Result<SaResult> namelogin(@RequestBody AuthUser user) {
+    public Result<SaResult> dologin(@RequestBody AuthUser user) {
         try {
-            Preconditions.checkArgument(!StringUtils.isBlank(user.getUserName()), "用户名不能为空");
-            return Result.ok( authUserService.namelogin(user));
+            return Result.ok( authUserService.doLogin(user));
         } catch (IllegalArgumentException e) {
             log.error("参数异常！错误原因{}", e.getMessage(), e);
             return Result.fail(e.getMessage());
         } catch (Exception e) {
-            log.error("用户名登录错误原因{}", e.getMessage(), e);
-            return Result.fail(e.getMessage());
-        }
-    }
-    /**
-     * 邮件登录
-     */
-    @PostMapping("/no-auth/email-login")
-    public Result<SaResult> emaillogin(@RequestBody AuthUser user) {
-        try {
-            log.info("UserController.emaillogin.userEmail:{}", user.getEmail());
-            Preconditions.checkArgument(!StringUtils.isBlank(user.getEmail()), "邮件名不能为空");
-            return Result.ok( authUserService.emaillogin(user));
-        } catch (IllegalArgumentException e) {
-            log.error("参数异常！错误原因{}", e.getMessage(), e);
-            return Result.fail(e.getMessage());
-        } catch (Exception e) {
-            log.error("邮件名登录错误原因{}", e.getMessage(), e);
+            log.error("登录错误原因{}", e.getMessage(), e);
             return Result.fail(e.getMessage());
         }
     }
@@ -201,7 +173,7 @@ public class AuthUserController {
      * 退出登录
      */
     @PostMapping("/auth/exit-login")
-    public Result exitlogin(@RequestBody AuthUser user) {
+    public Result<SaResult> exitlogin(@RequestBody AuthUser user) {
         try {
             log.info("UserController.exitlogin.userEmail:{}", user.getEmail());
             Preconditions.checkArgument(!StringUtils.isBlank(user.getEmail()), "邮箱不能为空");

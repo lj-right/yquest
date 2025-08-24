@@ -44,15 +44,11 @@ public interface AuthUserService {
 
     AuthUser queryByEmail(AuthUser authUser);
 
-    SaTokenInfo doLogin(String validCode);
-
     Boolean sendEmail(AuthUser user);
 
     String getEmailcaptcha(AuthUser user);
 
-    SaTokenInfo namelogin(AuthUser user);
-
-    SaTokenInfo emaillogin(AuthUser user);
-
     AuthUser queryByName(AuthUser authUser);
+
+    SaTokenInfo doLogin(AuthUser user);
 }

@@ -44,7 +44,7 @@ public class AuthUser implements Serializable {
      */
     private String avatar;
     /**
-     * 状态 0启用 1禁用
+     * 登录方式 1 name 2 email
      */
     private Integer status;
     /**
