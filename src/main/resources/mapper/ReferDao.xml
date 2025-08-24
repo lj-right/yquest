@@ -124,6 +124,20 @@
         </where>
     </select>
 
+    <select id="countByCondition" resultType="java.lang.Integer">
+        select count(*) from refer
+        where is_deleted = 0
+    </select>
+
+    <select id="queryAllRefer" resultMap="ReferMap">
+        select
+        id, company, referCode, industry, name, email, sort, description, created_by, created_time, updated_by,
+        updated_time
+        from refer
+        where is_deleted = 0
+        limit #{start},#{pageSize}
+    </select>
+
     <!--新增所有列-->
     <insert id="insert" keyProperty="id" useGeneratedKeys="true">
         insert into refer(company, referCode, industry, name, email, sort, description, created_by, created_time,

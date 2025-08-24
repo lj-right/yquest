@@ -79,5 +79,8 @@ public interface ReferDao {
      */
     int deleteById(Long id);
 
+    int countByCondition(Refer refer);
+
+    List<Refer> queryAllRefer(@Param("start") int start, @Param("pageSize") Integer pageSize);
 }
 

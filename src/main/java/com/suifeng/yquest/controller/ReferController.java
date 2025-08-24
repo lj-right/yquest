@@ -1,5 +1,7 @@
 package com.suifeng.yquest.controller;
 
+import com.suifeng.yquest.api.common.PageResult;
+import com.suifeng.yquest.api.common.Result;
 import com.suifeng.yquest.entity.Refer;
 import com.suifeng.yquest.service.ReferService;
 import org.springframework.http.ResponseEntity;
@@ -49,19 +51,30 @@ public class ReferController {
      * @return 编辑结果
      */
     @PutMapping("/edit")
-    public ResponseEntity<Refer> edit(@RequestBody Refer refer) {
-        return ResponseEntity.ok(this.referService.update(refer));
+    public ResponseEntity<Boolean> edit(@RequestBody Refer refer) {
+        return ResponseEntity.ok(this.referService.update(refer)>0);
     }
 
     /**
      * 删除数据
-     *
-     * @param id 主键
-     * @return 删除是否成功
+     * 定时删除
+     * @param refer 实体
+     * @return 编辑结果
      */
     @DeleteMapping("/deleteById")
-    public ResponseEntity<Boolean> deleteById(Long id) {
-        return ResponseEntity.ok(this.referService.deleteById(id));
+    public ResponseEntity<Boolean> deleteById(@RequestBody Refer refer) {
+        return ResponseEntity.ok(this.referService.deleteById(refer) > 0);
+    }
+
+
+    /**
+     * 分页查询
+     * @param refer
+     * @return
+     */
+    @PostMapping("/queryPage")
+    public Result<PageResult<Refer>> queryPage(@RequestBody Refer refer){
+        return Result.ok(this.referService.queryReferPage(refer));
     }
 
 }

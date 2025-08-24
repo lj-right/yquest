@@ -1,5 +1,6 @@
 package com.suifeng.yquest.entity;
 
+import com.suifeng.yquest.api.common.PageInfo;
 import lombok.Data;
 
 import java.util.Date;
@@ -9,7 +10,7 @@ import java.io.Serializable;
  * (Refer)实体类
  */
 @Data
-public class Refer implements Serializable {
+public class Refer extends PageInfo implements Serializable {
     private static final long serialVersionUID = 593221499503852051L;
     /**
      * id

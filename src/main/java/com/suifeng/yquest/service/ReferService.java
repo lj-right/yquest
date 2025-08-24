@@ -1,5 +1,6 @@
 package com.suifeng.yquest.service;
 
+import com.suifeng.yquest.api.common.PageResult;
 import com.suifeng.yquest.entity.Refer;
 
 /**
@@ -30,14 +31,15 @@ public interface ReferService {
      * @param refer 实例对象
      * @return 实例对象
      */
-    Refer update(Refer refer);
+    Integer update(Refer refer);
 
     /**
      * 通过主键删除数据
      *
-     * @param id 主键
-     * @return 是否成功
+     * @param refer 实例对象
+     * @return 实例对象
      */
-    boolean deleteById(Long id);
+    Integer deleteById(Refer refer);
 
+    PageResult<Refer> queryReferPage(Refer refer);
 }
