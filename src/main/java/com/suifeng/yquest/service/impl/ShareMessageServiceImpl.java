@@ -1,63 +1,136 @@
 package com.suifeng.yquest.service.impl;
 
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.suifeng.yquest.api.common.PageInfo;
+import com.suifeng.yquest.api.common.PageResult;
+import com.suifeng.yquest.api.enums.IsDeletedFlagEnum;
+import com.suifeng.yquest.api.req.GetShareMessageReq;
+import com.suifeng.yquest.api.vo.ShareMessageVO;
+import com.suifeng.yquest.dao.ShareMessageMapper;
+import com.suifeng.yquest.entity.AuthUser;
 import com.suifeng.yquest.entity.ShareMessage;
-import com.suifeng.yquest.dao.ShareMessageDao;
+import com.suifeng.yquest.service.AuthUserService;
 import com.suifeng.yquest.service.ShareMessageService;
+import com.suifeng.yquest.utils.LoginUtil;
+import com.suifeng.yquest.websocket.ChickenSocket;
 import org.springframework.stereotype.Service;
+
 import javax.annotation.Resource;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
- * 信息提醒表(ShareMessage)表服务实现类
+ *
+ * 消息表 服务实现类
  */
-@Service("shareMessageService")
-public class ShareMessageServiceImpl implements ShareMessageService {
+@Service
+public class ShareMessageServiceImpl extends ServiceImpl<ShareMessageMapper, ShareMessage> implements ShareMessageService {
+
     @Resource
-    private ShareMessageDao shareMessageDao;
+    private ChickenSocket chickenSocket;
+    @Resource
+    private AuthUserService userRpc;
 
-    /**
-     * 通过ID查询单条数据
-     *
-     * @param id 主键
-     * @return 实例对象
-     */
     @Override
-    public ShareMessage queryById(Long id) {
-        return this.shareMessageDao.queryById(id);
+    public PageResult<ShareMessageVO> getMessages(GetShareMessageReq req) {
+
+        LambdaQueryWrapper<ShareMessage> query = Wrappers.<ShareMessage>lambdaQuery()
+                .eq(ShareMessage::getToId, LoginUtil.getLoginId())
+                .eq(ShareMessage::getIsRead, req.getIsRead())
+                .eq(ShareMessage::getIsDeleted, IsDeletedFlagEnum.UN_DELETED.getCode())
+                .orderByDesc(ShareMessage::getId);
+        PageInfo pageInfo = req.getPageInfo();
+        Page<ShareMessage> page = new Page<>(pageInfo.getPageNo(), pageInfo.getPageSize());
+        Page<ShareMessage> pageRes = super.page(page, query);
+        PageResult<ShareMessageVO> result = new PageResult<>();
+        List<ShareMessage> records = pageRes.getRecords();
+        if (CollectionUtils.isNotEmpty(records)) {
+            List<Long> ids = records.stream().map(ShareMessage::getId).collect(Collectors.toList());
+            LambdaUpdateWrapper<ShareMessage> update = Wrappers.<ShareMessage>lambdaUpdate().set(ShareMessage::getIsRead, 1).in(ShareMessage::getId, ids);
+            super.update(update);
+        }
+        List<ShareMessageVO> list = records.stream().map(item -> {
+            ShareMessageVO vo = new ShareMessageVO();
+            vo.setId(item.getId());
+            vo.setContent(JSON.parseObject(item.getContent()));
+            vo.setCreatedTime(item.getCreatedTime());
+            return vo;
+        }).collect(Collectors.toList());
+        result.setRecords(list);
+        result.setTotal((int) pageRes.getTotal());
+        result.setPageSize(pageInfo.getPageSize());
+        result.setPageNo(pageInfo.getPageNo());
+        return result;
+
     }
 
-
-    /**
-     * 新增数据
-     *
-     * @param shareMessage 实例对象
-     * @return 实例对象
-     */
     @Override
-    public ShareMessage insert(ShareMessage shareMessage) {
-        this.shareMessageDao.insert(shareMessage);
-        return shareMessage;
+    public void comment(String fromId, String toId, Long targetId) {
+
+        JSONObject message = new JSONObject();
+        // 1=评论 2=回复
+        message.put("msgType", "COMMENT");
+        message.put("msg", "评论了你的内容，快来看看吧");
+        message.put("targetId", targetId);
+        ShareMessage shareMessage = new ShareMessage();
+        shareMessage.setFromId(fromId);
+        shareMessage.setToId(toId);
+        shareMessage.setContent(message.toJSONString());
+        shareMessage.setIsRead(2);
+        shareMessage.setCreatedBy(fromId);
+        shareMessage.setCreatedTime(new Date());
+        shareMessage.setIsDeleted(IsDeletedFlagEnum.UN_DELETED.getCode());
+        ChickenSocket socket = chickenSocket.getChickenSocket(toId);
+        if (Objects.nonNull(socket)) {
+            chickenSocket.sendMessage(shareMessage.getContent(), socket.getSession());
+        }
+        super.save(shareMessage);
+
     }
 
-    /**
-     * 修改数据
-     *
-     * @param shareMessage 实例对象
-     * @return 实例对象
-     */
     @Override
-    public ShareMessage update(ShareMessage shareMessage) {
-        this.shareMessageDao.update(shareMessage);
-        return this.queryById(shareMessage.getId());
+    public void reply(String fromId, String toId, Long targetId) {
+
+        JSONObject message = new JSONObject();
+        // 1=评论 2=回复
+        message.put("msgType", "COMMENT_REPLY");
+        AuthUser authUser = new AuthUser();
+        authUser.setId(Long.parseLong(fromId));
+        message.put("msg", String.format("%s 回复了你的评论，快来看看吧！", userRpc.getUserInfo(authUser).getNickName()));
+        message.put("targetId", targetId);
+        ShareMessage shareMessage = new ShareMessage();
+        shareMessage.setFromId(fromId);
+        shareMessage.setToId(toId);
+        shareMessage.setContent(message.toJSONString());
+        shareMessage.setIsRead(2);
+        shareMessage.setCreatedBy(fromId);
+        shareMessage.setCreatedTime(new Date());
+        shareMessage.setIsDeleted(IsDeletedFlagEnum.UN_DELETED.getCode());
+        ChickenSocket socket = chickenSocket.getChickenSocket(toId);
+        if (Objects.nonNull(socket)) {
+            chickenSocket.sendMessage(shareMessage.getContent(), socket.getSession());
+        }
+        super.save(shareMessage);
+
     }
 
-    /**
-     * 通过主键删除数据
-     *
-     * @param id 主键
-     * @return 是否成功
-     */
     @Override
-    public boolean deleteById(Long id) {
-        return this.shareMessageDao.deleteById(id) > 0;
+    public Boolean unRead() {
+        LambdaQueryWrapper<ShareMessage> query = Wrappers.<ShareMessage>lambdaQuery()
+                .eq(ShareMessage::getToId, LoginUtil.getLoginId())
+                .eq(ShareMessage::getIsRead, 2)
+                .eq(ShareMessage::getIsDeleted, IsDeletedFlagEnum.UN_DELETED.getCode());
+        return super.count(query) > 0;
     }
+
 }

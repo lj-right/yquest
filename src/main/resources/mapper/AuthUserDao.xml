@@ -106,6 +106,17 @@
         </where>
     </select>
 
+    <select id="listUserInfoByIds" resultMap="AuthUserMap">
+        select
+        id, user_name, nick_name, email, phone, password, sex, avatar, status, introduce, ext_json, created_by,
+        created_time, updated_by, updated_time, is_deleted
+        from auth_user
+        where user_name in
+        <foreach collection="userNameList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
     <!--统计总行数-->
     <select id="count" resultType="java.lang.Long">
         select count(1)

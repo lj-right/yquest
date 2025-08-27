@@ -1,4 +1,4 @@
-package com.suifeng.yquest.redis;
+package com.suifeng.yquest.config.redis;
 
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;

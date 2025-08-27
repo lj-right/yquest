@@ -3,6 +3,10 @@ package com.suifeng.yquest.service;
 import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.util.SaResult;
 import com.suifeng.yquest.entity.AuthUser;
+import com.suifeng.yquest.entity.UserInfo;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * 用户信息表(AuthUser)表服务接口
@@ -51,4 +55,10 @@ public interface AuthUserService {
     AuthUser queryByName(AuthUser authUser);
 
     SaTokenInfo doLogin(AuthUser user);
+
+    UserInfo getUserInfo(AuthUser userName);
+
+    List<AuthUser> listUserInfoByIds(List<String> usernamesList);
+
+    Map<String, UserInfo> batchGetUserInfo(List<String> userNameList);
 }

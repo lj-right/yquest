@@ -4,7 +4,7 @@ import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
 import com.suifeng.yquest.api.enums.LoginInfoTypeEnum;
 import com.suifeng.yquest.entity.AuthUser;
-import com.suifeng.yquest.redis.RedisUtil;
+import com.suifeng.yquest.config.redis.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;

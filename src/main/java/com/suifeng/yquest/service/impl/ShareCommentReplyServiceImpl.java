@@ -1,63 +1,149 @@
 package com.suifeng.yquest.service.impl;
 
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.suifeng.yquest.api.enums.IsDeletedFlagEnum;
+import com.suifeng.yquest.api.req.GetShareCommentReq;
+import com.suifeng.yquest.api.req.RemoveShareCommentReq;
+import com.suifeng.yquest.api.req.SaveShareCommentReplyReq;
+import com.suifeng.yquest.api.vo.ShareCommentReplyVO;
+import com.suifeng.yquest.dao.ShareCommentReplyMapper;
+import com.suifeng.yquest.dao.ShareMomentMapper;
 import com.suifeng.yquest.entity.ShareCommentReply;
-import com.suifeng.yquest.dao.ShareCommentReplyDao;
+import com.suifeng.yquest.entity.ShareMoment;
+import com.suifeng.yquest.entity.UserInfo;
+import com.suifeng.yquest.service.AuthUserService;
 import com.suifeng.yquest.service.ShareCommentReplyService;
+import com.suifeng.yquest.utils.LoginUtil;
+import com.suifeng.yquest.utils.TreeUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
- * 评论回复表(ShareCommentReply)表服务实现类
+ *
+ * 评论及回复信息 服务实现类
  */
-@Service("shareCommentReplyService")
-public class ShareCommentReplyServiceImpl implements ShareCommentReplyService {
+@Service
+public class ShareCommentReplyServiceImpl extends ServiceImpl<ShareCommentReplyMapper, ShareCommentReply> implements ShareCommentReplyService {
+
     @Resource
-    private ShareCommentReplyDao shareCommentReplyDao;
+    private ShareMomentMapper shareMomentMapper;
 
-    /**
-     * 通过ID查询单条数据
-     *
-     * @param id 主键
-     * @return 实例对象
-     */
+    @Resource
+    private AuthUserService userRpc;
+
     @Override
-    public ShareCommentReply queryById(Long id) {
-        return this.shareCommentReplyDao.queryById(id);
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean saveComment(SaveShareCommentReplyReq req) {
+        ShareMoment moment = shareMomentMapper.selectById(req.getMomentId());
+        ShareCommentReply comment = new ShareCommentReply();
+        comment.setMomentId(req.getMomentId());
+        comment.setReplyType(req.getReplyType());
+        String loginId = LoginUtil.getLoginId();
+        // 1评论 2回复
+        if (req.getReplyType() == 1) {
+            comment.setParentId(-1L);
+            comment.setToId(req.getTargetId());
+            comment.setToUser(loginId);
+            comment.setToUserAuthor(Objects.nonNull(moment.getCreatedBy()) && loginId.equals(moment.getCreatedBy()) ? 1 : 0);
+        } else {
+            comment.setParentId(req.getTargetId());
+            comment.setReplyId(req.getTargetId());
+            comment.setReplyUser(loginId);
+            comment.setReplyAuthor(Objects.nonNull(moment.getCreatedBy()) && loginId.equals(moment.getCreatedBy()) ? 1 : 0);
+        }
+        comment.setContent(req.getContent());
+        if (!CollectionUtils.isEmpty(req.getPicUrlList())) {
+            comment.setPicUrls(JSON.toJSONString(req.getPicUrlList()));
+        }
+        comment.setCreatedBy(LoginUtil.getLoginId());
+        comment.setCreatedTime(new Date());
+        comment.setIsDeleted(IsDeletedFlagEnum.UN_DELETED.getCode());
+        shareMomentMapper.incrReplyCount(moment.getId(), 1);
+        return super.save(comment);
     }
 
-    /**
-     * 新增数据
-     *
-     * @param shareCommentReply 实例对象
-     * @return 实例对象
-     */
     @Override
-    public ShareCommentReply insert(ShareCommentReply shareCommentReply) {
-        this.shareCommentReplyDao.insert(shareCommentReply);
-        return shareCommentReply;
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean removeComment(RemoveShareCommentReq req) {
+        ShareCommentReply comment = getById(req.getId());
+        LambdaQueryWrapper<ShareCommentReply> query = Wrappers.<ShareCommentReply>lambdaQuery()
+                .eq(ShareCommentReply::getMomentId, comment.getMomentId())
+                .eq(ShareCommentReply::getIsDeleted, IsDeletedFlagEnum.UN_DELETED.getCode()).select(ShareCommentReply::getId,
+                        ShareCommentReply::getMomentId,
+                        ShareCommentReply::getReplyType,
+                        ShareCommentReply::getContent,
+                        ShareCommentReply::getPicUrls,
+                        ShareCommentReply::getCreatedBy,
+                        ShareCommentReply::getToUser,
+                        ShareCommentReply::getParentId);
+        List<ShareCommentReply> list = list(query);
+        List<ShareCommentReply> replyList = new ArrayList<>();
+        List<ShareCommentReply> tree = TreeUtils.buildTree(list);
+        for (ShareCommentReply reply : tree) {
+            TreeUtils.findAll(replyList, reply, req.getId());
+        }
+        // 关联子级对象及 moment 的回复数量
+        Set<Long> ids = replyList.stream().map(ShareCommentReply::getId).collect(Collectors.toSet());
+        LambdaUpdateWrapper<ShareCommentReply> update = Wrappers.<ShareCommentReply>lambdaUpdate()
+                .eq(ShareCommentReply::getMomentId, comment.getMomentId())
+                .in(ShareCommentReply::getId, ids);
+        ShareCommentReply updateEntity = new ShareCommentReply();
+        updateEntity.setIsDeleted(IsDeletedFlagEnum.DELETED.getCode());
+        int count = getBaseMapper().update(updateEntity, update);
+        shareMomentMapper.incrReplyCount(comment.getMomentId(), -count);
+        return true;
     }
 
-    /**
-     * 修改数据
-     *
-     * @param shareCommentReply 实例对象
-     * @return 实例对象
-     */
     @Override
-    public ShareCommentReply update(ShareCommentReply shareCommentReply) {
-        this.shareCommentReplyDao.update(shareCommentReply);
-        return this.queryById(shareCommentReply.getId());
+    public List<ShareCommentReplyVO> listComment(GetShareCommentReq req) {
+        LambdaQueryWrapper<ShareCommentReply> query = Wrappers.<ShareCommentReply>lambdaQuery()
+                .eq(ShareCommentReply::getMomentId, req.getId())
+                .eq(ShareCommentReply::getIsDeleted, IsDeletedFlagEnum.UN_DELETED.getCode())
+                .select(ShareCommentReply::getId,
+                        ShareCommentReply::getMomentId,
+                        ShareCommentReply::getReplyType,
+                        ShareCommentReply::getContent,
+                        ShareCommentReply::getPicUrls,
+                        ShareCommentReply::getCreatedBy,
+                        ShareCommentReply::getToUser,
+                        ShareCommentReply::getCreatedTime,
+                        ShareCommentReply::getParentId);
+        List<ShareCommentReply> list = list(query);
+        List<String> userNameList = list.stream().map(ShareCommentReply::getCreatedBy).distinct().collect(Collectors.toList());
+        Map<String, UserInfo> userInfoMap = userRpc.batchGetUserInfo(userNameList);
+        UserInfo defaultUser = new UserInfo();
+        List<ShareCommentReplyVO> voList = list.stream().map(item -> {
+            ShareCommentReplyVO vo = new ShareCommentReplyVO();
+            vo.setId(item.getId());
+            vo.setMomentId(item.getMomentId());
+            vo.setReplyType(item.getReplyType());
+            vo.setContent(item.getContent());
+            if (Objects.nonNull(item.getPicUrls())) {
+                vo.setPicUrlList(JSONArray.parseArray(item.getPicUrls(), String.class));
+            }
+            if (item.getReplyType() == 2) {
+                vo.setFromId(item.getCreatedBy());
+                vo.setToId(item.getToUser());
+            }
+            vo.setParentId(item.getParentId());
+            UserInfo user = userInfoMap.getOrDefault(item.getCreatedBy(), defaultUser);
+            vo.setUserName(user.getNickName());
+            vo.setAvatar(user.getAvatar());
+            vo.setCreatedTime(item.getCreatedTime().getTime());
+            return vo;
+        }).collect(Collectors.toList());
+        return TreeUtils.buildTree(voList);
     }
 
-    /**
-     * 通过主键删除数据
-     *
-     * @param id 主键
-     * @return 是否成功
-     */
-    @Override
-    public boolean deleteById(Long id) {
-        return this.shareCommentReplyDao.deleteById(id) > 0;
-    }
 }

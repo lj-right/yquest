@@ -1,63 +1,105 @@
 package com.suifeng.yquest.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.suifeng.yquest.api.enums.IsDeletedFlagEnum;
+import com.suifeng.yquest.api.req.RemoveShareCircleReq;
+import com.suifeng.yquest.api.req.SaveShareCircleReq;
+import com.suifeng.yquest.api.req.UpdateShareCircleReq;
+import com.suifeng.yquest.api.vo.ShareCircleVO;
+import com.suifeng.yquest.dao.ShareCircleMapper;
 import com.suifeng.yquest.entity.ShareCircle;
-import com.suifeng.yquest.dao.ShareCircleDao;
 import com.suifeng.yquest.service.ShareCircleService;
+import com.suifeng.yquest.utils.LoginUtil;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import java.time.Duration;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
- * 圈子表(ShareCircle)表服务实现类
+ *
+ * 圈子信息 服务实现类
  */
-@Service("shareCircleService")
-public class ShareCircleServiceImpl implements ShareCircleService {
-    @Resource
-    private ShareCircleDao shareCircleDao;
+@Service
+public class ShareCircleServiceImpl extends ServiceImpl<ShareCircleMapper, ShareCircle> implements ShareCircleService {
 
-    /**
-     * 通过ID查询单条数据
-     *
-     * @param id 主键
-     * @return 实例对象
-     */
+    private static final Cache<Integer, List<ShareCircleVO>> CACHE = Caffeine.newBuilder().initialCapacity(1)
+            .maximumSize(1).expireAfterWrite(Duration.ofSeconds(30)).build();
+
     @Override
-    public ShareCircle queryById(Long id) {
-        return this.shareCircleDao.queryById(id);
+    public List<ShareCircleVO> listResult() {
+        List<ShareCircleVO> res = CACHE.getIfPresent(1);
+        return Optional.ofNullable(res).orElseGet(() -> {
+            List<ShareCircle> list = super.list(Wrappers.<ShareCircle>lambdaQuery().eq(ShareCircle::getIsDeleted, IsDeletedFlagEnum.UN_DELETED.getCode()));
+            List<ShareCircle> parentList = list.stream().filter(item -> item.getParentId() == -1L).collect(Collectors.toList());
+            Map<Long, List<ShareCircle>> map = list.stream().collect(Collectors.groupingBy(ShareCircle::getParentId));
+            List<ShareCircleVO> collect = parentList.stream().map(item -> {
+                ShareCircleVO vo = new ShareCircleVO();
+                vo.setId(item.getId());
+                vo.setCircleName(item.getCircleName());
+                vo.setIcon(item.getIcon());
+                List<ShareCircle> shareCircles = map.get(item.getId());
+                if (CollectionUtils.isEmpty(shareCircles)) {
+                    vo.setChildren(Collections.emptyList());
+                } else {
+                    List<ShareCircleVO> children = shareCircles.stream().map(cItem -> {
+                        ShareCircleVO cVo = new ShareCircleVO();
+                        cVo.setId(cItem.getId());
+                        cVo.setCircleName(cItem.getCircleName());
+                        cVo.setIcon(cItem.getIcon());
+                        cVo.setChildren(Collections.emptyList());
+                        return cVo;
+                    }).collect(Collectors.toList());
+                    vo.setChildren(children);
+                }
+                return vo;
+            }).collect(Collectors.toList());
+            CACHE.put(1, collect);
+            return collect;
+        });
     }
 
-    /**
-     * 新增数据
-     *
-     * @param shareCircle 实例对象
-     * @return 实例对象
-     */
     @Override
-    public ShareCircle insert(ShareCircle shareCircle) {
-        this.shareCircleDao.insert(shareCircle);
-        return shareCircle;
+    public Boolean saveCircle(SaveShareCircleReq req) {
+        ShareCircle circle = new ShareCircle();
+        circle.setCircleName(req.getCircleName());
+        circle.setIcon(req.getIcon());
+        circle.setParentId(req.getParentId());
+        circle.setIsDeleted(IsDeletedFlagEnum.UN_DELETED.getCode());
+        circle.setCreatedTime(new Date());
+        circle.setCreatedBy(LoginUtil.getLoginId());
+        CACHE.invalidateAll();
+        return save(circle);
     }
 
-    /**
-     * 修改数据
-     *
-     * @param shareCircle 实例对象
-     * @return 实例对象
-     */
     @Override
-    public ShareCircle update(ShareCircle shareCircle) {
-        this.shareCircleDao.update(shareCircle);
-        return this.queryById(shareCircle.getId());
+    public Boolean updateCircle(UpdateShareCircleReq req) {
+        LambdaUpdateWrapper<ShareCircle> update = Wrappers.<ShareCircle>lambdaUpdate().eq(ShareCircle::getId, req.getId())
+                .eq(ShareCircle::getIsDeleted, IsDeletedFlagEnum.UN_DELETED.getCode())
+                .set(Objects.nonNull(req.getParentId()), ShareCircle::getParentId, req.getParentId())
+                .set(Objects.nonNull(req.getIcon()), ShareCircle::getIcon, req.getIcon())
+                .set(Objects.nonNull(req.getCircleName()), ShareCircle::getCircleName, req.getCircleName())
+                .set(ShareCircle::getUpdateBy, LoginUtil.getLoginId())
+                .set(ShareCircle::getUpdateTime, new Date());
+        boolean res = super.update(update);
+        CACHE.invalidateAll();
+        return res;
     }
 
-    /**
-     * 通过主键删除数据
-     *
-     * @param id 主键
-     * @return 是否成功
-     */
     @Override
-    public boolean deleteById(Long id) {
-        return this.shareCircleDao.deleteById(id) > 0;
+    public Boolean removeCircle(RemoveShareCircleReq req) {
+        boolean res = super.update(Wrappers.<ShareCircle>lambdaUpdate().eq(ShareCircle::getId, req.getId())
+                .eq(ShareCircle::getIsDeleted, IsDeletedFlagEnum.UN_DELETED.getCode())
+                .set(ShareCircle::getIsDeleted, IsDeletedFlagEnum.DELETED.getCode()));
+        super.update(Wrappers.<ShareCircle>lambdaUpdate().eq(ShareCircle::getParentId, req.getId())
+                .eq(ShareCircle::getIsDeleted, IsDeletedFlagEnum.UN_DELETED.getCode())
+                .set(ShareCircle::getIsDeleted, IsDeletedFlagEnum.DELETED.getCode()));
+        CACHE.invalidateAll();
+        return res;
     }
 }

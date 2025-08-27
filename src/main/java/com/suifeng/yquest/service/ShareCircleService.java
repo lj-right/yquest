@@ -1,43 +1,29 @@
 package com.suifeng.yquest.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.suifeng.yquest.api.req.RemoveShareCircleReq;
+import com.suifeng.yquest.api.req.SaveShareCircleReq;
+import com.suifeng.yquest.api.req.UpdateShareCircleReq;
+import com.suifeng.yquest.api.vo.ShareCircleVO;
 import com.suifeng.yquest.entity.ShareCircle;
 
+import java.util.List;
+
 /**
- * 圈子表(ShareCircle)表服务接口
+ * <p>
+ * 圈子信息 服务类
+ * </p>
+ *
+ * @author ChickenWing
+ * @since 2024/05/16
  */
-public interface ShareCircleService {
+public interface ShareCircleService extends IService<ShareCircle> {
 
-    /**
-     * 通过ID查询单条数据
-     *
-     * @param id 主键
-     * @return 实例对象
-     */
-    ShareCircle queryById(Long id);
+    List<ShareCircleVO> listResult();
 
+    Boolean saveCircle(SaveShareCircleReq req);
 
-    /**
-     * 新增数据
-     *
-     * @param shareCircle 实例对象
-     * @return 实例对象
-     */
-    ShareCircle insert(ShareCircle shareCircle);
+    Boolean updateCircle(UpdateShareCircleReq req);
 
-    /**
-     * 修改数据
-     *
-     * @param shareCircle 实例对象
-     * @return 实例对象
-     */
-    ShareCircle update(ShareCircle shareCircle);
-
-    /**
-     * 通过主键删除数据
-     *
-     * @param id 主键
-     * @return 是否成功
-     */
-    boolean deleteById(Long id);
-
+    Boolean removeCircle(RemoveShareCircleReq req);
 }

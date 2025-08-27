@@ -1,42 +1,28 @@
 package com.suifeng.yquest.service;
 
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.suifeng.yquest.api.req.GetShareCommentReq;
+import com.suifeng.yquest.api.req.RemoveShareCommentReq;
+import com.suifeng.yquest.api.req.SaveShareCommentReplyReq;
+import com.suifeng.yquest.api.vo.ShareCommentReplyVO;
 import com.suifeng.yquest.entity.ShareCommentReply;
+import java.util.List;
 
 /**
- * 评论回复表(ShareCommentReply)表服务接口
+ * <p>
+ * 评论及回复信息 服务类
+ * </p>
+ *
+ * @author ChickenWing
+ * @since 2024/05/16
  */
-public interface ShareCommentReplyService {
+public interface ShareCommentReplyService extends IService<ShareCommentReply> {
 
-    /**
-     * 通过ID查询单条数据
-     *
-     * @param id 主键
-     * @return 实例对象
-     */
-    ShareCommentReply queryById(Long id);
+    Boolean saveComment(SaveShareCommentReplyReq req);
 
-    /**
-     * 新增数据
-     *
-     * @param shareCommentReply 实例对象
-     * @return 实例对象
-     */
-    ShareCommentReply insert(ShareCommentReply shareCommentReply);
+    Boolean removeComment(RemoveShareCommentReq req);
 
-    /**
-     * 修改数据
-     *
-     * @param shareCommentReply 实例对象
-     * @return 实例对象
-     */
-    ShareCommentReply update(ShareCommentReply shareCommentReply);
-
-    /**
-     * 通过主键删除数据
-     *
-     * @param id 主键
-     * @return 是否成功
-     */
-    boolean deleteById(Long id);
+    List<ShareCommentReplyVO> listComment(GetShareCommentReq req);
 
 }

@@ -1,69 +1,134 @@
 package com.suifeng.yquest.controller;
 
+
+import com.alibaba.fastjson.JSON;
+import com.google.common.base.Preconditions;
+import com.suifeng.yquest.api.common.Result;
+import com.suifeng.yquest.api.req.RemoveShareCircleReq;
+import com.suifeng.yquest.api.req.SaveShareCircleReq;
+import com.suifeng.yquest.api.req.UpdateShareCircleReq;
+import com.suifeng.yquest.api.vo.ShareCircleVO;
 import com.suifeng.yquest.entity.ShareCircle;
 import com.suifeng.yquest.service.ShareCircleService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.http.ResponseEntity;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
+import java.util.Objects;
 
 /**
- * 圈子表(ShareCircle)表控制层
+ *
+ * 圈子信息 前端控制器
  */
+@Slf4j
 @RestController
-@RequestMapping("/shareCircle")
+@RequestMapping("/circle/share/circle")
 public class ShareCircleController {
-    /**
-     * 服务对象
-     */
+
     @Resource
     private ShareCircleService shareCircleService;
 
     /**
-     * 通过主键查询单条数据
-     *
-     * @param id 主键
-     * @return 单条数据
+     * 圈子查询
      */
-    @GetMapping("{id}")
-    public ResponseEntity<ShareCircle> queryById(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(this.shareCircleService.queryById(id));
+    @GetMapping(value = "/list")
+    public Result<List<ShareCircleVO>> listResult() {
+        try {
+            List<ShareCircleVO> result = shareCircleService.listResult();
+            if (log.isInfoEnabled()) {
+                log.info("圈子查询出参{}", JSON.toJSONString(result));
+            }
+            return Result.ok(result);
+        } catch (Exception e) {
+            log.error("圈子查询异常！错误原因{}", e.getMessage(), e);
+            return Result.fail("圈子查询异常！");
+        }
     }
 
     /**
-     * 新增数据
-     *
-     * @param shareCircle 实体
-     * @return 新增结果
+     * 新增圈子
      */
-    @PostMapping("/add")
-    public ResponseEntity<ShareCircle> add(@RequestBody ShareCircle shareCircle) {
-        return ResponseEntity.ok(this.shareCircleService.insert(shareCircle));
+    @PostMapping(value = "/save")
+    public Result<Boolean> save(@RequestBody SaveShareCircleReq req) {
+        try {
+            if (log.isInfoEnabled()) {
+                log.info("新增圈子入参{}", JSON.toJSONString(req));
+            }
+            Preconditions.checkArgument(Objects.nonNull(req), "参数不能为空！");
+            Preconditions.checkArgument(Objects.nonNull(req.getCircleName()), "圈子名称不能为空！");
+            Preconditions.checkArgument(Objects.nonNull(req.getIcon()), "圈子图标不能为空！");
+            if (req.getParentId() != -1) {
+                ShareCircle circle = shareCircleService.getById(req.getParentId());
+                Preconditions.checkArgument(Objects.nonNull(circle), "父级不存在！");
+            }
+            Boolean result = shareCircleService.saveCircle(req);
+            if (log.isInfoEnabled()) {
+                log.info("新增圈子{}", JSON.toJSONString(result));
+            }
+            return Result.ok(result);
+        } catch (IllegalArgumentException e) {
+            log.error("参数异常！错误原因{}", e.getMessage(), e);
+            return Result.fail(e.getMessage());
+        } catch (Exception e) {
+            log.error("新增圈子异常！错误原因{}", e.getMessage(), e);
+            return Result.fail("新增圈子异常！");
+        }
     }
 
     /**
-     * 编辑数据
-     *
-     * @param shareCircle 实体
-     * @return 编辑结果
+     * 修改圈子
      */
-    @PutMapping("/edit")
-    public ResponseEntity<ShareCircle> edit(@RequestBody ShareCircle shareCircle) {
-        return ResponseEntity.ok(this.shareCircleService.update(shareCircle));
+    @PostMapping(value = "/update")
+    public Result<Boolean> update(@RequestBody UpdateShareCircleReq req) {
+        try {
+            if (log.isInfoEnabled()) {
+                log.info("修改圈子入参{}", JSON.toJSONString(req));
+            }
+            Preconditions.checkArgument(Objects.nonNull(req), "参数不能为空！");
+            Preconditions.checkArgument(Objects.nonNull(req.getCircleName()), "圈子名称不能为空！");
+            if (Objects.nonNull(req.getParentId()) && req.getParentId() != -1) {
+                ShareCircle circle = shareCircleService.getById(req.getParentId());
+                Preconditions.checkArgument(Objects.nonNull(circle), "父级不存在！");
+            }
+            Boolean result = shareCircleService.updateCircle(req);
+            if (log.isInfoEnabled()) {
+                log.info("修改圈子{}", JSON.toJSONString(result));
+            }
+            return Result.ok(result);
+        } catch (IllegalArgumentException e) {
+            log.error("参数异常！错误原因{}", e.getMessage(), e);
+            return Result.fail(e.getMessage());
+        } catch (Exception e) {
+            log.error("修改圈子异常！错误原因{}", e.getMessage(), e);
+            return Result.fail("修改圈子异常！");
+        }
     }
 
+
     /**
-     * 删除数据
-     *
-     * @param id 主键
-     * @return 删除是否成功
+     * 删除圈子
      */
-    @DeleteMapping("/deleteById")
-    public ResponseEntity<Boolean> deleteById(Long id) {
-        return ResponseEntity.ok(this.shareCircleService.deleteById(id));
+    @PostMapping(value = "/remove")
+    public Result<Boolean> remove(@RequestBody RemoveShareCircleReq req) {
+        try {
+            if (log.isInfoEnabled()) {
+                log.info("删除圈子入参{}", JSON.toJSONString(req));
+            }
+            Preconditions.checkArgument(Objects.nonNull(req), "参数不能为空！");
+            Preconditions.checkArgument(Objects.nonNull(req.getId()), "圈子ID！");
+            Boolean result = shareCircleService.removeCircle(req);
+            if (log.isInfoEnabled()) {
+                log.info("删除圈子{}", JSON.toJSONString(result));
+            }
+            return Result.ok(result);
+        } catch (IllegalArgumentException e) {
+            log.error("参数异常！错误原因{}", e.getMessage(), e);
+            return Result.fail(e.getMessage());
+        } catch (Exception e) {
+            log.error("删除圈子异常！错误原因{}", e.getMessage(), e);
+            return Result.fail("删除圈子异常！");
+        }
     }
 
 }
-

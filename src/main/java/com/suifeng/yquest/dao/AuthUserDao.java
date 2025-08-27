@@ -82,5 +82,9 @@ public interface AuthUserDao {
     AuthUser queryByEmail(AuthUser authUser);
 
     AuthUser queryByName(AuthUser authUser);
+
+    List<AuthUser> queryAllByLimit(AuthUser authUser);
+
+    List<AuthUser> listUserInfoByIds(List<String> userList);
 }
 

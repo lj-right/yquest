@@ -1,55 +1,73 @@
 package com.suifeng.yquest.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.Date;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
- * 信息提醒表(ShareMessage)实体类
+ *
+ * 消息表
  */
 @Data
+@TableName("share_message")
 public class ShareMessage implements Serializable {
-    private static final long serialVersionUID = 445517594160472063L;
+
+    private static final long serialVersionUID = 1L;
+
     /**
      * 主键
      */
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
+
     /**
-     * 回复人id
+     * 来自人
      */
     private String fromId;
+
     /**
-     * 被回复人id
+     * 送达人
      */
     private String toId;
+
     /**
-     * 回复内容
+     * 消息内容
      */
     private String content;
+
     /**
-     * 是否已读
+     * 是否被阅读 1是 2否
      */
     private Integer isRead;
+
     /**
      * 创建人
      */
     private String createdBy;
+
     /**
      * 创建时间
      */
     private Date createdTime;
+
     /**
      * 更新人
      */
-    private String updatedBy;
+    private String updateBy;
+
     /**
      * 更新时间
      */
-    private Date updatedTime;
+    private Date updateTime;
+
     /**
-     * 是否删除
+     * 是否被删除 0为删除 1已删除
      */
     private Integer isDeleted;
 }
-

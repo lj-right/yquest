@@ -1,67 +1,76 @@
 package com.suifeng.yquest.controller;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.google.common.base.Preconditions;
+import com.suifeng.yquest.api.common.Result;
+import com.suifeng.yquest.api.enums.IsDeletedFlagEnum;
 import com.suifeng.yquest.entity.SensitiveWords;
 import com.suifeng.yquest.service.SensitiveWordsService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
- * 敏感词表(SensitiveWords)表控制层
+ * 圈子信息 前端控制器
  */
+@Slf4j
 @RestController
-@RequestMapping("/sensitiveWords")
+@RequestMapping("/circle/sensitive/words")
 public class SensitiveWordsController {
-    /**
-     * 服务对象
-     */
+
     @Resource
     private SensitiveWordsService sensitiveWordsService;
 
     /**
-     * 通过主键查询单条数据
-     *
-     * @param id 主键
-     * @return 单条数据
+     * 新增敏感词
      */
-    @GetMapping("{id}")
-    public ResponseEntity<SensitiveWords> queryById(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(this.sensitiveWordsService.queryById(id));
+    @GetMapping(value = "/save")
+    public Result<Boolean> save(String words, Integer type) {
+        try {
+            if (log.isInfoEnabled()) {
+                log.info("新增敏感词入参{}", words);
+            }
+            Preconditions.checkArgument(StringUtils.isNotBlank(words), "参数不能为空！");
+            SensitiveWords data = new SensitiveWords();
+            data.setType(type);
+            data.setIsDeleted(IsDeletedFlagEnum.UN_DELETED.getCode());
+            data.setWords(words);
+            return Result.ok(sensitiveWordsService.save(data));
+        } catch (IllegalArgumentException e) {
+            log.error("参数异常！错误原因{}", e.getMessage(), e);
+            return Result.fail(e.getMessage());
+        } catch (Exception e) {
+            log.error("新增敏感词异常！错误原因{}", e.getMessage(), e);
+            return Result.fail("新增敏感词异常！");
+        }
     }
 
     /**
-     * 新增数据
-     *
-     * @param sensitiveWords 实体
-     * @return 新增结果
+     * 删除敏感词
      */
-    @PostMapping("/add")
-    public ResponseEntity<SensitiveWords> add(@RequestBody SensitiveWords sensitiveWords) {
-        return ResponseEntity.ok(this.sensitiveWordsService.insert(sensitiveWords));
-    }
-
-    /**
-     * 编辑数据
-     *
-     * @param sensitiveWords 实体
-     * @return 编辑结果
-     */
-    @PutMapping("/edit")
-    public ResponseEntity<SensitiveWords> edit(@RequestBody SensitiveWords sensitiveWords) {
-        return ResponseEntity.ok(this.sensitiveWordsService.update(sensitiveWords));
-    }
-
-    /**
-     * 删除数据
-     *
-     * @param id 主键
-     * @return 删除是否成功
-     */
-    @DeleteMapping("/deleteById")
-    public ResponseEntity<Boolean> deleteById(Long id) {
-        return ResponseEntity.ok(this.sensitiveWordsService.deleteById(id));
+    @GetMapping(value = "/remove")
+    public Result<Boolean> remove(Long id) {
+        try {
+            if (log.isInfoEnabled()) {
+                log.info("删除敏感词入参{}", id);
+            }
+            Preconditions.checkArgument(Objects.nonNull(id), "参数不能为空！");
+            LambdaUpdateWrapper<SensitiveWords> update = Wrappers.<SensitiveWords>lambdaUpdate().set(SensitiveWords::getIsDeleted, IsDeletedFlagEnum.DELETED.getCode())
+                    .eq(SensitiveWords::getId, id).eq(SensitiveWords::getIsDeleted, IsDeletedFlagEnum.UN_DELETED.getCode());
+            return Result.ok(sensitiveWordsService.update(update));
+        } catch (IllegalArgumentException e) {
+            log.error("参数异常！错误原因{}", e.getMessage(), e);
+            return Result.fail(e.getMessage());
+        } catch (Exception e) {
+            log.error("删除敏感词异常！错误原因{}", e.getMessage(), e);
+            return Result.fail("删除敏感词异常！");
+        }
     }
 
 }
-

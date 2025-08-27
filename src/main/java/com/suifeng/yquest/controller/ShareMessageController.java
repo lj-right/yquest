@@ -1,46 +1,67 @@
 package com.suifeng.yquest.controller;
 
-import com.suifeng.yquest.entity.ShareMessage;
+
+import com.alibaba.fastjson.JSON;
+import com.google.common.base.Preconditions;
+import com.suifeng.yquest.api.common.PageResult;
+import com.suifeng.yquest.api.common.Result;
+import com.suifeng.yquest.api.req.GetShareMessageReq;
+import com.suifeng.yquest.api.vo.ShareMessageVO;
 import com.suifeng.yquest.service.ShareMessageService;
-import org.springframework.http.ResponseEntity;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
- * 信息提醒表(ShareMessage)表控制层
+ *
+ * 动态信息 前端控制器
  */
+@Slf4j
 @RestController
-@RequestMapping("/shareMessage")
+@RequestMapping("/circle/share/message")
 public class ShareMessageController {
-    /**
-     * 服务对象
-     */
+
     @Resource
     private ShareMessageService shareMessageService;
 
-
     /**
-     * 通过主键查询单条数据
-     *
-     * @param id 主键
-     * @return 单条数据
+     * 分页查询消息
      */
-    @GetMapping("{id}")
-    public ResponseEntity<ShareMessage> queryById(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(this.shareMessageService.queryById(id));
+    @GetMapping(value = "/unRead")
+    public Result<Boolean> unRead() {
+        try {
+            return Result.ok(shareMessageService.unRead());
+        } catch (Exception e) {
+            log.error("消息异常！错误原因{}", e.getMessage(), e);
+            return Result.fail("消息异常！");
+        }
     }
 
     /**
-     * 新增数据
-     *
-     * @param shareMessage 实体
-     * @return 新增结果
+     * 分页查询消息
      */
-    @PostMapping("/add")
-    public ResponseEntity<ShareMessage> add(@RequestBody ShareMessage shareMessage) {
-        return ResponseEntity.ok(this.shareMessageService.insert(shareMessage));
+    @PostMapping(value = "/getMessages")
+    public Result<PageResult<ShareMessageVO>> getMessages(@RequestBody GetShareMessageReq req) {
+        try {
+            if (log.isInfoEnabled()) {
+                log.info("消息入参{}", JSON.toJSONString(req));
+            }
+            Preconditions.checkArgument(!Objects.isNull(req), "参数不能为空！");
+            PageResult<ShareMessageVO> result = shareMessageService.getMessages(req);
+            if (log.isInfoEnabled()) {
+                log.info("消息出参{}", JSON.toJSONString(result));
+            }
+            return Result.ok(result);
+        } catch (IllegalArgumentException e) {
+            log.error("参数异常！错误原因{}", e.getMessage(), e);
+            return Result.fail(e.getMessage());
+        } catch (Exception e) {
+            log.error("消息异常！错误原因{}", e.getMessage(), e);
+            return Result.fail("消息异常！");
+        }
     }
+
 
 }
-

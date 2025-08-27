@@ -1,4 +1,4 @@
-package com.suifeng.yquest.redis;
+package com.suifeng.yquest.config.redis;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.Cursor;

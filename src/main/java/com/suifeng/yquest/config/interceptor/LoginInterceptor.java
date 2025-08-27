@@ -1,6 +1,6 @@
-package com.suifeng.yquest.interceptor;
+package com.suifeng.yquest.config.interceptor;
 
-import com.suifeng.yquest.context.LoginContextHolder;
+import com.suifeng.yquest.config.context.LoginContextHolder;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.web.servlet.HandlerInterceptor;

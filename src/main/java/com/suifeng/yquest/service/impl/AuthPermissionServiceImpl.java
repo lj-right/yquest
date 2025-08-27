@@ -5,7 +5,7 @@ import com.google.gson.Gson;
 import com.suifeng.yquest.api.enums.IsDeletedFlagEnum;
 import com.suifeng.yquest.entity.AuthPermission;
 import com.suifeng.yquest.dao.AuthPermissionDao;
-import com.suifeng.yquest.redis.RedisUtil;
+import com.suifeng.yquest.config.redis.RedisUtil;
 import com.suifeng.yquest.service.AuthPermissionService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
