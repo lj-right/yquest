@@ -1,9 +1,7 @@
 package com.suifeng.yquest.api.adapter;
 
-import org.apache.tomcat.jni.FileInfo;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.InputStream;
-import java.util.List;
 
 /**
  * 文件存储适配器

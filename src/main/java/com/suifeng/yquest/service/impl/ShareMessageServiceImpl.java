@@ -80,7 +80,7 @@ public class ShareMessageServiceImpl extends ServiceImpl<ShareMessageMapper, Sha
         JSONObject message = new JSONObject();
         // 1=评论 2=回复
         message.put("msgType", "COMMENT");
-        message.put("msg", "评论了你的内容，快来看看吧");
+        message.put("msg", "有人评论了你的内容，快来看看吧");
         message.put("targetId", targetId);
         ShareMessage shareMessage = new ShareMessage();
         shareMessage.setFromId(fromId);
@@ -105,7 +105,7 @@ public class ShareMessageServiceImpl extends ServiceImpl<ShareMessageMapper, Sha
         // 1=评论 2=回复
         message.put("msgType", "COMMENT_REPLY");
         AuthUser authUser = new AuthUser();
-        authUser.setId(Long.parseLong(fromId));
+        authUser.setUserName(fromId);
         message.put("msg", String.format("%s 回复了你的评论，快来看看吧！", userRpc.getUserInfo(authUser).getNickName()));
         message.put("targetId", targetId);
         ShareMessage shareMessage = new ShareMessage();

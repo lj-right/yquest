@@ -29,8 +29,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- *
- * 回复及评论 前端控制器
+ * 回复及评论
  */
 @Slf4j
 @RestController
@@ -87,7 +86,7 @@ public class ShareCommentController {
 
 
     /**
-     * 删除鸡圈评论内容
+     * 删除圈子评论内容
      */
     @PostMapping(value = "/remove")
     public Result<Boolean> remove(@RequestBody RemoveShareCommentReq req) {
@@ -119,21 +118,21 @@ public class ShareCommentController {
     public Result<List<ShareCommentReplyVO>> list(@RequestBody GetShareCommentReq req) {
         try {
             if (log.isInfoEnabled()) {
-                log.info("获取鸡圈评论内容入参{}", JSON.toJSONString(req));
+                log.info("获取圈子评论内容入参{}", JSON.toJSONString(req));
             }
             Preconditions.checkArgument(Objects.nonNull(req), "参数不能为空！");
             Preconditions.checkArgument(Objects.nonNull(req.getId()), "内容ID不能为空！");
             List<ShareCommentReplyVO> result = shareCommentReplyService.listComment(req);
             if (log.isInfoEnabled()) {
-                log.info("获取鸡圈评论内容{}", JSON.toJSONString(result));
+                log.info("获取圈子评论内容{}", JSON.toJSONString(result));
             }
             return Result.ok(result);
         } catch (IllegalArgumentException e) {
             log.error("参数异常！错误原因{}", e.getMessage(), e);
             return Result.fail(e.getMessage());
         } catch (Exception e) {
-            log.error("获取鸡圈评论内容异常！错误原因{}", e.getMessage(), e);
-            return Result.fail("获取鸡圈评论内容异常！");
+            log.error("获取圈子评论内容异常！错误原因{}", e.getMessage(), e);
+            return Result.fail("获取圈子评论内容异常！");
         }
     }
 

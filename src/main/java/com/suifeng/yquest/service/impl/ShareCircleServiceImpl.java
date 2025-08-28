@@ -84,8 +84,8 @@ public class ShareCircleServiceImpl extends ServiceImpl<ShareCircleMapper, Share
                 .set(Objects.nonNull(req.getParentId()), ShareCircle::getParentId, req.getParentId())
                 .set(Objects.nonNull(req.getIcon()), ShareCircle::getIcon, req.getIcon())
                 .set(Objects.nonNull(req.getCircleName()), ShareCircle::getCircleName, req.getCircleName())
-                .set(ShareCircle::getUpdateBy, LoginUtil.getLoginId())
-                .set(ShareCircle::getUpdateTime, new Date());
+                .set(ShareCircle::getUpdatedBy, LoginUtil.getLoginId())
+                .set(ShareCircle::getUpdatedTime, new Date());
         boolean res = super.update(update);
         CACHE.invalidateAll();
         return res;

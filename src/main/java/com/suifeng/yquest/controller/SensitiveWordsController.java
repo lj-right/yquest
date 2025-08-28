@@ -17,7 +17,7 @@ import javax.annotation.Resource;
 import java.util.Objects;
 
 /**
- * 圈子信息 前端控制器
+ * 圈子信息
  */
 @Slf4j
 @RestController

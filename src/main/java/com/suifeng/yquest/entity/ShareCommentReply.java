@@ -93,12 +93,12 @@ public class ShareCommentReply extends TreeNode implements Serializable {
     /**
      * 更新人
      */
-    private String updateBy;
+    private String updatedBy;
 
     /**
      * 更新时间
      */
-    private Date updateTime;
+    private Date updatedTime;
 
     /**
      * 是否被删除 0为删除 1已删除

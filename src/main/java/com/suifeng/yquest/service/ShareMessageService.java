@@ -8,12 +8,8 @@ import com.suifeng.yquest.api.vo.ShareMessageVO;
 import com.suifeng.yquest.entity.ShareMessage;
 
 /**
- * <p>
- * 消息表 服务类
- * </p>
  *
- * @author ChickenWing
- * @since 2024/05/18
+ * 消息表 服务类
  */
 public interface ShareMessageService extends IService<ShareMessage> {
 

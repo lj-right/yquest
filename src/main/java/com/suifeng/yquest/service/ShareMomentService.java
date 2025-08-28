@@ -10,12 +10,8 @@ import com.suifeng.yquest.api.vo.ShareMomentVO;
 import com.suifeng.yquest.entity.ShareMoment;
 
 /**
- * <p>
- * 动态信息 服务类
- * </p>
  *
- * @author ChickenWing
- * @since 2024/05/16
+ * 动态信息 服务类
  */
 public interface ShareMomentService extends IService<ShareMoment> {
 

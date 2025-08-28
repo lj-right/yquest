@@ -101,7 +101,7 @@ public class ShareCommentReplyServiceImpl extends ServiceImpl<ShareCommentReplyM
         ShareCommentReply updateEntity = new ShareCommentReply();
         updateEntity.setIsDeleted(IsDeletedFlagEnum.DELETED.getCode());
         int count = getBaseMapper().update(updateEntity, update);
-        shareMomentMapper.incrReplyCount(comment.getMomentId(), -count);
+        shareMomentMapper.incrReplyCount(comment.getMomentId(),  -count);
         return true;
     }
 

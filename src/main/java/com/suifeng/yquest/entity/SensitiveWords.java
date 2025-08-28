@@ -36,7 +36,7 @@ public class SensitiveWords implements Serializable {
     private Integer type;
 
     /**
-     * 是否被删除 0为删除 1已删除
+     * 是否被删除 0未删除 1已删除
      */
     private Integer isDeleted;
 }

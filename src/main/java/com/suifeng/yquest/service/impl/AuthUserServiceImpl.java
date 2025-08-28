@@ -2,18 +2,17 @@ package com.suifeng.yquest.service.impl;
 
 import cn.dev33.satoken.secure.SaSecureUtil;
 import cn.dev33.satoken.stp.SaTokenInfo;
-import cn.dev33.satoken.stp.StpUtil;
 import cn.zvo.email.Email;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.google.gson.Gson;
 import com.suifeng.yquest.api.enums.AuthUserStatusEnum;
 import com.suifeng.yquest.api.enums.IsDeletedFlagEnum;
-import com.suifeng.yquest.api.enums.LoginInfoTypeEnum;
 import com.suifeng.yquest.constants.AuthConstant;
 import com.suifeng.yquest.entity.*;
 import com.suifeng.yquest.dao.AuthUserDao;
 import com.suifeng.yquest.handler.LoginTypeHandler;
 import com.suifeng.yquest.handler.LoginTypeHandlerFactory;
-import com.suifeng.yquest.redis.RedisUtil;
+import com.suifeng.yquest.config.redis.RedisUtil;
 import com.suifeng.yquest.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -21,10 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -260,5 +256,51 @@ public class AuthUserServiceImpl implements AuthUserService {
         }
         SaTokenInfo saTokenInfo = loginHandler.login(user);
         return saTokenInfo;
+    }
+
+
+    @Override
+    public UserInfo getUserInfo(AuthUser user) {
+        AuthUser authUser = new AuthUser();
+        authUser.setUserName(user.getUserName());
+        List<AuthUser> result = userDao.queryAllByLimit(authUser);
+        if (CollectionUtils.isEmpty(result)) {
+            return new UserInfo();
+        }
+        UserInfo userInfo = new UserInfo();
+        AuthUser data = result.get(0);
+        userInfo.setUserName(data.getUserName());
+        userInfo.setNickName(data.getNickName());
+        userInfo.setAvatar(data.getAvatar());
+        return userInfo;
+    }
+
+
+    @Override
+    public List<AuthUser> listUserInfoByIds(List<String> usernamesList) {
+        List<AuthUser> result = userDao.listUserInfoByIds(usernamesList);
+        if (CollectionUtils.isEmpty(result)) {
+            return Collections.emptyList();
+        }
+        return result;
+    }
+
+    @Override
+    public Map<String, UserInfo> batchGetUserInfo(List<String> userNameList) {
+        if (CollectionUtils.isEmpty(userNameList)) {
+            return Collections.emptyMap();
+        }
+        List<AuthUser> listResult = this.listUserInfoByIds(userNameList);
+        if (Objects.isNull(listResult) || CollectionUtils.isEmpty(listResult)) {
+            return Collections.emptyMap();
+        }
+        Map<String, UserInfo> result = new HashMap<>();
+        AuthUser data = listResult.get(0);
+        UserInfo userInfo = new UserInfo();
+            userInfo.setUserName(data.getUserName());
+            userInfo.setNickName(data.getNickName());
+            userInfo.setAvatar(data.getAvatar());
+            result.put(userInfo.getUserName(), userInfo);
+        return result;
     }
 }

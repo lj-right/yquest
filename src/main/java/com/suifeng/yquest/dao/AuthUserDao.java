@@ -85,6 +85,6 @@ public interface AuthUserDao {
 
     List<AuthUser> queryAllByLimit(AuthUser authUser);
 
-    List<AuthUser> listUserInfoByIds(List<String> userList);
+    List<AuthUser> listUserInfoByIds(@Param("userNameList")List<String> userList);
 }
 

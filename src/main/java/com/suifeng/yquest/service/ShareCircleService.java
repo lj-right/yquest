@@ -10,12 +10,8 @@ import com.suifeng.yquest.entity.ShareCircle;
 import java.util.List;
 
 /**
- * <p>
- * 圈子信息 服务类
- * </p>
  *
- * @author ChickenWing
- * @since 2024/05/16
+ * 圈子信息 服务类
  */
 public interface ShareCircleService extends IService<ShareCircle> {
 

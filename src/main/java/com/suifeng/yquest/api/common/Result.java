@@ -44,4 +44,11 @@ public class Result <T>{
         result.setDate(date);
         return result;
     }
+    public static  Result fail (Integer code ,String message){
+        Result result = new Result();
+        result.setSuccess(false);
+        result.setCode(code);
+        result.setMessage(message);
+        return result;
+    }
 }

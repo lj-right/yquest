@@ -3,7 +3,7 @@ package com.suifeng.yquest.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.suifeng.yquest.entity.ShareMoment;
-import org.springframework.data.repository.query.Param;
+import org.apache.ibatis.annotations.Param;
 
 /**
  *

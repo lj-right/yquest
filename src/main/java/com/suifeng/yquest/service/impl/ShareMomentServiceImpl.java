@@ -35,7 +35,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- *
  * 动态信息 服务实现类
  */
 @Service

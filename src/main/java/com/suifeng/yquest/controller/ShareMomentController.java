@@ -22,7 +22,7 @@ import javax.annotation.Resource;
 import java.util.Objects;
 
 /**
- * 动态信息 前端控制器
+ * 动态信息
  */
 @Slf4j
 @RestController
