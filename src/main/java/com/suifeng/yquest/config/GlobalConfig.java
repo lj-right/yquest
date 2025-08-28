@@ -1,8 +1,9 @@
-package  com.suifeng.yquest.config;
+package com.suifeng.yquest.config;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.suifeng.yquest.config.interceptor.LoginInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -20,6 +21,7 @@ public class GlobalConfig extends WebMvcConfigurationSupport {
     /**
      * 通过继承WebMvcConfigurationSupport并重写configureMessageConverters方法，
      * 实现了全局的HTTP消息转换器配置，简化了后续开发中对JSON处理的配置需求。
+     *
      * @param converters
      */
     @Override
@@ -33,9 +35,14 @@ public class GlobalConfig extends WebMvcConfigurationSupport {
 
     @Override
     protected void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new LoginInterceptor())
+                .addPathPatterns("/**")
+                .excludePathPatterns("/authUser/auth/login")
+                .excludePathPatterns("/authUser/no-auth/register")
+                .excludePathPatterns("/authUser/email/send");
     }
 
-    private MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter(){
+    private MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
         ObjectMapper objectMapper = new ObjectMapper();
         //ObjectMapper被配置为在序列化空对象时
         //不会抛出异常（FAIL_ON_EMPTY_BEANS设置为false），增强了系统的健壮性。
