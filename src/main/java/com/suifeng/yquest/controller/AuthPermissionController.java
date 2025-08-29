@@ -58,7 +58,7 @@ public class AuthPermissionController {
     /**
      * 查询用户权限
      */
-    @GetMapping("/getPermission")
+    @PostMapping("/getPermission")
     public Result<Boolean> getPermission(@RequestBody AuthPermission authPermission) {
         try {
             log.info("PermissionController.getPermission.id:{}",authPermission.getId());
