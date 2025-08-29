@@ -6,6 +6,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +18,6 @@ import java.util.stream.Stream;
 
 /**
  * RedisUtil工具类
- *
  */
 @Component
 @Slf4j
@@ -25,13 +26,27 @@ public class RedisUtil {
     @Resource
     private RedisTemplate redisTemplate;
 
+    public static RedisTemplate redis;
+
     private static final String CACHE_KEY_SEPARATOR = ".";
+
+    @PostConstruct
+    public void getRedisTemplate() {
+        redis = this.redisTemplate;
+    }
 
     /**
      * 构建缓存key
      */
     public String buildKey(String... strObjs) {
         return Stream.of(strObjs).collect(Collectors.joining(CACHE_KEY_SEPARATOR));
+    }
+
+    /**
+     * 构建tokenkey
+     */
+    public String buildTokenKey(String... strObjs) {
+        return Stream.of(strObjs).collect(Collectors.joining(":"));
     }
 
     /**

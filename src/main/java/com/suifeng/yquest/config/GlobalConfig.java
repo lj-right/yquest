@@ -37,9 +37,9 @@ public class GlobalConfig extends WebMvcConfigurationSupport {
     protected void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new LoginInterceptor())
                 .addPathPatterns("/**")
-                .excludePathPatterns("/authUser/auth/login")
-                .excludePathPatterns("/authUser/no-auth/register")
-                .excludePathPatterns("/authUser/email/send");
+                .excludePathPatterns("/authUser/auth/login",
+                "/authUser/no-auth/register",
+                "/authUser/email/send");
     }
 
     private MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {

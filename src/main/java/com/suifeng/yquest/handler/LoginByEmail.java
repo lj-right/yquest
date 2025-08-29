@@ -26,6 +26,7 @@ public class LoginByEmail implements LoginTypeHandler{
 
     @Override
     public SaTokenInfo login(AuthUser user) {
+        //这里用我们留存的ExtJson来验证码是否正确
         if (StringUtils.isBlank(user.getEmail()) && StringUtils.isBlank(user.getExtJson())) {
             return null;
         }
