@@ -2,8 +2,8 @@ server:
   port: 5555
 minio:
   url: http://27.106.112.214:9000
-  accessKey: asd1625414624
-  secretKey: asd1625414624
+  accessKey: minioadmin
+  secretKey: minioadmin
 storage:
   service:
     type: minio

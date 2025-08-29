@@ -22,14 +22,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- *
  * 圈子信息 服务实现类
  */
 @Service
 public class ShareCircleServiceImpl extends ServiceImpl<ShareCircleMapper, ShareCircle> implements ShareCircleService {
 
-    private static final Cache<Integer, List<ShareCircleVO>> CACHE = Caffeine.newBuilder().initialCapacity(1)
-            .maximumSize(1).expireAfterWrite(Duration.ofSeconds(30)).build();
+    private static final Cache<Integer, List<ShareCircleVO>> CACHE =
+                    Caffeine.newBuilder().initialCapacity(1)
+                    .maximumSize(1)
+                    .expireAfterWrite(Duration.ofSeconds(120))
+                    .build();
 
     @Override
     public List<ShareCircleVO> listResult() {
