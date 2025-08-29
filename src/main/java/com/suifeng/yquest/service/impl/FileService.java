@@ -41,6 +41,6 @@ public class FileService {
          * @return
          */
         public void deletefile(AuthUser user) {
-            storageAdapter.deleteObject("yquest",user.getAvatar());
+            storageAdapter.deleteObject("suifeng",user.getAvatar());
         }
 }

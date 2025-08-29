@@ -10,6 +10,7 @@ import com.suifeng.yquest.service.AuthUserService;
 import com.suifeng.yquest.service.impl.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,6 +32,9 @@ public class AuthUserController {
 
     @Resource
     private FileService fileService;
+
+    @Value("${storage.service.type}")
+    private String storageType;
 
     /**
      * 通过email查询单条数据
@@ -129,12 +133,12 @@ public class AuthUserController {
     @PostMapping("/user/uploadFile")
     public Result<String> uploadFile(@RequestBody MultipartFile uploadFile) {
         try {
-            return Result.ok(fileService.uploadFile(uploadFile,"yquest","avator"));
+            return Result.ok(fileService.uploadFile(uploadFile,"suifeng","icon"));
         } catch (IllegalArgumentException e) {
             log.error("参数异常！错误原因{}", e.getMessage(), e);
             return Result.fail(e.getMessage());
         } catch (Exception e) {
-            log.error("发送邮箱验证码错误原因{}", e.getMessage(), e);
+            log.error("上传文件错误原因{}", e.getMessage(), e);
             return Result.fail(e.getMessage());
         }
     }
