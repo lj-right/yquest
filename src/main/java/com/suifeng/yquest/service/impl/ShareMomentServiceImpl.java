@@ -106,7 +106,10 @@ public class ShareMomentServiceImpl extends ServiceImpl<ShareMomentMapper, Share
     public Boolean removeMoment(RemoveShareMomentReq req) {
         ShareCommentReply updateEntity = new ShareCommentReply();
         updateEntity.setIsDeleted(IsDeletedFlagEnum.DELETED.getCode());
-        LambdaUpdateWrapper<ShareCommentReply> update = Wrappers.<ShareCommentReply>lambdaUpdate().eq(ShareCommentReply::getMomentId, req.getId());
+        LambdaUpdateWrapper<ShareCommentReply> update = Wrappers.<ShareCommentReply>lambdaUpdate()
+                .eq(ShareCommentReply::getMomentId, req.getId())
+                .eq(ShareCommentReply::getIsDeleted,IsDeletedFlagEnum.UN_DELETED.getCode())
+                .set(ShareCommentReply::getIsDeleted, IsDeletedFlagEnum.DELETED.getCode());
         shareCommentReplyMapper.update(updateEntity, update);
         return super.update(Wrappers.<ShareMoment>lambdaUpdate()
                 .eq(ShareMoment::getId, req.getId())
