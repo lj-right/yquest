@@ -4,7 +4,6 @@ package com.suifeng.yquest.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -30,14 +29,17 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- *
  * 消息表 服务实现类
  */
 @Service
 public class ShareMessageServiceImpl extends ServiceImpl<ShareMessageMapper, ShareMessage> implements ShareMessageService {
 
     @Resource
+    private ShareMessageMapper shareMessageMapper;
+
+    @Resource
     private ChickenSocket chickenSocket;
+
     @Resource
     private AuthUserService userRpc;
 
@@ -56,8 +58,7 @@ public class ShareMessageServiceImpl extends ServiceImpl<ShareMessageMapper, Sha
         List<ShareMessage> records = pageRes.getRecords();
         if (CollectionUtils.isNotEmpty(records)) {
             List<Long> ids = records.stream().map(ShareMessage::getId).collect(Collectors.toList());
-            LambdaUpdateWrapper<ShareMessage> update = Wrappers.<ShareMessage>lambdaUpdate().set(ShareMessage::getIsRead, 1).in(ShareMessage::getId, ids);
-            super.update(update);
+            shareMessageMapper.updateReaded(ids);
         }
         List<ShareMessageVO> list = records.stream().map(item -> {
             ShareMessageVO vo = new ShareMessageVO();
