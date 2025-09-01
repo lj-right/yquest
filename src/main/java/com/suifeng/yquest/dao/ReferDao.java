@@ -82,5 +82,9 @@ public interface ReferDao {
     int countByCondition(Refer refer);
 
     List<Refer> queryAllRefer(@Param("start") int start, @Param("pageSize") Integer pageSize);
+
+    int countByDelCondition(Refer refer);
+
+    List<Refer> queryAllDelRefer(@Param("start") int start, @Param("pageSize") Integer pageSize);
 }
 

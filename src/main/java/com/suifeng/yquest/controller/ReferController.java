@@ -14,6 +14,7 @@ import javax.annotation.Resource;
  */
 @RestController
 @RequestMapping("/refer")
+@CrossOrigin
 public class ReferController {
     /**
      * 服务对象
@@ -75,6 +76,16 @@ public class ReferController {
     @PostMapping("/queryPage")
     public Result<PageResult<Refer>> queryPage(@RequestBody Refer refer){
         return Result.ok(this.referService.queryReferPage(refer));
+    }
+
+    /**
+     * 分页查询待审核列表
+     * @param refer
+     * @return
+     */
+    @PostMapping("/manageReferPage")
+    public Result<PageResult<Refer>> manageReferPage(@RequestBody Refer refer){
+        return Result.ok(this.referService.manageReferPage(refer));
     }
 
 }

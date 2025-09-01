@@ -80,4 +80,21 @@ public class ReferServiceImpl implements ReferService {
         pageResult.setTotal(count);
         return pageResult;
     }
+
+    @Override
+    public PageResult<Refer> manageReferPage(Refer refer) {
+        PageResult<Refer> pageResult = new PageResult<>();
+        pageResult.setPageNo(refer.getPageNo());
+        pageResult.setPageSize(refer.getPageSize());
+        int start = (refer.getPageNo() - 1) * refer.getPageSize();
+
+        int count = referDao.countByDelCondition(refer);
+        if(count == 0){
+            return pageResult;
+        }
+        List<Refer> referList =  referDao.queryAllDelRefer(start,refer.getPageSize());
+        pageResult.setRecords(referList);
+        pageResult.setTotal(count);
+        return pageResult;
+    }
 }

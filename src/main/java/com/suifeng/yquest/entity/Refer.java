@@ -45,6 +45,10 @@ public class Refer extends PageInfo implements Serializable {
      */
     private String description;
     /**
+     * 内推地址
+     */
+    private String url;
+    /**
      * 创建人
      */
     private String createdBy;

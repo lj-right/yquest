@@ -42,4 +42,6 @@ public interface ReferService {
     Integer deleteById(Refer refer);
 
     PageResult<Refer> queryReferPage(Refer refer);
+
+    PageResult<Refer> manageReferPage(Refer refer);
 }

@@ -11,6 +11,7 @@
         <result property="email" column="email" jdbcType="VARCHAR"/>
         <result property="sort" column="sort" jdbcType="INTEGER"/>
         <result property="description" column="description" jdbcType="VARCHAR"/>
+        <result property="url" column="url" jdbcType="VARCHAR"/>
         <result property="createdBy" column="created_by" jdbcType="VARCHAR"/>
         <result property="createdTime" column="created_time" jdbcType="TIMESTAMP"/>
         <result property="updatedBy" column="updated_by" jdbcType="VARCHAR"/>
@@ -21,7 +22,7 @@
     <!--查询单个-->
     <select id="queryById" resultMap="ReferMap">
         select
-        id, company, referCode, industry, name, email, sort, description, created_by, created_time, updated_by,
+        id, company, referCode, industry, name, email, sort, description, url, created_by, created_time, updated_by,
         updated_time, is_deleted
         from refer
         where id = #{id}
@@ -30,7 +31,7 @@
     <!--查询指定行数据-->
     <select id="queryAllByLimit" resultMap="ReferMap">
         select
-        id, company, referCode, industry, name, email, sort, description, created_by, created_time, updated_by,
+        id, company, referCode, industry, name, email, sort, description, url, created_by, created_time, updated_by,
         updated_time, is_deleted
         from refer
         <where>
@@ -58,6 +59,9 @@
             <if test="description != null and description != ''">
                 and description = #{description}
             </if>
+            <if test="url != null and url != ''">
+                and url = #{url}
+            </if>
             <if test="createdBy != null and createdBy != ''">
                 and created_by = #{createdBy}
             </if>
@@ -74,7 +78,6 @@
                 and is_deleted = #{isDeleted}
             </if>
         </where>
-        limit #{pageable.offset}, #{pageable.pageSize}
     </select>
 
     <!--统计总行数-->
@@ -106,6 +109,9 @@
             <if test="description != null and description != ''">
                 and description = #{description}
             </if>
+            <if test="url != null and url != ''">
+                and url = #{url}
+            </if>
             <if test="createdBy != null and createdBy != ''">
                 and created_by = #{createdBy}
             </if>
@@ -131,40 +137,53 @@
 
     <select id="queryAllRefer" resultMap="ReferMap">
         select
-        id, company, referCode, industry, name, email, sort, description, created_by, created_time, updated_by,
+        id, company, referCode, industry, name, email, sort, description,url, created_by, created_time, updated_by,
         updated_time
         from refer
         where is_deleted = 0
         limit #{start},#{pageSize}
     </select>
+    <select id="countByDelCondition" resultType="java.lang.Integer">
+        select count(*) from refer
+        where is_deleted = 1
+    </select>
+
+    <select id="queryAllDelRefer" resultMap="ReferMap">
+        select
+        id, company, referCode, industry, name, email, sort, description,url, created_by, created_time, updated_by,
+        updated_time
+        from refer
+        where is_deleted = 1
+        limit #{start},#{pageSize}
+    </select>
 
     <!--新增所有列-->
     <insert id="insert" keyProperty="id" useGeneratedKeys="true">
-        insert into refer(company, referCode, industry, name, email, sort, description, created_by, created_time,
+        insert into refer(company, referCode, industry, name, email, sort, description, url, created_by, created_time,
         updated_by, updated_time, is_deleted)
-        values (#{company}, #{refercode}, #{industry}, #{name}, #{email}, #{sort}, #{description}, #{createdBy},
+        values (#{company}, #{refercode}, #{industry}, #{name}, #{email}, #{sort}, #{description}, #{url}, #{createdBy},
         #{createdTime}, #{updatedBy}, #{updatedTime}, #{isDeleted})
     </insert>
 
     <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
-        insert into refer(company, referCode, industry, name, email, sort, description, created_by, created_time,
+        insert into refer(company, referCode, industry, name, email, sort, description, url, created_by, created_time,
         updated_by, updated_time, is_deleted)
         values
         <foreach collection="entities" item="entity" separator=",">
             (#{entity.company}, #{entity.refercode}, #{entity.industry}, #{entity.name}, #{entity.email},
-            #{entity.sort}, #{entity.description}, #{entity.createdBy}, #{entity.createdTime}, #{entity.updatedBy},
-            #{entity.updatedTime}, #{entity.isDeleted})
+            #{entity.sort}, #{entity.description}, #{entity.url}, #{entity.createdBy}, #{entity.createdTime},
+            #{entity.updatedBy}, #{entity.updatedTime}, #{entity.isDeleted})
         </foreach>
     </insert>
 
     <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
-        insert into refer(company, referCode, industry, name, email, sort, description, created_by, created_time,
+        insert into refer(company, referCode, industry, name, email, sort, description, url, created_by, created_time,
         updated_by, updated_time, is_deleted)
         values
         <foreach collection="entities" item="entity" separator=",">
             (#{entity.company}, #{entity.refercode}, #{entity.industry}, #{entity.name}, #{entity.email},
-            #{entity.sort}, #{entity.description}, #{entity.createdBy}, #{entity.createdTime}, #{entity.updatedBy},
-            #{entity.updatedTime}, #{entity.isDeleted})
+            #{entity.sort}, #{entity.description}, #{entity.url}, #{entity.createdBy}, #{entity.createdTime},
+            #{entity.updatedBy}, #{entity.updatedTime}, #{entity.isDeleted})
         </foreach>
         on duplicate key update
         company = values(company),
@@ -174,6 +193,7 @@
         email = values(email),
         sort = values(sort),
         description = values(description),
+        url = values(url),
         created_by = values(created_by),
         created_time = values(created_time),
         updated_by = values(updated_by),
@@ -205,6 +225,9 @@
             </if>
             <if test="description != null and description != ''">
                 description = #{description},
+            </if>
+            <if test="url != null and url != ''">
+                url = #{url},
             </if>
             <if test="createdBy != null and createdBy != ''">
                 created_by = #{createdBy},
