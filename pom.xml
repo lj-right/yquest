@@ -214,8 +214,8 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
                 <configuration>
-                    <mainClass>com.suifeng.yquest.CardApplication</mainClass>
-                    <skip>true</skip>
+                    <mainClass>com.suifeng.yquest.YQuestApplication</mainClass>
+                    <skip>false</skip>
                 </configuration>
                 <executions>
                     <execution>

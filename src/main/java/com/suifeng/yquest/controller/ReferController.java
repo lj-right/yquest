@@ -1,5 +1,7 @@
 package com.suifeng.yquest.controller;
 
+
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.suifeng.yquest.api.common.PageResult;
 import com.suifeng.yquest.api.common.Result;
 import com.suifeng.yquest.entity.Refer;
@@ -83,6 +85,7 @@ public class ReferController {
      * @param refer
      * @return
      */
+    @SaCheckPermission("manage_user")
     @PostMapping("/manageReferPage")
     public Result<PageResult<Refer>> manageReferPage(@RequestBody Refer refer){
         return Result.ok(this.referService.manageReferPage(refer));

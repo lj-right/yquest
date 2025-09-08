@@ -23,6 +23,7 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("/authUser")
 @Slf4j
+@CrossOrigin
 public class AuthUserController {
     /**
      * 服务对象

@@ -10,9 +10,9 @@ storage:
 spring:
   datasource:
     username: root
-    password: bOOI5bjXRLYNMMhxG1rrD9rnocqf2CgqS+Hie4qmdJ2JYXHXE+ksYS8PspzbzQHz64FS/mc5Mzhha4RLFzEPbw==
+    password: xQW/+EemeeYkAyGMyL4U2Labmj0saDjHtkbJOS/LfI10b0lYGBDdvg03aOC8DO6O/fyYrOFssBB2XefboQAVDA==
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/yquest?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8&useSSL=true
+    url: jdbc:mysql://27.106.112.214:3306/yquest?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8&useSSL=true
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
       initial-size: 20
@@ -62,7 +62,7 @@ spring:
         min-evictable-idle-time-millis: 300000
 logging:
   config: classpath:log4j2-spring.xml
-publicKey:  MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBANZHQPyYplZNJER5CBlUJRQTdnQeUZe6NvdIZ3Y2fbUeUEBIbKAIFfvCtuN2cEYXWCwNypMiD7WvTCWm64lgKocCAwEAAQ==
+publicKey:  MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAMiEuaG88631+cEw9T90XYmiZT+RK3zaNxS1qxPcnufUhqsENdxAZlk1qaMtP8qC9bV2Mqlf78MmS6bhl+jSk08CAwEAAQ==
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
