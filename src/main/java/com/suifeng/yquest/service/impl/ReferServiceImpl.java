@@ -81,6 +81,11 @@ public class ReferServiceImpl implements ReferService {
         return pageResult;
     }
 
+    /**
+     * 用于后台审核新内推内容
+     * @param refer
+     * @return
+     */
     @Override
     public PageResult<Refer> manageReferPage(Refer refer) {
         PageResult<Refer> pageResult = new PageResult<>();
@@ -93,6 +98,23 @@ public class ReferServiceImpl implements ReferService {
             return pageResult;
         }
         List<Refer> referList =  referDao.queryAllDelRefer(start,refer.getPageSize());
+        pageResult.setRecords(referList);
+        pageResult.setTotal(count);
+        return pageResult;
+    }
+
+    @Override
+    public PageResult<Refer> searchByMessage(Refer refer) {
+        PageResult<Refer> pageResult = new PageResult<>();
+        pageResult.setPageNo(refer.getPageNo());
+        pageResult.setPageSize(refer.getPageSize());
+        int start = (refer.getPageNo() - 1) * refer.getPageSize();
+
+        int count = referDao.countByCondition(refer);
+        if(count == 0){
+            return pageResult;
+        }
+        List<Refer> referList =  referDao.searchByMessage(start,refer.getPageSize());
         pageResult.setRecords(referList);
         pageResult.setTotal(count);
         return pageResult;

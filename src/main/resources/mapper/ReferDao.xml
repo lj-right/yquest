@@ -156,6 +156,15 @@
         where is_deleted = 1
         limit #{start},#{pageSize}
     </select>
+    <select id="searchByMessage" resultMap="ReferMap">
+        select
+        id, company, referCode, industry, name, email, sort, description,url, created_by, created_time, updated_by,
+        updated_time
+        from refer
+        where is_deleted = 0
+        and company like concat('%',#{company},'%')
+        limit #{start},#{pageSize}
+    </select>
 
     <!--新增所有列-->
     <insert id="insert" keyProperty="id" useGeneratedKeys="true">

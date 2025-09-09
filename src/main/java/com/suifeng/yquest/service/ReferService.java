@@ -44,4 +44,6 @@ public interface ReferService {
     PageResult<Refer> queryReferPage(Refer refer);
 
     PageResult<Refer> manageReferPage(Refer refer);
+
+    PageResult<Refer> searchByMessage(Refer refer);
 }

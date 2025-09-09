@@ -90,6 +90,16 @@ public class ReferController {
     public Result<PageResult<Refer>> manageReferPage(@RequestBody Refer refer){
         return Result.ok(this.referService.manageReferPage(refer));
     }
+    /**
+     * 分页搜索审核列表
+     * @param refer
+     * @return
+     */
+    @SaCheckPermission("manage_user")
+    @PostMapping("/manageReferPage")
+    public Result<PageResult<Refer>> searchByMessage(@RequestBody Refer refer){
+        return Result.ok(this.referService.searchByMessage(refer));
+    }
 
 }
 
