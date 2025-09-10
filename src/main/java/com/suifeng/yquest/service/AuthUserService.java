@@ -1,7 +1,6 @@
 package com.suifeng.yquest.service;
 
 import cn.dev33.satoken.stp.SaTokenInfo;
-import cn.dev33.satoken.util.SaResult;
 import com.suifeng.yquest.entity.AuthUser;
 import com.suifeng.yquest.entity.UserInfo;
 
@@ -61,4 +60,6 @@ public interface AuthUserService {
     List<AuthUser> listUserInfoByIds(List<String> usernamesList);
 
     Map<String, UserInfo> batchGetUserInfo(List<String> userNameList);
+
+    Boolean isLogin();
 }

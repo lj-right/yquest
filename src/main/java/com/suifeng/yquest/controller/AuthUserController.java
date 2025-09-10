@@ -192,5 +192,10 @@ public class AuthUserController {
             return Result.fail(e.getMessage());
         }
     }
+
+    @GetMapping("/auth/isLogin")
+    public Result<Boolean> isLogin(){
+       return Result.ok(authUserService.isLogin());
+    }
 }
 

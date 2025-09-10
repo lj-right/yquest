@@ -2,6 +2,7 @@ package com.suifeng.yquest.service.impl;
 
 import cn.dev33.satoken.secure.SaSecureUtil;
 import cn.dev33.satoken.stp.SaTokenInfo;
+import cn.dev33.satoken.stp.StpUtil;
 import cn.zvo.email.Email;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.google.gson.Gson;
@@ -90,7 +91,7 @@ public class AuthUserServiceImpl implements AuthUserService {
             user.setPassword(SaSecureUtil.md5BySalt(user.getPassword(), salt));
         }
         if (StringUtils.isBlank(user.getNickName())) {
-            user.setNickName("fans");
+            user.setNickName(user.getNickName());
         }
         user.setUserName(SaSecureUtil.md5BySalt(user.getEmail(), salt));
         user.setStatus(AuthUserStatusEnum.OPEN.getCode());
@@ -241,7 +242,15 @@ public class AuthUserServiceImpl implements AuthUserService {
         String result = redisUtil.get(redisUtil.buildKey(LOGIN_PREFIX, String.valueOf(user.getEmail())));
         return result;
     }
-
+    /**
+     * 校验用户是否登录
+     *
+     * @return
+     */
+    @Override
+    public Boolean isLogin() {
+        return (Boolean)StpUtil.isLogin();
+    }
 
     /**
      * 工厂+策略实现统一登录
