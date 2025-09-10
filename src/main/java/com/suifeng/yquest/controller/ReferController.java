@@ -95,8 +95,7 @@ public class ReferController {
      * @param refer
      * @return
      */
-    @SaCheckPermission("manage_user")
-    @PostMapping("/manageReferPage")
+    @PostMapping("/searchByMessage")
     public Result<PageResult<Refer>> searchByMessage(@RequestBody Refer refer){
         return Result.ok(this.referService.searchByMessage(refer));
     }

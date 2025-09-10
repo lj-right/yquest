@@ -114,7 +114,7 @@ public class ReferServiceImpl implements ReferService {
         if(count == 0){
             return pageResult;
         }
-        List<Refer> referList =  referDao.searchByMessage(start,refer.getPageSize());
+        List<Refer> referList =  referDao.searchByMessage(start,refer.getPageSize(),refer.getCompany());
         pageResult.setRecords(referList);
         pageResult.setTotal(count);
         return pageResult;

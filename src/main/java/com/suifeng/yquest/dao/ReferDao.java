@@ -87,6 +87,6 @@ public interface ReferDao {
 
     List<Refer> queryAllDelRefer(@Param("start") int start, @Param("pageSize") Integer pageSize);
 
-    List<Refer> searchByMessage(@Param("start") int start, @Param("pageSize") Integer pageSize);
+    List<Refer> searchByMessage(@Param("start") int start, @Param("pageSize") Integer pageSize,@Param("company") String company);
 }
 
