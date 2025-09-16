@@ -217,11 +217,18 @@ public class AuthUserServiceImpl implements AuthUserService {
      */
     @Override
     public Boolean sendEmail(AuthUser user) {
-        String host = "smtp.163.com";
-        String username = "XXX@163.com"; //您的163邮箱
-        String password = "XXX";
-        Email mail = new Email(host, username, password); //创建
         String email = user.getEmail();
+        // 验证码频率限制
+        String sendLimitKey = redisUtil.buildKey("send_limit", email);
+        boolean canSend = redisUtil.setNx(sendLimitKey, "1", 2L, TimeUnit.MINUTES);
+        if (!canSend) {
+            return false; // 2分钟内不允许重复发送
+        }
+
+        String host = "smtp.163.com";
+        String username = "18973513695@163.com"; //您的163邮箱
+        String password = "NGNwr435B28YkGJ2";
+        Email mail = new Email(host, username, password); //创建
         Random random = new Random();
         int verificationCode = random.nextInt(900000) + 100000;
         String codeKey = redisUtil.buildKey(LOGIN_PREFIX, user.getEmail());
