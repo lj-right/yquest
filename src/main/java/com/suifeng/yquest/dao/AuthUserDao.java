@@ -86,5 +86,7 @@ public interface AuthUserDao {
     List<AuthUser> queryAllByLimit(AuthUser authUser);
 
     List<AuthUser> listUserInfoByIds(@Param("userNameList")List<String> userList);
+
+    String queryNickNameByEmail(String email);
 }
 

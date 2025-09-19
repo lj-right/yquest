@@ -105,12 +105,13 @@ public class ReferServiceImpl implements ReferService {
 
     @Override
     public PageResult<Refer> searchByMessage(Refer refer) {
+        refer.setIsDeleted(IsDeletedFlagEnum.UN_DELETED.getCode());
         PageResult<Refer> pageResult = new PageResult<>();
         pageResult.setPageNo(refer.getPageNo());
         pageResult.setPageSize(refer.getPageSize());
         int start = (refer.getPageNo() - 1) * refer.getPageSize();
 
-        int count = referDao.countByCondition(refer);
+        int count = referDao.countBySearch(refer);
         if(count == 0){
             return pageResult;
         }

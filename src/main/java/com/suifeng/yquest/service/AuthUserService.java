@@ -62,4 +62,6 @@ public interface AuthUserService {
     Map<String, UserInfo> batchGetUserInfo(List<String> userNameList);
 
     Boolean isLogin();
+
+    String queryNickNameByEmail(String email);
 }

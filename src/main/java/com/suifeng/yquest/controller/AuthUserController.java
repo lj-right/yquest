@@ -51,6 +51,13 @@ public class AuthUserController {
     public Result<AuthUser> queryByName(@RequestBody AuthUser authUser) {
         return Result.ok(authUserService.queryByName(authUser));
     }
+    /**
+     * 通过email获取nickname
+     */
+    @GetMapping("/queryNickNameByEmail")
+    public Result<String> queryNickNameByEmail(@RequestParam("email") String email) {
+        return Result.ok(authUserService.queryNickNameByEmail(email));
+    }
 
     /**
      * 注册用户

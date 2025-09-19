@@ -186,6 +186,14 @@ public class AuthUserServiceImpl implements AuthUserService {
         authUser.setIsDeleted(IsDeletedFlagEnum.UN_DELETED.getCode());
         return userDao.queryByName(authUser);
     }
+    /**
+     * 根据邮箱查询用户别名 NickName
+     *
+     */
+    @Override
+    public String queryNickNameByEmail(String email) {
+        return userDao.queryNickNameByEmail(email);
+    }
 
     /**
      * 扫码登录
