@@ -2,10 +2,12 @@ package com.suifeng.yquest.controller;
 
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import com.google.common.base.Preconditions;
 import com.suifeng.yquest.api.common.PageResult;
 import com.suifeng.yquest.api.common.Result;
 import com.suifeng.yquest.entity.Refer;
 import com.suifeng.yquest.service.ReferService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,8 +45,8 @@ public class ReferController {
      * @return 新增结果
      */
     @PostMapping("/add")
-    public ResponseEntity<Refer> add(@RequestBody Refer refer) {
-        return ResponseEntity.ok(this.referService.insert(refer));
+    public Result<Boolean> add(@RequestBody Refer refer) {
+        return Result.ok(this.referService.insert(refer));
     }
 
     /**
@@ -54,8 +56,8 @@ public class ReferController {
      * @return 编辑结果
      */
     @PutMapping("/edit")
-    public ResponseEntity<Boolean> edit(@RequestBody Refer refer) {
-        return ResponseEntity.ok(this.referService.update(refer)>0);
+    public Result<Boolean> edit(@RequestBody Refer refer) {
+        return Result.ok(this.referService.update(refer));
     }
 
     /**
@@ -88,7 +90,18 @@ public class ReferController {
     @SaCheckPermission("manage_user")
     @PostMapping("/manageReferPage")
     public Result<PageResult<Refer>> manageReferPage(@RequestBody Refer refer){
-        return Result.ok(this.referService.manageReferPage(refer));
+        try {
+            Preconditions.checkArgument(!StringUtils.isBlank(refer.getCompany()), "公司名称不能为空");
+            Preconditions.checkArgument(!StringUtils.isBlank(refer.getRefercode()), "内推码不能为空");
+            Preconditions.checkArgument(!StringUtils.isBlank(refer.getIndustry()), "行业不能为空");
+            Preconditions.checkArgument(!StringUtils.isBlank(refer.getName()), "发起人不能为空");
+            Preconditions.checkArgument(!StringUtils.isBlank(refer.getEmail()), "发起人邮箱不能为空");
+            Preconditions.checkArgument(!StringUtils.isBlank(refer.getDescription()), "描述不能为空");
+            Preconditions.checkArgument(!StringUtils.isBlank(refer.getUrl()), "内推链接不能为空");
+            return Result.ok(this.referService.manageReferPage(refer));
+        } catch (Exception e) {
+            return Result.fail("新内推提交失败");
+        }
     }
     /**
      * 分页搜索审核列表

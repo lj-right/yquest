@@ -8,6 +8,7 @@ import com.suifeng.yquest.service.ReferService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -36,10 +37,10 @@ public class ReferServiceImpl implements ReferService {
      * @return 实例对象
      */
     @Override
-    public Refer insert(Refer refer) {
+    public Boolean insert(Refer refer) {
         refer.setIsDeleted(IsDeletedFlagEnum.DELETED.getCode()); //用于审核
-        this.referDao.insert(refer);
-        return refer;
+        refer.setCreatedTime(new Date());
+        return this.referDao.insert(refer) > 0;
     }
 
     /**
@@ -49,8 +50,8 @@ public class ReferServiceImpl implements ReferService {
      * @return 实例对象
      */
     @Override
-    public Integer update(Refer refer) {
-        return this.referDao.update(refer);
+    public Boolean update(Refer refer) {
+        return this.referDao.update(refer) >0;
     }
 
     /**

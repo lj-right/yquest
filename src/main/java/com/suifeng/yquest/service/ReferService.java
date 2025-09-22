@@ -23,7 +23,7 @@ public interface ReferService {
      * @param refer 实例对象
      * @return 实例对象
      */
-    Refer insert(Refer refer);
+    Boolean insert(Refer refer);
 
     /**
      * 修改数据
@@ -31,7 +31,7 @@ public interface ReferService {
      * @param refer 实例对象
      * @return 实例对象
      */
-    Integer update(Refer refer);
+    Boolean update(Refer refer);
 
     /**
      * 通过主键删除数据
