@@ -1,6 +1,7 @@
 package com.suifeng.yquest.service;
 
 import cn.dev33.satoken.stp.SaTokenInfo;
+import com.suifeng.yquest.api.common.PageResult;
 import com.suifeng.yquest.entity.AuthUser;
 import com.suifeng.yquest.entity.UserInfo;
 
@@ -64,4 +65,6 @@ public interface AuthUserService {
     Boolean isLogin();
 
     String queryNickNameByEmail(String email);
+
+    PageResult<AuthUser> queryPage(AuthUser authUser);
 }

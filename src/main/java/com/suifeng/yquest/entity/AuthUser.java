@@ -1,5 +1,6 @@
 package com.suifeng.yquest.entity;
 
+import com.suifeng.yquest.api.common.PageInfo;
 import lombok.Data;
 
 import java.util.Date;
@@ -9,7 +10,7 @@ import java.io.Serializable;
  * 用户信息表(AuthUser)实体类
  */
 @Data
-public class AuthUser implements Serializable {
+public class AuthUser extends PageInfo implements Serializable {
     private static final long serialVersionUID = -48428390573994316L;
     /**
      * 主键id

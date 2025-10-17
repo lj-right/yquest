@@ -191,7 +191,7 @@
         limit #{start},#{pageSize}
     </select>
     <select id="countByDelCondition" resultType="java.lang.Integer">
-        select count(*) from refer
+        select count(id) from refer
         where is_deleted = 1
     </select>
 

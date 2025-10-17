@@ -3,15 +3,14 @@ package com.suifeng.yquest.controller;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.base.Preconditions;
+import com.suifeng.yquest.api.common.PageResult;
 import com.suifeng.yquest.api.common.Result;
 import com.suifeng.yquest.api.enums.IsDeletedFlagEnum;
 import com.suifeng.yquest.entity.SensitiveWords;
 import com.suifeng.yquest.service.SensitiveWordsService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.Objects;
@@ -70,6 +69,46 @@ public class SensitiveWordsController {
         } catch (Exception e) {
             log.error("删除敏感词异常！错误原因{}", e.getMessage(), e);
             return Result.fail("删除敏感词异常！");
+        }
+    }
+
+    /**
+     * 更新敏感词
+     */
+    @PostMapping(value = "/update")
+    public Result<Boolean> update(@RequestBody SensitiveWords sensitiveWords) {
+        try {
+            if (log.isInfoEnabled()) {
+                log.info("修改敏感词入参{}", sensitiveWords);
+            }
+            Preconditions.checkArgument(Objects.nonNull(sensitiveWords.getId()), "id参数不能为空！");
+            Preconditions.checkArgument(Objects.nonNull(sensitiveWords.getWords()), "敏感词参数不能为空！");
+            Preconditions.checkArgument(Objects.nonNull(sensitiveWords.getType()), "类型参数不能为空！");
+            LambdaUpdateWrapper<SensitiveWords> update = Wrappers.<SensitiveWords>lambdaUpdate()
+                    .eq(SensitiveWords::getId, sensitiveWords.getId())
+                    .set(SensitiveWords::getWords, sensitiveWords.getWords())
+                    .set(SensitiveWords::getType, sensitiveWords.getType())
+                    .eq(SensitiveWords::getIsDeleted, IsDeletedFlagEnum.UN_DELETED.getCode());
+            return Result.ok(sensitiveWordsService.update(update));
+        } catch (IllegalArgumentException e) {
+            log.error("参数异常！错误原因{}", e.getMessage(), e);
+            return Result.fail(e.getMessage());
+        } catch (Exception e) {
+            log.error("修改敏感词异常！错误原因{}", e.getMessage(), e);
+            return Result.fail("删除敏感词异常！");
+        }
+    }
+
+    /**
+     * 敏感词分页查询
+     */
+    @PostMapping(value = "/queryPage")
+    public Result<PageResult<SensitiveWords>> queryPage(@RequestBody SensitiveWords sw) {
+        try {
+            return Result.ok(sensitiveWordsService.queryPage(sw));
+        } catch (Exception e) {
+            log.error("分页查询敏感词异常！错误原因{}", e.getMessage(), e);
+            return Result.fail("分页查询敏感词异常！");
         }
     }
 

@@ -1,8 +1,10 @@
 package com.suifeng.yquest.dao;
 
 import com.suifeng.yquest.entity.AuthUser;
+import com.suifeng.yquest.entity.SensitiveWords;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -88,5 +90,10 @@ public interface AuthUserDao {
     List<AuthUser> listUserInfoByIds(@Param("userNameList")List<String> userList);
 
     String queryNickNameByEmail(String email);
+
+    @Select("SELECT * FROM auth_user LIMIT #{start}, #{pageSize}")
+    List<AuthUser> queryAllUsers(@Param("start") int start, @Param("pageSize") Integer pageSize);
+
+    int countByCondition(AuthUser authUser);
 }
 

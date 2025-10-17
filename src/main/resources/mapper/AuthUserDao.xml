@@ -283,6 +283,11 @@
         where id = #{id}
     </update>
 
+    <select id="countByCondition" resultType="java.lang.Integer">
+        select count(id) from auth_user
+        where is_deleted = 0
+    </select>
+
     <!--通过主键删除-->
     <delete id="deleteById">
         delete from auth_user where id = #{id}

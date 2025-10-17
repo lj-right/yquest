@@ -6,6 +6,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.zvo.email.Email;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.google.gson.Gson;
+import com.suifeng.yquest.api.common.PageResult;
 import com.suifeng.yquest.api.enums.AuthUserStatusEnum;
 import com.suifeng.yquest.api.enums.IsDeletedFlagEnum;
 import com.suifeng.yquest.constants.AuthConstant;
@@ -193,6 +194,28 @@ public class AuthUserServiceImpl implements AuthUserService {
     @Override
     public String queryNickNameByEmail(String email) {
         return userDao.queryNickNameByEmail(email);
+    }
+
+    /**
+     * 分页查询用户
+     * @param authUser
+     * @return
+     */
+    @Override
+    public PageResult<AuthUser> queryPage(AuthUser authUser) {
+        PageResult<AuthUser> pageResult = new PageResult<>();
+        pageResult.setPageNo(authUser.getPageNo());
+        pageResult.setPageSize(authUser.getPageSize());
+        int start = (authUser.getPageNo() - 1) * authUser.getPageSize();
+
+        int count = userDao.countByCondition(authUser);
+        if(count == 0){
+            return pageResult;
+        }
+        List<AuthUser> userList =  userDao.queryAllUsers(start,authUser.getPageSize());
+        pageResult.setRecords(userList);
+        pageResult.setTotal(count);
+        return pageResult;
     }
 
     /**

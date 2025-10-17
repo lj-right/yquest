@@ -4,8 +4,10 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.util.SaResult;
 import com.alibaba.fastjson.JSON;
 import com.google.common.base.Preconditions;
+import com.suifeng.yquest.api.common.PageResult;
 import com.suifeng.yquest.api.common.Result;
 import com.suifeng.yquest.entity.AuthUser;
+import com.suifeng.yquest.entity.UserInfo;
 import com.suifeng.yquest.service.AuthUserService;
 import com.suifeng.yquest.service.impl.FileService;
 import lombok.extern.slf4j.Slf4j;
@@ -94,6 +96,13 @@ public class AuthUserController {
     @DeleteMapping("/deleteById/{id}")
     public ResponseEntity<Boolean> deleteById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(authUserService.deleteById(id));
+    }
+    /**
+     * 分页查询用户
+     */
+    @PostMapping("/queryPage")
+    public Result<PageResult<AuthUser>> queryPage(@RequestBody AuthUser authUser) {
+        return Result.ok(authUserService.queryPage(authUser));
     }
 
     /**
