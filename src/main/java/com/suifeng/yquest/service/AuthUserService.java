@@ -50,7 +50,7 @@ public interface AuthUserService {
 
     Boolean sendEmail(AuthUser user);
 
-    String getEmailcaptcha(AuthUser user);
+    Boolean getEmailcaptcha(AuthUser user);
 
     AuthUser queryByName(AuthUser authUser);
 

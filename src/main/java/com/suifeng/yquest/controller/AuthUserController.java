@@ -129,12 +129,13 @@ public class AuthUserController {
      * 获取邮箱验证码(用于校验用户输入)
      */
     @PostMapping("/auth/captcha")
-    public Result<String> getEmailcaptcha(@RequestBody AuthUser user) {
+    public Result<Boolean> getEmailcaptcha(@RequestBody AuthUser user) {
         try {
             if (log.isInfoEnabled()) {
                 log.info("获取邮箱验证码{}", JSON.toJSONString(user));
             }
             Preconditions.checkArgument(!StringUtils.isBlank(user.getEmail()), "邮箱不能为空");
+            Preconditions.checkArgument(!StringUtils.isBlank(user.getExtJson()), "验证码不能为空");
             return Result.ok(authUserService.getEmailcaptcha(user));
         } catch (IllegalArgumentException e) {
             log.error("参数异常！错误原因{}", e.getMessage(), e);
