@@ -2,15 +2,20 @@ package com.suifeng.yquest.service.impl;
 
 import com.suifeng.yquest.api.adapter.StorageAdapter;
 import com.suifeng.yquest.entity.AuthUser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 
+/**
+ * 文件服务
+ * @author suifeng
+ */
 @Service
 public class FileService {
 
-        @Resource
+        @Autowired
         private final StorageAdapter storageAdapter;
 
         public FileService(StorageAdapter storageAdapter) {

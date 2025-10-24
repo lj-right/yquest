@@ -126,7 +126,7 @@ public class AuthUserController {
     }
 
     /**
-     * 获取邮箱验证码(用于校验用户输入)
+     * 校验用户邮箱验证码
      */
     @PostMapping("/auth/captcha")
     public Result<Boolean> getEmailcaptcha(@RequestBody AuthUser user) {
@@ -151,7 +151,7 @@ public class AuthUserController {
     @PostMapping("/user/uploadFile")
     public Result<String> uploadFile(@RequestBody MultipartFile uploadFile) {
         try {
-            return Result.ok(fileService.uploadFile(uploadFile,"suifeng","icon"));
+            return Result.ok(fileService.uploadFile(uploadFile,"avator","icon"));
         } catch (IllegalArgumentException e) {
             log.error("参数异常！错误原因{}", e.getMessage(), e);
             return Result.fail(e.getMessage());

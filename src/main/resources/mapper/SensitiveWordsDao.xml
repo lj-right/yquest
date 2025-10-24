@@ -3,7 +3,7 @@
 <mapper namespace="com.suifeng.yquest.dao.SensitiveWordsMapper">
 
     <select id="countByCondition" resultType="java.lang.Integer">
-        select count(id) from sensitive_words
+        select count(*) from sensitive_words
         where is_deleted = 0
     </select>
 </mapper>

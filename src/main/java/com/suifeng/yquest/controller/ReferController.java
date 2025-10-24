@@ -91,16 +91,9 @@ public class ReferController {
     @PostMapping("/manageReferPage")
     public Result<PageResult<Refer>> manageReferPage(@RequestBody Refer refer){
         try {
-            Preconditions.checkArgument(!StringUtils.isBlank(refer.getCompany()), "公司名称不能为空");
-            Preconditions.checkArgument(!StringUtils.isBlank(refer.getRefercode()), "内推码不能为空");
-            Preconditions.checkArgument(!StringUtils.isBlank(refer.getIndustry()), "行业不能为空");
-            Preconditions.checkArgument(!StringUtils.isBlank(refer.getName()), "发起人不能为空");
-            Preconditions.checkArgument(!StringUtils.isBlank(refer.getEmail()), "发起人邮箱不能为空");
-            Preconditions.checkArgument(!StringUtils.isBlank(refer.getDescription()), "描述不能为空");
-            Preconditions.checkArgument(!StringUtils.isBlank(refer.getUrl()), "内推链接不能为空");
             return Result.ok(this.referService.manageReferPage(refer));
         } catch (Exception e) {
-            return Result.fail("新内推提交失败");
+            return Result.fail("分页查询待审核列表");
         }
     }
     /**
