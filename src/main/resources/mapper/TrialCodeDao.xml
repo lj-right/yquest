@@ -96,7 +96,33 @@
 
     <select id="countByCondition" resultType="java.lang.Integer">
         select count(1) from trial_code
-        where is_deleted = 0
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="code != null and code != ''">
+                and code = #{code}
+            </if>
+            <if test="status != null and status != ''">
+                and status = #{status}
+            </if>
+            <if test="expireTime != null">
+                and expire_time = #{expireTime}
+            </if>
+            <if test="createdBy != null and createdBy != ''">
+                and created_by = #{createdBy}
+            </if>
+            <if test="createdTime != null">
+                and created_time = #{createdTime}
+            </if>
+            <if test="updatedBy != null and updatedBy != ''">
+                and updated_by = #{updatedBy}
+            </if>
+            <if test="updatedTime != null">
+                and updated_time = #{updatedTime}
+            </if>
+            and is_deleted = 0
+        </where>
     </select>
 
     <select id="queryAllCode" resultMap="TrialCodeMap">
@@ -106,6 +132,63 @@
         where is_deleted = 0
         limit #{start},#{pageSize}
     </select>
+
+    <select id="queryExpiredCodes" resultMap="TrialCodeMap" >
+        select id, code, status, expire_time, created_by, created_time, updated_by, updated_time, is_deleted
+        from trial_code
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="code != null and code != ''">
+                and code = #{code}
+            </if>
+            <if test="status != null and status != ''">
+                and status = #{status}
+            </if>
+            <if test="expireTime != null">
+                and expire_time &lt;= #{expireTime}
+            </if>
+            <if test="createdBy != null and createdBy != ''">
+                and created_by = #{createdBy}
+            </if>
+            <if test="createdTime != null">
+                and created_time = #{createdTime}
+            </if>
+            <if test="updatedBy != null and updatedBy != ''">
+                and updated_by = #{updatedBy}
+            </if>
+            <if test="updatedTime != null">
+                and updated_time = #{updatedTime}
+            </if>
+            and is_deleted = 0
+        </where>
+    </select>
+
+    <update id="updateByCode">
+        update trial_code
+        <set>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="expireTime != null">
+                expire_time = #{expireTime},
+            </if>
+            <if test="createdBy != null">
+                created_by = #{createdBy},
+            </if>
+            <if test="createdTime != null">
+                created_time = #{createdTime},
+            </if>
+            <if test="updatedTime != null">
+                updated_time = #{updatedTime},
+            </if>
+            <if test="isDeleted != null">
+                is_deleted = #{isDeleted},
+            </if>
+        </set>
+        where code = #{code}
+    </update>
 
     <!--新增所有列-->
     <insert id="insert" keyProperty="id" useGeneratedKeys="true">
@@ -177,44 +260,7 @@
         <foreach collection="list" item="item" open="(" separator="," close=")">
             #{item.id}
         </foreach>
-        />
     </update>
-
-    <select id="queryExpiredCodes" resultMap="TrialCodeMap">
-        select
-        id, code, status, expire_time, created_by, created_time, updated_by, updated_time, is_deleted
-        from trial_code
-        <where>
-            <if test="id != null">
-                and id = #{id}
-            </if>
-            <if test="code != null and code != ''">
-                and code = #{code}
-            </if>
-            <if test="status != null and status != ''">
-                and status = #{status}
-            </if>
-            <if test="expireTime != null">
-                and expire_time = #{expireTime}
-            </if>
-            <if test="createdBy != null and createdBy != ''">
-                and created_by = #{createdBy}
-            </if>
-            <if test="createdTime != null">
-                and created_time = #{createdTime}
-            </if>
-            <if test="updatedBy != null and updatedBy != ''">
-                and updated_by = #{updatedBy}
-            </if>
-            <if test="updatedTime != null">
-                and  #{updatedTime} >= expire_time
-            </if>
-            <if test="isDeleted != null">
-                and is_deleted = #{isDeleted}
-            </if>
-        </where>
-        limit #{pageable.offset}, #{pageable.pageSize}
-    </select>
 
     <!--通过主键删除-->
     <delete id="deleteById">

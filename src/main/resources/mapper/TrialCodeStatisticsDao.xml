@@ -178,7 +178,10 @@
 
     <!--通过主键删除-->
     <delete id="deleteById">
-        delete from trial_code_statistics where id = #{id}
+<!--        delete from trial_code_statistics where id = #{id}-->
+        update trial_code_statistics
+        set is_deleted = 1
+        where id = #{id}
     </delete>
 
 </mapper>

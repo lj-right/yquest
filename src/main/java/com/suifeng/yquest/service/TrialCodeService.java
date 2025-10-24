@@ -68,5 +68,7 @@ public interface TrialCodeService {
 
     boolean cleanExpiredCodes();
 
-    boolean ConsumeTrialCode(Set<String> trialCode);
+    boolean ConsumeTrialCode(String trialCode);
+
+    String getTrialCode();
 }

@@ -1,11 +1,13 @@
 package com.suifeng.yquest.service.impl;
 
+import com.suifeng.yquest.api.enums.IsDeletedFlagEnum;
 import com.suifeng.yquest.dao.TrialCodeStatisticsDao;
 import com.suifeng.yquest.entity.TrialCodeStatistics;
 import com.suifeng.yquest.service.TrialCodeStatisticsService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Date;
 
 /**
  * (TrialCodeStatistics)表服务实现类
@@ -35,6 +37,8 @@ public class TrialCodeStatisticsServiceImpl implements TrialCodeStatisticsServic
      */
     @Override
     public TrialCodeStatistics insert(TrialCodeStatistics trialCodeStatistics) {
+        trialCodeStatistics.setCreatedTime(new Date());
+        trialCodeStatistics.setIsDeleted(IsDeletedFlagEnum.UN_DELETED.getCode());
         this.trialCodeStatisticsDao.insert(trialCodeStatistics);
         return trialCodeStatistics;
     }
@@ -48,8 +52,8 @@ public class TrialCodeStatisticsServiceImpl implements TrialCodeStatisticsServic
     @Override
     public boolean update(TrialCodeStatistics trialCodeStatistics) {
         return this.trialCodeStatisticsDao.update(trialCodeStatistics) > 0;
-
     }
+
 
     /**
      * 通过主键删除数据

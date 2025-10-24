@@ -74,11 +74,21 @@ public class TrialCodeController {
     }
 
     /**
-     * 消费试用码
+     * 获取试用码
+     */
+    @PostMapping("/getTrialCode")
+    public Result<String> getTeialCode() {
+        return Result.ok(this.trialCodeService.getTrialCode());
+    }
+
+    /**
+     * 消费单个试用码
      */
     @PostMapping("/consume")
-    public Result<Boolean> consume(@RequestParam("trialCode") Set<String> trialCodeSet) {
-        return Result.ok(this.trialCodeService.ConsumeTrialCode(trialCodeSet));
+    public Result<Boolean> consume(@RequestParam("trialCode") String trialCode) {
+        return Result.ok(this.trialCodeService.ConsumeTrialCode(trialCode));
     }
+
+
 }
 

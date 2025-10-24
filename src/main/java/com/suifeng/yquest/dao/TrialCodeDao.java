@@ -82,6 +82,8 @@ public interface TrialCodeDao {
 
     List<TrialCode> queryAllCode(@Param("start") int start,@Param("pageSize") Integer pageSize);
 
-    Set<TrialCode> queryExpiredCodes(TrialCode trialCode);
+    Set<TrialCode> queryExpiredCodes( TrialCode trialCode);
+
+    int updateByCode(TrialCode trialCode);
 }
 

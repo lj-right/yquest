@@ -47,9 +47,6 @@ public class TrialCodeServiceImpl implements TrialCodeService {
     //试用码的key
     private static final String TRIAL_CODE_KEY = "trial:codes";
 
-    //试用码已使用的key
-    private static final String TRIAL_CODE_USED_KEY = "trial:code:used";
-
     /**
      * 通过ID查询单条数据
      *
@@ -60,7 +57,7 @@ public class TrialCodeServiceImpl implements TrialCodeService {
     public TrialCode queryById(Integer id) {
         return this.trialCodeDao.queryById(id);
     }
-    
+
 
     /**
      * 分页查询
@@ -115,7 +112,7 @@ public class TrialCodeServiceImpl implements TrialCodeService {
                 .atZone(ZoneId.systemDefault()).toInstant();
         trialCodeList.forEach(trialCode -> {
             trialCode.setExpireTime(Date.from(instant));
-            trialCode.setStatus(1);
+            trialCode.setStatus(0);
             trialCode.setCreatedTime(new Date());
             trialCode.setIsDeleted(IsDeletedFlagEnum.UN_DELETED.getCode());
         });
@@ -127,7 +124,14 @@ public class TrialCodeServiceImpl implements TrialCodeService {
      */
     @Override
     public boolean update(Set<TrialCode> trialCodeSet) {
-        return this.trialCodeDao.update(trialCodeSet) > 0 ;
+        return this.trialCodeDao.update(trialCodeSet) > 0;
+    }
+
+    /**
+     * 根据code数据
+     */
+    public boolean updateByCode(TrialCode trialCode) {
+        return this.trialCodeDao.updateByCode(trialCode) > 0;
     }
 
     /**
@@ -155,9 +159,7 @@ public class TrialCodeServiceImpl implements TrialCodeService {
         }
         // 将试用码添加到Redis Set中
         String[] codeArray = codes.toArray(new String[0]);
-        redisUtil.sAdd(TRIAL_CODE_KEY, codeArray);
-        // 设置过期时间
-        redisUtil.expire(TRIAL_CODE_KEY, expireHours, TimeUnit.DAYS);
+
 
         //遍历codeArray数组获取code
         Set<TrialCode> CodeSet = new HashSet<>();
@@ -168,16 +170,36 @@ public class TrialCodeServiceImpl implements TrialCodeService {
         }
         TrialCodeStatistics statistics = trialCodeStatisticsDao.queryById(1);
         TrialCodeStatistics result = new TrialCodeStatistics();
+        result.setId(1);
         long avail = statistics.getAvailableCount() + batchSize;
         long total = statistics.getTotalGenerated() + batchSize;
         result.setAvailableCount(avail);
+        result.setExpiredCount((statistics.getExpiredCount() != null && statistics.getExpiredCount() != 0) ? statistics.getExpiredCount() : 0);
         result.setTotalGenerated(total);
-        result.setUsePercentage((double) avail / total);
+        result.setUsePercentage(Math.round((double) avail / total * 100.0) / 100.0);
         result.setUpdatedTime(new Date());
 
         boolean result2 = trialCodeStatisticsDao.update(result) > 0;
         boolean batch = insertBatch(CodeSet);
-        return batch && result2;
+
+        redisUtil.sAdd(TRIAL_CODE_KEY, codeArray);
+        // 设置过期时间
+        Boolean expire = redisUtil.expire(TRIAL_CODE_KEY, expireHours, TimeUnit.DAYS);
+        return batch && result2 && expire;
+    }
+
+    /**
+     * 随机获取一个试用码
+     */
+    @Override
+    public String getTrialCode() {
+        try {
+            String code = redisUtil.sPop(TRIAL_CODE_KEY);
+            return code != null ? code : "";
+        } catch (Exception e) {
+            // 记录日志或进行其他异常处理
+            return "";
+        }
     }
 
     /**
@@ -187,26 +209,31 @@ public class TrialCodeServiceImpl implements TrialCodeService {
     @Transactional
     public boolean cleanExpiredCodes() {
         TrialCode trialCode = new TrialCode();
-        trialCode.setUpdatedTime(new Date());
-        trialCode.setIsDeleted(IsDeletedFlagEnum.UN_DELETED.getCode());
+        trialCode.setStatus(0);
+        trialCode.setIsDeleted(IsDeletedFlagEnum.UN_DELETED.getCode());  //默认未删除
+        trialCode.setExpireTime(new Date());
         //查找出所有过期时间大于现在时间的数据
-        Set<TrialCode> trialCodeSet = trialCodeDao.queryExpiredCodes(trialCode);
+        Set<TrialCode> codeSet = trialCodeDao.queryExpiredCodes(trialCode);
+        if (codeSet.isEmpty()) {
+            return false;
+        }
         //更新数据库
-        trialCodeSet.forEach(trialCode2 -> {
+        codeSet.forEach(trialCode2 -> {
             trialCode2.setStatus(2);
             trialCode2.setIsDeleted(IsDeletedFlagEnum.DELETED.getCode());
         });
-        boolean update = update(trialCodeSet);
-
-        Set<String> ids = trialCodeSet.stream()
+        Set<String> ids = codeSet.stream()
                 .map(trialCode3 -> String.valueOf(trialCode3.getId()))
                 .collect(Collectors.toSet());
+
+        boolean updated = this.update(codeSet);
+
         TrialCodeStatistics statistics = lowTrialCodeStatistics(ids);
 
         int result = trialCodeStatisticsDao.update(statistics);
 
 
-        return update && result > 0 ;
+        return updated && result > 0;
     }
 
 
@@ -214,23 +241,23 @@ public class TrialCodeServiceImpl implements TrialCodeService {
      * 消费试用码
      */
     @Override
-    public boolean ConsumeTrialCode(Set<String> trialCodeSet){
-        Set<TrialCode> trialCodeList = new HashSet<>();
-        trialCodeSet.forEach(code -> {
-            TrialCode trialCode1 = new TrialCode();
-            trialCode1.setCode(code);
-            trialCode1.setStatus(1);
-            trialCode1.setIsDeleted(IsDeletedFlagEnum.DELETED.getCode());
-            trialCodeList.add(trialCode1);
-        });
+    @Transactional
+    public boolean ConsumeTrialCode(String code) {
+        TrialCode trialCode = new TrialCode();
+        trialCode.setCode(code);
+        trialCode.setStatus(1);
+        trialCode.setUpdatedTime(new Date());
+        trialCode.setIsDeleted(IsDeletedFlagEnum.DELETED.getCode());
 
-        boolean redisConsume = redisUtil.sRem(TRIAL_CODE_KEY, trialCodeSet.toArray()) > 0;
+        boolean redisConsume = redisUtil.sRem(TRIAL_CODE_KEY, code) > 0;
 
-        TrialCodeStatistics statistics = lowTrialCodeStatistics(trialCodeSet);
+        Set<String> CodeSet = new HashSet<>();
+        CodeSet.add(code);
+        TrialCodeStatistics statistics = lowTrialCodeStatistics(CodeSet);
 
         boolean result2 = trialCodeStatisticsDao.update(statistics) > 0;
-        boolean update = update(trialCodeList);
-        return redisConsume && update && result2;
+        boolean updated = updateByCode(trialCode);
+        return redisConsume && updated && result2;
     }
 
     //数据减少时更新TrialCodeStatistics
@@ -238,14 +265,13 @@ public class TrialCodeServiceImpl implements TrialCodeService {
     private TrialCodeStatistics lowTrialCodeStatistics(Set<String> trialCodeSet) {
         int length = trialCodeSet.stream().toArray().length;
         TrialCodeStatistics statistics = trialCodeStatisticsDao.queryById(1);
-        TrialCodeStatistics result = new TrialCodeStatistics();
         long avail = statistics.getAvailableCount() - length;
-        long total = statistics.getTotalGenerated() - length;
-        result.setAvailableCount(avail);
-        result.setTotalGenerated(total);
-        result.setUsePercentage((double) avail / total);
-        result.setUpdatedTime(new Date());
-        return result;
+        long expired = statistics.getExpiredCount() + length;
+        statistics.setAvailableCount(avail);
+        statistics.setExpiredCount(expired);
+        statistics.setUsePercentage(Math.round((double) avail / statistics.getTotalGenerated() * 100.0) / 100.0);
+        statistics.setUpdatedTime(new Date());
+        return statistics;
     }
 
 
@@ -254,8 +280,7 @@ public class TrialCodeServiceImpl implements TrialCodeService {
         String code;
         do {
             code = generateRandomCode();
-        } while (redisUtil.sIsMember(TRIAL_CODE_KEY, code) ||
-                redisUtil.exist(TRIAL_CODE_USED_KEY)); // 检查是否已在可用集合或已使用集合中
+        } while (redisUtil.sIsMember(TRIAL_CODE_KEY, code));// 检查是否已在可用集合或已使用集合中
         return code;
     }
 
@@ -267,7 +292,6 @@ public class TrialCodeServiceImpl implements TrialCodeService {
         }
         return sb.toString();
     }
-
 
 
 }
