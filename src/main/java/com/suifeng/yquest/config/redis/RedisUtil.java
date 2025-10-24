@@ -149,5 +149,47 @@ public class RedisUtil {
         }
         return map;
     }
+
+    /**
+     * 向Set中添加元素
+     */
+    public Long sAdd(String key, String... values) {
+        return redisTemplate.opsForSet().add(key, values);
+    }
+
+    /**
+     * 从Set中随机弹出一个元素
+     */
+    public String sPop(String key) {
+        return (String) redisTemplate.opsForSet().pop(key);
+    }
+
+    /**
+     * 获取Set中所有元素
+     */
+    public Set<String> sMembers(String key) {
+        return redisTemplate.opsForSet().members(key);
+    }
+
+    /**
+     * 判断元素是否在Set中
+     */
+    public Boolean sIsMember(String key, Object value) {
+        return redisTemplate.opsForSet().isMember(key, value);
+    }
+
+    /**
+     * 删除Set中的元素
+     */
+    public Long sRem(String key, Object... values) {
+        return redisTemplate.opsForSet().remove(key, values);
+    }
+
+    /**
+     * 设置过期时间
+     */
+    public Boolean expire(String key, long time, TimeUnit timeUnit) {
+        return redisTemplate.expire(key, time, timeUnit);
+    }
 }
 

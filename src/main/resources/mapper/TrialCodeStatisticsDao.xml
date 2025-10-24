@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.suifeng.yquest.dao.TrialCodeStatisticsDao">
+
+    <resultMap type="com.suifeng.yquest.entity.TrialCodeStatistics" id="TrialCodeStatisticsMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="availableCount" column="available_count" jdbcType="INTEGER"/>
+        <result property="expiredCount" column="expired_count" jdbcType="INTEGER"/>
+        <result property="totalGenerated" column="total_generated" jdbcType="INTEGER"/>
+        <result property="usePercentage" column="use_percentage" jdbcType="VARCHAR"/>
+        <result property="createdBy" column="created_by" jdbcType="VARCHAR"/>
+        <result property="createdTime" column="created_time" jdbcType="TIMESTAMP"/>
+        <result property="updatedBy" column="updated_by" jdbcType="VARCHAR"/>
+        <result property="updatedTime" column="updated_time" jdbcType="TIMESTAMP"/>
+        <result property="isDeleted" column="is_deleted" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="TrialCodeStatisticsMap">
+        select
+        id, available_count, expired_count, total_generated, use_percentage, created_by, created_time, updated_by,
+        updated_time, is_deleted
+        from trial_code_statistics
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="TrialCodeStatisticsMap">
+        select
+        id, available_count, expired_count, total_generated, use_percentage, created_by, created_time, updated_by,
+        updated_time, is_deleted
+        from trial_code_statistics
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="availableCount != null">
+                and available_count = #{availableCount}
+            </if>
+            <if test="expiredCount != null">
+                and expired_count = #{expiredCount}
+            </if>
+            <if test="totalGenerated != null">
+                and total_generated = #{totalGenerated}
+            </if>
+            <if test="usePercentage != null and usePercentage != ''">
+                and use_percentage = #{usePercentage}
+            </if>
+            <if test="createdBy != null and createdBy != ''">
+                and created_by = #{createdBy}
+            </if>
+            <if test="createdTime != null">
+                and created_time = #{createdTime}
+            </if>
+            <if test="updatedBy != null and updatedBy != ''">
+                and updated_by = #{updatedBy}
+            </if>
+            <if test="updatedTime != null">
+                and updated_time = #{updatedTime}
+            </if>
+            <if test="isDeleted != null">
+                and is_deleted = #{isDeleted}
+            </if>
+        </where>
+        limit #{pageable.offset}, #{pageable.pageSize}
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from trial_code_statistics
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="availableCount != null">
+                and available_count = #{availableCount}
+            </if>
+            <if test="expiredCount != null">
+                and expired_count = #{expiredCount}
+            </if>
+            <if test="totalGenerated != null">
+                and total_generated = #{totalGenerated}
+            </if>
+            <if test="usePercentage != null and usePercentage != ''">
+                and use_percentage = #{usePercentage}
+            </if>
+            <if test="createdBy != null and createdBy != ''">
+                and created_by = #{createdBy}
+            </if>
+            <if test="createdTime != null">
+                and created_time = #{createdTime}
+            </if>
+            <if test="updatedBy != null and updatedBy != ''">
+                and updated_by = #{updatedBy}
+            </if>
+            <if test="updatedTime != null">
+                and updated_time = #{updatedTime}
+            </if>
+            <if test="isDeleted != null">
+                and is_deleted = #{isDeleted}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into trial_code_statistics(available_count, expired_count, total_generated, use_percentage, created_by,
+        created_time, updated_by, updated_time, is_deleted)
+        values (#{availableCount}, #{expiredCount}, #{totalGenerated}, #{usePercentage}, #{createdBy}, #{createdTime},
+        #{updatedBy}, #{updatedTime}, #{isDeleted})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into trial_code_statistics(available_count, expired_count, total_generated, use_percentage, created_by,
+        created_time, updated_by, updated_time, is_deleted)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.availableCount}, #{entity.expiredCount}, #{entity.totalGenerated}, #{entity.usePercentage},
+            #{entity.createdBy}, #{entity.createdTime}, #{entity.updatedBy}, #{entity.updatedTime}, #{entity.isDeleted})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into trial_code_statistics(available_count, expired_count, total_generated, use_percentage, created_by,
+        created_time, updated_by, updated_time, is_deleted)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.availableCount}, #{entity.expiredCount}, #{entity.totalGenerated}, #{entity.usePercentage},
+            #{entity.createdBy}, #{entity.createdTime}, #{entity.updatedBy}, #{entity.updatedTime}, #{entity.isDeleted})
+        </foreach>
+        on duplicate key update
+        available_count = values(available_count),
+        expired_count = values(expired_count),
+        total_generated = values(total_generated),
+        use_percentage = values(use_percentage),
+        created_by = values(created_by),
+        created_time = values(created_time),
+        updated_by = values(updated_by),
+        updated_time = values(updated_time),
+        is_deleted = values(is_deleted)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update trial_code_statistics
+        <set>
+            <if test="availableCount != null">
+                available_count = #{availableCount},
+            </if>
+            <if test="expiredCount != null">
+                expired_count = #{expiredCount},
+            </if>
+            <if test="totalGenerated != null">
+                total_generated = #{totalGenerated},
+            </if>
+            <if test="usePercentage != null and usePercentage != ''">
+                use_percentage = #{usePercentage},
+            </if>
+            <if test="createdBy != null and createdBy != ''">
+                created_by = #{createdBy},
+            </if>
+            <if test="createdTime != null">
+                created_time = #{createdTime},
+            </if>
+            <if test="updatedBy != null and updatedBy != ''">
+                updated_by = #{updatedBy},
+            </if>
+            <if test="updatedTime != null">
+                updated_time = #{updatedTime},
+            </if>
+            <if test="isDeleted != null">
+                is_deleted = #{isDeleted},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from trial_code_statistics where id = #{id}
+    </delete>
+
+</mapper>
+
