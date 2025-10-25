@@ -95,7 +95,7 @@ public class TrialCodeServiceImpl implements TrialCodeService {
                 .atTime(LocalTime.MIDNIGHT)
                 .atZone(ZoneId.systemDefault()).toInstant();
         trialCode.setExpireTime(Date.from(instant));
-        trialCode.setStatus(1);
+        trialCode.setStatus(0);
         trialCode.setCreatedTime(new Date());
         trialCode.setIsDeleted(IsDeletedFlagEnum.UN_DELETED.getCode());
         return this.trialCodeDao.insert(trialCode) > 0;
@@ -142,7 +142,10 @@ public class TrialCodeServiceImpl implements TrialCodeService {
      */
     @Override
     public boolean deleteById(Integer id) {
-        return this.trialCodeDao.deleteById(id) > 0;
+        TrialCode trialCode = this.queryById(id);
+        String code = trialCode.getCode();
+        boolean sRem = redisUtil.sRem(TRIAL_CODE_KEY, code) > 0;
+        return this.trialCodeDao.deleteById(id) > 0 && sRem;
     }
 
 
