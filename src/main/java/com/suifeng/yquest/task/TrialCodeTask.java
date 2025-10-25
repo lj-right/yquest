@@ -24,7 +24,7 @@ public class TrialCodeTask {
     /**
      * 每天凌晨2点生成试用码
      */
-    @Scheduled(cron = "0 0 2 * * ?")
+    @Scheduled(cron = "0 0 2 * * *")
 //    @Scheduled(cron = "0 0/1 * * * ? ")
     public void dailyTrialCodeGeneration() {
         log.info("开始执行每日试用码生成任务");
@@ -34,7 +34,7 @@ public class TrialCodeTask {
     /**
      * 每小时检查试用码数量，不足时补充
      */
-    @Scheduled(cron = "0 0 * * * ?")
+    @Scheduled(cron = "0 0 * * * *")
 //    @Scheduled(cron = "0 0/1 * * * ? ")
     public void checkAndReplenishCodes() {
         TrialCodeStatistics stats = trialCodeStatisticsService.queryById(1);
@@ -48,8 +48,8 @@ public class TrialCodeTask {
     /**
      * 每天凌晨3点清理过期试用码
      */
-//    @Scheduled(cron = "0 0/1 0 0 1/3 1#1 ")
-    @Scheduled(cron = "0 0/1 * * * ? ")
+    @Scheduled(cron = "0 0 3 * * *")
+//    @Scheduled(cron = "0 0/1 * * * ? ")
     public void cleanExpiredTrialCodes() {
         log.info("开始执行过期试用码清理任务");
         trialCodeService.cleanExpiredCodes();
