@@ -123,8 +123,8 @@ public class TrialCodeServiceImpl implements TrialCodeService {
      * 批量修改数据
      */
     @Override
-    public boolean update(Set<TrialCode> trialCodeSet) {
-        return this.trialCodeDao.update(trialCodeSet) > 0;
+    public boolean update(List<TrialCode> trialCode) {
+        return this.trialCodeDao.update(trialCode) > 0;
     }
 
     /**
@@ -220,13 +220,15 @@ public class TrialCodeServiceImpl implements TrialCodeService {
         //更新数据库
         codeSet.forEach(trialCode2 -> {
             trialCode2.setStatus(2);
+            trialCode2.setUpdatedTime(new Date());
             trialCode2.setIsDeleted(IsDeletedFlagEnum.DELETED.getCode());
         });
         Set<String> ids = codeSet.stream()
                 .map(trialCode3 -> String.valueOf(trialCode3.getId()))
                 .collect(Collectors.toSet());
 
-        boolean updated = this.update(codeSet);
+        List<TrialCode> codeList = new ArrayList<>(codeSet);
+        boolean updated = this.update(codeList);
 
         TrialCodeStatistics statistics = lowTrialCodeStatistics(ids);
 

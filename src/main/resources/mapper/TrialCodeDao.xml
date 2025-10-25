@@ -133,7 +133,7 @@
         limit #{start},#{pageSize}
     </select>
 
-    <select id="queryExpiredCodes" resultMap="TrialCodeMap" >
+    <select id="queryExpiredCodes" resultMap="TrialCodeMap">
         select id, code, status, expire_time, created_by, created_time, updated_by, updated_time, is_deleted
         from trial_code
         <where>
@@ -227,37 +227,15 @@
         is_deleted = values(is_deleted)
     </insert>
 
-    <!--通过主键修改数据-->
-    <update id="update">
-        update trial_code
-        <set>
-            <if test="code != null and code != ''">
-                code = #{code},
-            </if>
-            <if test="status != null and status != ''">
-                status = #{status},
-            </if>
-            <if test="expireTime != null">
-                expire_time = #{expireTime},
-            </if>
-            <if test="createdBy != null and createdBy != ''">
-                created_by = #{createdBy},
-            </if>
-            <if test="createdTime != null">
-                created_time = #{createdTime},
-            </if>
-            <if test="updatedBy != null and updatedBy != ''">
-                updated_by = #{updatedBy},
-            </if>
-            <if test="updatedTime != null">
-                updated_time = #{updatedTime},
-            </if>
-            <if test="isDeleted != null">
-                is_deleted = #{isDeleted},
-            </if>
-        </set>
-        where id in
-        <foreach collection="list" item="item" open="(" separator="," close=")">
+    <!--通过主键批量修改数据-->
+    <update id="update" parameterType="java.util.List">
+        UPDATE trial_code
+        SET
+        status = #{list[0].status},
+        updated_time = #{list[0].updatedTime},
+        is_deleted = #{list[0].isDeleted}
+        WHERE id IN
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
             #{item.id}
         </foreach>
     </update>

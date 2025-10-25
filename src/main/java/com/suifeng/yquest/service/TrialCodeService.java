@@ -43,7 +43,7 @@ public interface TrialCodeService {
      * @param trialCode 实例对象
      * @return 实例对象
      */
-    boolean update(Set<TrialCode> trialCode);
+    boolean update(List<TrialCode> trialCode);
 
     /**
      * 通过主键删除数据

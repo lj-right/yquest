@@ -7,6 +7,7 @@ import com.suifeng.yquest.api.common.Result;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -58,8 +59,8 @@ public class TrialCodeController {
      * 编辑数据(批量)
      */
     @PutMapping("/edit")
-    public Result<Boolean> edit(@RequestBody Set<TrialCode> trialCodeSet) {
-        return Result.ok(this.trialCodeService.update(trialCodeSet));
+    public Result<Boolean> edit(@RequestBody List<TrialCode> trialCodeList) {
+        return Result.ok(this.trialCodeService.update(trialCodeList));
     }
 
     /**

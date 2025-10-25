@@ -4,6 +4,7 @@ import com.suifeng.yquest.entity.TrialCode;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -62,13 +63,6 @@ public interface TrialCodeDao {
      */
     int insertOrUpdateBatch(@Param("entities") List<TrialCode> entities);
 
-    /**
-     * 修改数据
-     *
-     * @param trialCode 实例对象
-     * @return 影响行数
-     */
-    int update(@Param("list") Set<TrialCode> trialCode);
 
     /**
      * 通过主键删除数据
@@ -80,10 +74,17 @@ public interface TrialCodeDao {
 
     int countByCondition(TrialCode trialCode);
 
-    List<TrialCode> queryAllCode(@Param("start") int start,@Param("pageSize") Integer pageSize);
+    List<TrialCode> queryAllCode(@Param("start") int start, @Param("pageSize") Integer pageSize);
 
-    Set<TrialCode> queryExpiredCodes( TrialCode trialCode);
+    Set<TrialCode> queryExpiredCodes(TrialCode trialCode);
 
     int updateByCode(TrialCode trialCode);
+
+    /**
+     * 通过ids修改数据
+     * @param trialCode
+     * @return
+     */
+    int update(@Param("list") List<TrialCode> trialCode);
 }
 
