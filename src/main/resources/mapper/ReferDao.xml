@@ -304,6 +304,12 @@
         where id = #{id}
     </update>
 
+    <update id="passRefer">
+        update refer
+        set is_deleted = 0
+        where id = #{id}
+    </update>
+
     <!--通过主键删除-->
     <delete id="deleteById">
         delete from refer where id = #{id}

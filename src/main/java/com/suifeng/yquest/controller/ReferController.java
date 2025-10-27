@@ -61,6 +61,17 @@ public class ReferController {
     }
 
     /**
+     * 通过审核内推数据
+     *
+     * @param refer 实体
+     * @return 编辑结果
+     */
+    @PutMapping("/passRefer")
+    public Result<Boolean> passRefer(@RequestBody Refer refer) {
+        return Result.ok(this.referService.passRefer(refer));
+    }
+
+    /**
      * 删除数据
      * 定时删除
      * @param refer 实体

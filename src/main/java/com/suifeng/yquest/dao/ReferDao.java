@@ -90,5 +90,7 @@ public interface ReferDao {
     List<Refer> searchByMessage(@Param("start") int start, @Param("pageSize") Integer pageSize,@Param("company") String company);
 
     int countBySearch(Refer refer);
+
+    int passRefer(Refer refer);
 }
 

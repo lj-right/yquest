@@ -53,6 +53,17 @@ public class ReferServiceImpl implements ReferService {
     public Boolean update(Refer refer) {
         return this.referDao.update(refer) >0;
     }
+    /**
+     * 通过审核内推数据
+     *
+     * @param refer 实例对象
+     * @return 实例对象
+     */
+    @Override
+    public Boolean passRefer(Refer refer) {
+        refer.setIsDeleted(IsDeletedFlagEnum.UN_DELETED.getCode());
+        return this.referDao.passRefer(refer) >0;
+    }
 
     /**
      * 通过主键删除数据
