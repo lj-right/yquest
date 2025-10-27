@@ -284,7 +284,7 @@
     </update>
 
     <select id="countByCondition" resultType="java.lang.Integer">
-        select count(id) from auth_user
+        select count(*) from auth_user
         where is_deleted = 0
     </select>
 

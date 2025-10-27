@@ -91,7 +91,7 @@ public interface AuthUserDao {
 
     String queryNickNameByEmail(String email);
 
-    @Select("SELECT * FROM auth_user LIMIT #{start}, #{pageSize}")
+    @Select("SELECT * FROM auth_user where is_deleted = 0 LIMIT #{start}, #{pageSize} ")
     List<AuthUser> queryAllUsers(@Param("start") int start, @Param("pageSize") Integer pageSize);
 
     int countByCondition(AuthUser authUser);

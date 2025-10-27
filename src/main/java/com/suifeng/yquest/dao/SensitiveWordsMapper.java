@@ -17,6 +17,6 @@ public interface SensitiveWordsMapper extends BaseMapper<SensitiveWords> {
 
     int countByCondition(SensitiveWords sw);
 
-    @Select("SELECT * FROM sensitive_words LIMIT #{start}, #{pageSize}")
+    @Select("SELECT * FROM sensitive_words where is_deleted = 0 LIMIT #{start}, #{pageSize}")
     List<SensitiveWords> queryAllWords(@Param("start") int start, @Param("pageSize") Integer pageSize);
 }
