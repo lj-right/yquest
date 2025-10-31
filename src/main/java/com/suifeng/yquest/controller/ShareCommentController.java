@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * 回复及评论
+ * 动态下的回复及评论
  */
 @Slf4j
 @RestController
@@ -46,7 +46,7 @@ public class ShareCommentController {
     private ShareMessageService shareMessageService;
 
     /**
-     * 发布内容
+     * 评论或回复动态
      */
     @PostMapping(value = "/save")
     public Result<Boolean> save(@RequestBody SaveShareCommentReplyReq req) {
@@ -86,7 +86,7 @@ public class ShareCommentController {
 
 
     /**
-     * 删除圈子评论内容
+     * 删除圈子动态下评论内容
      */
     @PostMapping(value = "/remove")
     public Result<Boolean> remove(@RequestBody RemoveShareCommentReq req) {

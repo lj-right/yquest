@@ -22,7 +22,7 @@ import javax.annotation.Resource;
 import java.util.Objects;
 
 /**
- * 动态信息
+ * 圈子中发布动态信息
  */
 @Slf4j
 @RestController
@@ -37,7 +37,7 @@ public class ShareMomentController {
     private WordFilter wordFilter;
 
     /**
-     * 发布内容
+     * 在圈子中发布内容
      */
     @PostMapping(value = "/save")
     public Result<Boolean> save(@RequestBody SaveMomentCircleReq req) {
@@ -67,7 +67,7 @@ public class ShareMomentController {
 
 
     /**
-     * 分页查询圈子内容
+     * 分页查询圈子中的动态
      */
     @PostMapping(value = "/getMoments")
     public Result<PageResult<ShareMomentVO>> getMoments(@RequestBody GetShareMomentReq req) {
@@ -92,7 +92,7 @@ public class ShareMomentController {
 
 
     /**
-     * 删除圈子内容
+     * 删除圈子中的动态内容
      */
     @PostMapping(value = "/remove")
     public Result<Boolean> remove(@RequestBody RemoveShareMomentReq req) {

@@ -116,15 +116,23 @@ public class MybatisInterceptor implements Interceptor {
     }
 
     private Field[] getAllFields(Object object) {
-        Class<?> clazz = object.getClass();
-        List<Field> fieldList = new ArrayList<>();
-        while (clazz != null) {
-            fieldList.addAll(Arrays.asList(clazz.getDeclaredFields()));
-            clazz = clazz.getSuperclass();
+        if (object != null) {
+
+            Class<?> clazz = object.getClass();
+            List<Field> fieldList = new ArrayList<>();
+            while (clazz != null) {
+                fieldList.addAll(Arrays.asList(clazz.getDeclaredFields()));
+                clazz = clazz.getSuperclass();
+            }
+            Field[] fields = new Field[fieldList.size()];
+            fieldList.toArray(fields);
+            return fields;
+            // 继续后续处理
+        } else {
+            // 处理空对象的情况
+            log.warn("尝试处理空对象的字段");
+            return new Field[0];
         }
-        Field[] fields = new Field[fieldList.size()];
-        fieldList.toArray(fields);
-        return fields;
     }
 
     @Override

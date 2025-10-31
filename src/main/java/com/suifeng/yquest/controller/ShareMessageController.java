@@ -16,7 +16,7 @@ import java.util.Objects;
 
 /**
  *
- * 动态信息
+ * 仅发送通知（动态信息）
  */
 @Slf4j
 @RestController
@@ -27,7 +27,7 @@ public class ShareMessageController {
     private ShareMessageService shareMessageService;
 
     /**
-     * 分页查询消息
+     * 分页查询未读通知
      */
     @GetMapping(value = "/unRead")
     public Result<Boolean> unRead() {
@@ -40,7 +40,7 @@ public class ShareMessageController {
     }
 
     /**
-     * 分页查询消息
+     * 分页查询通知
      */
     @PostMapping(value = "/getMessages")
     public Result<PageResult<ShareMessageVO>> getMessages(@RequestBody GetShareMessageReq req) {
