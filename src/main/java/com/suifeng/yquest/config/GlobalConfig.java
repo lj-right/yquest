@@ -35,15 +35,16 @@ public class GlobalConfig extends WebMvcConfigurationSupport {
 
     @Override
     protected void addInterceptors(InterceptorRegistry registry) {
-//        registry.addInterceptor(new LoginInterceptor())
-//                .addPathPatterns("/**")
-//                .excludePathPatterns("/authUser/auth/login",
-//                        "/authUser/no-auth/register",
-//                        "/authUser/email/send",
-//                        "/authUser/auth/captcha",
-//                        "/refer/searchByMessage",
-//                        "/authUser/auth/isLogin",
-//                        "/refer/queryPage");
+        registry.addInterceptor(new LoginInterceptor())
+                .addPathPatterns("/**")
+                .excludePathPatterns("/authUser/auth/login",
+                        "/authUser/no-auth/register",
+                        "/authUser/email/send",
+                        "/authUser/auth/captcha",
+                        "/refer/searchByMessage",
+                        "/authUser/auth/isLogin",
+                        "/auth/exit-login",
+                        "/refer/queryPage");
     }
 
     private MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {

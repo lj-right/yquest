@@ -30,7 +30,7 @@ public class LoginInterceptor implements HandlerInterceptor {
                     return true;
                 }
             }
-            String satoken = request.getHeader("satoken");
+            String satoken = request.getHeader("token");
             if (StringUtils.isBlank(satoken)) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return false;

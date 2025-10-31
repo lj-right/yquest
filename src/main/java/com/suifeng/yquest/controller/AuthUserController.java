@@ -7,13 +7,11 @@ import com.google.common.base.Preconditions;
 import com.suifeng.yquest.api.common.PageResult;
 import com.suifeng.yquest.api.common.Result;
 import com.suifeng.yquest.entity.AuthUser;
-import com.suifeng.yquest.entity.UserInfo;
 import com.suifeng.yquest.service.AuthUserService;
 import com.suifeng.yquest.service.impl.FileService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -86,16 +84,16 @@ public class AuthUserController {
      * 编辑数据
      */
     @PutMapping("/edit")
-    public ResponseEntity<Boolean> edit(@RequestBody AuthUser authUser) {
-        return ResponseEntity.ok(authUserService.update(authUser));
+    public Result<Boolean> edit(@RequestBody AuthUser authUser) {
+        return Result.ok(authUserService.update(authUser));
     }
 
     /**
      * 删除数据
      */
     @DeleteMapping("/deleteById/{id}")
-    public ResponseEntity<Boolean> deleteById(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(authUserService.deleteById(id));
+    public Result<Boolean> deleteById(@PathVariable("id") Long id) {
+        return Result.ok(authUserService.deleteById(id));
     }
     /**
      * 分页查询用户
