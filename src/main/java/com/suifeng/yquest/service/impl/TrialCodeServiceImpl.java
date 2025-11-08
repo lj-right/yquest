@@ -172,6 +172,15 @@ public class TrialCodeServiceImpl implements TrialCodeService {
             CodeSet.add(trialCode);
         }
         TrialCodeStatistics statistics = trialCodeStatisticsDao.queryById(1);
+        if (statistics == null) {
+            TrialCodeStatistics statistics1 = new TrialCodeStatistics();
+            statistics1.setId(1);
+            statistics1.setExpiredCount((long)0);
+            statistics1.setAvailableCount((long)0);
+            statistics1.setTotalGenerated((long)0);
+            statistics1.setUsePercentage((double)0);
+            trialCodeStatisticsDao.insert(statistics1);
+        }
         TrialCodeStatistics result = new TrialCodeStatistics();
         result.setId(1);
         long avail = statistics.getAvailableCount() + batchSize;
