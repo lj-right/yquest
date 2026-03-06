@@ -54,6 +54,10 @@ public class ShareMessageServiceImpl extends ServiceImpl<ShareMessageMapper, Sha
         PageInfo pageInfo = req.getPageInfo();
         Page<ShareMessage> page = new Page<>(pageInfo.getPageNo(), pageInfo.getPageSize());
         Page<ShareMessage> pageRes = super.page(page, query);
+        
+        // 在更新前保存总数
+        long total = pageRes.getRecords().size();
+        
         PageResult<ShareMessageVO> result = new PageResult<>();
         List<ShareMessage> records = pageRes.getRecords();
         if (CollectionUtils.isNotEmpty(records)) {
@@ -68,7 +72,7 @@ public class ShareMessageServiceImpl extends ServiceImpl<ShareMessageMapper, Sha
             return vo;
         }).collect(Collectors.toList());
         result.setRecords(list);
-        result.setTotal((int) pageRes.getTotal());
+        result.setTotal((int) total);
         result.setPageSize(pageInfo.getPageSize());
         result.setPageNo(pageInfo.getPageNo());
         return result;
