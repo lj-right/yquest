@@ -109,10 +109,15 @@
             <artifactId>mapstruct-processor</artifactId>
             <version>1.4.2.Final</version>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>cn.zvo.email</groupId>-->
+<!--            <artifactId>email</artifactId>-->
+<!--            <version>1.0</version>-->
+<!--        </dependency>-->
         <dependency>
-            <groupId>cn.zvo.email</groupId>
-            <artifactId>email</artifactId>
-            <version>1.0</version>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4.7</version>
         </dependency>
         <dependency>
             <groupId>io.minio</groupId>
