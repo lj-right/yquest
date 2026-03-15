@@ -104,7 +104,7 @@ public class AuthUserController {
     }
 
     /**
-     * 发送邮箱验证码
+     * 注册 | 忘记密码：发送邮箱验证码
      */
     @PostMapping("/email/send")
     public Result<Boolean> sendEmail(@RequestBody AuthUser user) {
@@ -124,7 +124,27 @@ public class AuthUserController {
     }
 
     /**
-     * 校验用户邮箱验证码
+     * 登录：发送邮箱验证码
+     */
+    @PostMapping("/email/sendToLogin")
+    public Result<Boolean> sendToLogin(@RequestBody AuthUser user) {
+        try {
+            if (log.isInfoEnabled()) {
+                log.info("发送邮箱验证码{}", JSON.toJSONString(user));
+            }
+            Preconditions.checkArgument(!StringUtils.isBlank(user.getEmail()), "邮箱不能为空");
+            return Result.ok(authUserService.sendEmailtoLogin(user));
+        } catch (IllegalArgumentException e) {
+            log.error("参数异常！错误原因{}", e.getMessage(), e);
+            return Result.fail(e.getMessage());
+        } catch (Exception e) {
+            log.error("发送邮箱验证码！错误原因{}", e.getMessage(), e);
+            return Result.fail(e.getMessage());
+        }
+    }
+
+    /**
+     * 注册 | 忘记密码: 校验用户邮箱验证码
      */
     @PostMapping("/auth/captcha")
     public Result<Boolean> getEmailcaptcha(@RequestBody AuthUser user) {
@@ -143,6 +163,31 @@ public class AuthUserController {
             return Result.fail(e.getMessage());
         }
     }
+    /**
+     * 登录: 校验用户邮箱验证码
+     * 该功能已在LoginByEmail类中实现
+     * 可以不用调用
+     */
+    @PostMapping("/auth/captchaToLogin")
+    public Result<Boolean> captchaToLogin(@RequestBody AuthUser user) {
+        try {
+            if (log.isInfoEnabled()) {
+                log.info("获取邮箱验证码{}", JSON.toJSONString(user));
+            }
+            Preconditions.checkArgument(!StringUtils.isBlank(user.getEmail()), "邮箱不能为空");
+            Preconditions.checkArgument(!StringUtils.isBlank(user.getExtJson()), "验证码不能为空");
+            return Result.ok(authUserService.getLoginEmailCaptcha(user));
+        } catch (IllegalArgumentException e) {
+            log.error("参数异常！错误原因{}", e.getMessage(), e);
+            return Result.fail(e.getMessage());
+        } catch (Exception e) {
+            log.error("获取邮箱验证码！错误原因{}", e.getMessage(), e);
+            return Result.fail(e.getMessage());
+        }
+    }
+
+
+
     /**
      * 上传文件
      */
@@ -202,6 +247,22 @@ public class AuthUserController {
         } catch (IllegalArgumentException e) {
             log.error("参数异常！错误原因{}", e.getMessage(), e);
             return Result.fail(e.getMessage());
+        } catch (Exception e) {
+            log.error("邮件名登录错误原因{}", e.getMessage(), e);
+            return Result.fail(e.getMessage());
+        }
+    }
+
+    /**
+     * 忘记密码
+     */
+    @PostMapping("/auth/forgetPwd")
+    public Result<SaResult> forgetPwd(@RequestBody AuthUser user) {
+        try {
+            log.info("UserController.forgetPwd.userEmail:{}", user.getEmail());
+            Preconditions.checkArgument(!StringUtils.isBlank(user.getEmail()), "邮箱不能为空");
+            Preconditions.checkArgument(!StringUtils.isBlank(user.getExtJson()), "验证码不能为空");
+            return Result.ok(authUserService.forgetPwd(user));
         } catch (Exception e) {
             log.error("邮件名登录错误原因{}", e.getMessage(), e);
             return Result.fail(e.getMessage());

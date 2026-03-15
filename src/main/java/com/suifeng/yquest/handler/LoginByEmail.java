@@ -32,9 +32,7 @@ public class LoginByEmail implements LoginTypeHandler{
         }
         String tEmail = redisUtil.buildKey(LOGIN_PREFIX, user.getEmail());
         String code = redisUtil.get(tEmail);
-        if (StringUtils.isBlank(code)) {
-            return null;
-        } else if (code.equals(user.getExtJson())) {
+        if (code.equals(user.getExtJson())) {
             StpUtil.login(user.getEmail()); //以email作为唯一的标识
             SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
             log.info("登录成功！token{}", tokenInfo.getTokenValue());

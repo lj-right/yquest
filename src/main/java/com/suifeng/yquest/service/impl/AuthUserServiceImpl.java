@@ -3,7 +3,6 @@ package com.suifeng.yquest.service.impl;
 import cn.dev33.satoken.secure.SaSecureUtil;
 import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
-import cn.zvo.email.Email;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.google.gson.Gson;
 import com.suifeng.yquest.api.common.PageResult;
@@ -16,12 +15,18 @@ import com.suifeng.yquest.handler.LoginTypeHandler;
 import com.suifeng.yquest.handler.LoginTypeHandlerFactory;
 import com.suifeng.yquest.config.redis.RedisUtil;
 import com.suifeng.yquest.service.*;
+import com.suifeng.yquest.utils.EmailUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.mail.Message;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -33,6 +38,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AuthUserServiceImpl implements AuthUserService {
     private static final String LOGIN_PREFIX = "loginCode";
+
+    private static final String REGISTER_PREFIX = "registerCode";
 
     private String authPermissionPrefix = "auth.permission";
 
@@ -241,7 +248,7 @@ public class AuthUserServiceImpl implements AuthUserService {
 //    }
 
     /**
-     * 发送邮箱验证码
+     * 注册 | 忘记密码：发送邮箱验证码
      *
      * @param user
      * @return
@@ -256,30 +263,90 @@ public class AuthUserServiceImpl implements AuthUserService {
             return false; // 2分钟内不允许重复发送
         }
 
-        String host = "smtp.163.com";
-        String username = "18973513695@163.com"; //您的163邮箱
-        String password = "NGNwr435B28YkGJ2";
-        Email mail = new Email(host, username, password); //创建
         Random random = new Random();
         int verificationCode = random.nextInt(900000) + 100000;
-        String codeKey = redisUtil.buildKey(LOGIN_PREFIX, user.getEmail());
+        String codeKey = redisUtil.buildKey(REGISTER_PREFIX, user.getEmail());
         redisUtil.setNx(codeKey, String.valueOf(verificationCode), 5L, TimeUnit.MINUTES);
-        String CodeContent = "【yquest】您的注册验证码为：" + verificationCode + "该验证码5分钟内有效，请及时验证。";
-        mail.sendHtmlMail(email, "【yquest】验证你的电子邮件地址", CodeContent);
+        String CodeContent = "【yquest】您的注册验证码为：" + verificationCode + ",该验证码5分钟内有效，请及时验证。";
+
+        Set EmailSet = new HashSet<>();
+        EmailSet.add(email);
+        EmailUtil.sendEmailUtil(EmailSet, "【yquest】验证您的电子邮件地址", CodeContent);
         return true;
     }
 
     /**
-     * 获取邮箱验证码
+     * 注册 | 忘记密码：校验邮箱验证码
      *
      * @param user
      * @return
      */
     @Override
     public Boolean getEmailcaptcha(AuthUser user) {
+        String result = redisUtil.get(redisUtil.buildKey(REGISTER_PREFIX, String.valueOf(user.getEmail())));
+        return result.equals(user.getExtJson());
+    }
+
+    /**
+     * 忘记密码
+     * @param user
+     * @return
+     */
+    @Override
+    public Boolean forgetPwd(AuthUser user) {
+        if(this.getEmailcaptcha(user)){
+            //查找 用户的id。用于更新密码
+            AuthUser authUser = this.queryByEmail(user);
+            //重置为默认密码123456
+            user.setPassword("123456");
+            user.setId(authUser.getId());
+            this.userDao.update(user);
+        }
+        return false;
+    }
+
+    /**
+     * 登录：发送邮箱验证码
+     *
+     * @param user
+     * @return
+     */
+    @Override
+    public Boolean sendEmailtoLogin(AuthUser user) {
+        String email = user.getEmail();
+        // 验证码频率限制
+        String sendLimitKey = redisUtil.buildKey("send_limit", email);
+        boolean canSend = redisUtil.setNx(sendLimitKey, "1", 2L, TimeUnit.MINUTES);
+        if (!canSend) {
+            return false; // 2分钟内不允许重复发送
+        }
+
+        Random random = new Random();
+        int verificationCode = random.nextInt(900000) + 100000;
+        String codeKey = redisUtil.buildKey(LOGIN_PREFIX, user.getEmail());
+        redisUtil.setNx(codeKey, String.valueOf(verificationCode), 5L, TimeUnit.MINUTES);
+        String CodeContent = "【yquest】您的登录验证码为：" + verificationCode + ",该验证码5分钟内有效，请及时验证。";
+
+        Set EmailSet = new HashSet<>();
+        EmailSet.add(email);
+        EmailUtil.sendEmailUtil(EmailSet, "【yquest】验证您的电子邮件地址", CodeContent);
+        return true;
+    }
+
+
+
+    /**
+     * 登录：校验邮箱验证码
+     *
+     * @param user
+     * @return
+     */
+    @Override
+    public Boolean getLoginEmailCaptcha(AuthUser user) {
         String result = redisUtil.get(redisUtil.buildKey(LOGIN_PREFIX, String.valueOf(user.getEmail())));
         return result.equals(user.getExtJson());
     }
+
     /**
      * 校验用户是否登录
      *

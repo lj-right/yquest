@@ -50,6 +50,8 @@ public interface AuthUserService {
 
     Boolean sendEmail(AuthUser user);
 
+    Boolean getLoginEmailCaptcha(AuthUser user);
+
     Boolean getEmailcaptcha(AuthUser user);
 
     AuthUser queryByName(AuthUser authUser);
@@ -67,4 +69,8 @@ public interface AuthUserService {
     String queryNickNameByEmail(String email);
 
     PageResult<AuthUser> queryPage(AuthUser authUser);
+
+    Boolean sendEmailtoLogin(AuthUser user);
+
+    Boolean forgetPwd(AuthUser user);
 }
