@@ -409,12 +409,15 @@ public class AuthUserServiceImpl implements AuthUserService {
             return Collections.emptyMap();
         }
         Map<String, UserInfo> result = new HashMap<>();
-        AuthUser data = listResult.get(0);
-        UserInfo userInfo = new UserInfo();
+
+        listResult.stream().forEach(data ->{
+            UserInfo userInfo = new UserInfo();
             userInfo.setUserName(data.getUserName());
             userInfo.setNickName(data.getNickName());
             userInfo.setAvatar(data.getAvatar());
             result.put(userInfo.getUserName(), userInfo);
+        });
+
         return result;
     }
 }
