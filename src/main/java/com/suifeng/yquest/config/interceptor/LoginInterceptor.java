@@ -23,34 +23,21 @@ public class LoginInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         try {
-            if (StpUtil.isLogin()) {
-                String loginId = (String) StpUtil.getTokenInfo().loginId;
-                if (loginId != null) {
-                    LoginContextHolder.set("loginId", SaSecureUtil.md5BySalt(loginId, "suifeng"));
-                    return true;
-                }
-            }
-            String satoken = request.getHeader("token");
-            if (StringUtils.isBlank(satoken)) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return false;
-            }
-            String tokenKey = "satoken:login:token:" + satoken;
-            if (redisTemplate.hasKey(tokenKey)) {
-                Object tokenValue = redisTemplate.opsForValue().get(tokenKey);
-                if (tokenValue.equals(-4)){
-                    return false;
-                }
-                String loginId =(String) tokenValue;
-                //把唯一的username加密后作为loginId
-                LoginContextHolder.set("loginId", loginId);
-                return true;
-            }
-            return false;
+            // 1. 校验是否登录 —— 判断是否登录（Sa-Token 自动查 Redis、验Token、验过期）
+            StpUtil.checkLogin();
+
+            // 2. 获取登录ID（安全获取）
+            String loginId = (String) StpUtil.getLoginId();
+
+            // 3. 存入上下文（你项目统一格式即可，不要一会加密一会不加密）
+            LoginContextHolder.set("loginId", SaSecureUtil.md5BySalt(loginId, "suifeng"));
+
+            return true;
 
         } catch (Exception e) {
-            log.error("登录拦截器处理异常", e);
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            log.error("登录拦截器校验失败: {}", e.getMessage());
+            // 未登录 / token 无效
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         }
     }
