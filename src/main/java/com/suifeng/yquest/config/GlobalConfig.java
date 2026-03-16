@@ -41,6 +41,7 @@ public class GlobalConfig extends WebMvcConfigurationSupport {
                         "/authUser/no-auth/register",
                         "/authUser/email/send",
                         "/authUser/auth/captcha",
+                        "/authUser/auth/forgetPwd",
                         "/refer/searchByMessage",
                         "/authUser/auth/isLogin",
                         "/auth/exit-login",

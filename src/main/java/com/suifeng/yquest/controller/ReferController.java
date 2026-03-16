@@ -2,6 +2,7 @@ package com.suifeng.yquest.controller;
 
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.dev33.satoken.annotation.SaCheckRole;
 import com.google.common.base.Preconditions;
 import com.suifeng.yquest.api.common.PageResult;
 import com.suifeng.yquest.api.common.Result;
@@ -88,6 +89,18 @@ public class ReferController {
      * @param refer
      * @return
      */
+//    @SaCheckPermission(value = "aaa")
+//    {"success":false,"code":403,"message":"无权限：无此权限：aaa"}
+//    实现鉴权权限:
+//    @SaCheckPermission(value = "normal_user")
+
+//    @SaCheckRole("aaa")
+//    {"success":false,"code":403,"message":"无角色权限：无此角色：aaa"}
+//    实现鉴权角色:
+//    @SaCheckRole(value = "normal_user")
+
+//    @SaCheckRole("normal_user")
+//    @SaCheckPermission("normal_user")
     @PostMapping("/queryPage")
     public Result<PageResult<Refer>> queryPage(@RequestBody Refer refer){
         return Result.ok(this.referService.queryReferPage(refer));

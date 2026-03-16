@@ -148,6 +148,12 @@
             <artifactId>sa-token-redis-jackson</artifactId>
             <version>1.37.0</version>
         </dependency>
+        <!-- Sa-Token 注解AOP（权限注解必须靠它！）-->
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-spring-aop</artifactId>
+            <version>1.37.0</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-pool2</artifactId>

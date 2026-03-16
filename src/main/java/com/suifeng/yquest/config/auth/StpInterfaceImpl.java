@@ -50,7 +50,7 @@ public class StpInterfaceImpl implements StpInterface {
         if (authRolePrefix.equals(prefix)){
             List<AuthRole> roleList = new Gson().fromJson(authValue, new TypeToken<List<AuthRole>>() {
             }.getType());
-            authList = roleList.stream().map(AuthRole::getRoleKey).collect(Collectors.toList());
+            authList = roleList.stream().map(AuthRole::getRoleKey).map(String::toLowerCase).collect(Collectors.toList());
         }else if(authPermissionPrefix.equals(prefix)){
             List<AuthPermission> permissionList = new Gson()
                     .fromJson(authValue, new TypeToken<List<AuthPermission>>() {
