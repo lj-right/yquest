@@ -294,13 +294,14 @@ public class AuthUserServiceImpl implements AuthUserService {
      */
     @Override
     public Boolean forgetPwd(AuthUser user) {
+        //一定要校验邮箱验证码才允许进入！
         if(this.getEmailcaptcha(user)){
             //查找 用户的id。用于更新密码
             AuthUser authUser = this.queryByEmail(user);
             //重置为默认密码123456
-            user.setPassword("123456");
+            user.setPassword(SaSecureUtil.md5BySalt("123456", salt));
             user.setId(authUser.getId());
-            this.userDao.update(user);
+            return this.userDao.update(user) > 0;
         }
         return false;
     }

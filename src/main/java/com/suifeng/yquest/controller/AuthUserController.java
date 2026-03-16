@@ -244,11 +244,8 @@ public class AuthUserController {
             Preconditions.checkArgument(!StringUtils.isBlank(user.getEmail()), "邮箱不能为空");
             StpUtil.logout(user.getEmail());
             return Result.ok();
-        } catch (IllegalArgumentException e) {
-            log.error("参数异常！错误原因{}", e.getMessage(), e);
-            return Result.fail(e.getMessage());
         } catch (Exception e) {
-            log.error("邮件名登录错误原因{}", e.getMessage(), e);
+            log.error("退出登录错误原因{}", e.getMessage(), e);
             return Result.fail(e.getMessage());
         }
     }
@@ -264,7 +261,7 @@ public class AuthUserController {
             Preconditions.checkArgument(!StringUtils.isBlank(user.getExtJson()), "验证码不能为空");
             return Result.ok(authUserService.forgetPwd(user));
         } catch (Exception e) {
-            log.error("邮件名登录错误原因{}", e.getMessage(), e);
+            log.error("忘记密码错误原因{}", e.getMessage(), e);
             return Result.fail(e.getMessage());
         }
     }
