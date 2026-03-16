@@ -29,6 +29,14 @@
         where user_id = #{userId}
         and is_deleted = 0
     </select>
+    <!--查询多个-->
+    <select id="queryListByUserId" resultMap="AuthUserRoleMap">
+        select
+        id, user_id, role_id, created_by, created_time, updated_by, updated_time, is_deleted
+        from auth_user_role
+        where user_id = #{userId}
+        and is_deleted = 0
+    </select>
 
     <!--查询指定行数据-->
     <select id="queryAllByLimit" resultMap="AuthUserRoleMap">

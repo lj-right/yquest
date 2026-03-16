@@ -1,5 +1,6 @@
 package com.suifeng.yquest.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.util.SaResult;
 import com.alibaba.fastjson.JSON;
@@ -98,6 +99,7 @@ public class AuthUserController {
     /**
      * 分页查询用户
      */
+    @SaCheckPermission({"manage_user"})
     @PostMapping("/queryPage")
     public Result<PageResult<AuthUser>> queryPage(@RequestBody AuthUser authUser) {
         return Result.ok(authUserService.queryPage(authUser));
@@ -226,14 +228,26 @@ public class AuthUserController {
     public Result<SaResult> dologin(@RequestBody AuthUser user) {
         try {
             return Result.ok( authUserService.doLogin(user));
-        } catch (IllegalArgumentException e) {
-            log.error("参数异常！错误原因{}", e.getMessage(), e);
-            return Result.fail(e.getMessage());
         } catch (Exception e) {
             log.error("登录错误原因{}", e.getMessage(), e);
             return Result.fail(e.getMessage());
         }
     }
+    /**
+     *  这是用户 已经存在于数据库中 的时候
+     *  刷新缓存中对应用户的角色和权限
+     */
+    @PostMapping("/auth/refreshRedis")
+    public Result<Boolean> refreshRedis(@RequestBody AuthUser user) {
+        try {
+            return Result.ok( authUserService.refreshRedis(user));
+        }catch (Exception e) {
+            log.error("登录错误原因{}", e.getMessage(), e);
+            return Result.fail(e.getMessage());
+        }
+    }
+
+
     /**
      * 退出登录
      */

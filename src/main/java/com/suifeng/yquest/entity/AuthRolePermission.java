@@ -19,10 +19,12 @@ public class AuthRolePermission implements Serializable {
     /**
      * 角色id
      */
+    @JsonProperty("role_id")
     private Long roleId;
     /**
      * 权限id
      */
+    @JsonProperty("permission_id")
     private Long permissionId;
     /**
      * 创建人

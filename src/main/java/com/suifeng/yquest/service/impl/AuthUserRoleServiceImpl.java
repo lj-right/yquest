@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * 用户角色表(AuthUserRole)表服务实现类
@@ -53,6 +54,10 @@ public class AuthUserRoleServiceImpl implements AuthUserRoleService {
     @Override
     public AuthUserRole queryByUserId(Long userId) {
         return this.authUserRoleDao.queryByUserId(userId);
+    }
+    @Override
+    public List<AuthUserRole> queryListByUserId(Long userId) {
+        return this.authUserRoleDao.queryListByUserId(userId);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.suifeng.yquest.controller;
 
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.alibaba.fastjson.JSON;
 import com.google.common.base.Preconditions;
 import com.suifeng.yquest.api.common.Result;
@@ -32,6 +33,7 @@ public class ShareCircleController {
     /**
      * 圈子查询
      */
+    @SaCheckPermission({"manage_user"})
     @GetMapping(value = "/list")
     public Result<List<ShareCircleVO>> listResult() {
         try {
@@ -79,6 +81,7 @@ public class ShareCircleController {
     /**
      * 修改圈子
      */
+    @SaCheckPermission({"manage_user"})
     @PostMapping(value = "/update")
     public Result<Boolean> update(@RequestBody UpdateShareCircleReq req) {
         try {
@@ -109,6 +112,7 @@ public class ShareCircleController {
     /**
      * 删除圈子
      */
+    @SaCheckPermission({"manage_user"})
     @PostMapping(value = "/remove")
     public Result<Boolean> remove(@RequestBody RemoveShareCircleReq req) {
         try {

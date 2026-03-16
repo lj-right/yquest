@@ -80,5 +80,7 @@ public interface AuthUserRoleDao {
     int deleteById(Integer id);
 
     AuthUserRole queryByUserId(Long userId);
+
+    List<AuthUserRole> queryListByUserId(Long userId);
 }
 

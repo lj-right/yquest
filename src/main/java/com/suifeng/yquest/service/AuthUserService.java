@@ -73,4 +73,6 @@ public interface AuthUserService {
     Boolean sendEmailtoLogin(AuthUser user);
 
     Boolean forgetPwd(AuthUser user);
+
+    Boolean refreshRedis(AuthUser user);
 }

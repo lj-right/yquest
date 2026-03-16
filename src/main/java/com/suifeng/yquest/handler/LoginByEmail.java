@@ -5,8 +5,10 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.suifeng.yquest.api.enums.LoginInfoTypeEnum;
 import com.suifeng.yquest.entity.AuthUser;
 import com.suifeng.yquest.config.redis.RedisUtil;
+import com.suifeng.yquest.service.AuthUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -24,6 +26,10 @@ public class LoginByEmail implements LoginTypeHandler{
         return LoginInfoTypeEnum.LOGIN_BY_EMAIL;
     }
 
+    @Resource
+    @Lazy
+    private AuthUserService authUserService;
+
     @Override
     public SaTokenInfo login(AuthUser user) {
         //这里用我们留存的ExtJson来验证码是否正确
@@ -36,6 +42,7 @@ public class LoginByEmail implements LoginTypeHandler{
             StpUtil.login(user.getEmail()); //以email作为唯一的标识
             SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
             log.info("登录成功！token{}", tokenInfo.getTokenValue());
+            authUserService.refreshRedis(user);
             return tokenInfo;
         }
         return null;

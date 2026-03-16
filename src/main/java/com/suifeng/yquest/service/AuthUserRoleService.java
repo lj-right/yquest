@@ -2,6 +2,8 @@ package com.suifeng.yquest.service;
 
 import com.suifeng.yquest.entity.AuthUserRole;
 
+import java.util.List;
+
 /**
  * 用户角色表(AuthUserRole)表服务接口
  */
@@ -29,4 +31,6 @@ public interface AuthUserRoleService {
     AuthUserRole queryByUserId(Long id);
 
     Boolean update(AuthUserRole userRole);
+
+    List<AuthUserRole> queryListByUserId(Long rUserId);
 }

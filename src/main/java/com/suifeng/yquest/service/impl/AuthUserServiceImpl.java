@@ -142,6 +142,67 @@ public class AuthUserServiceImpl implements AuthUserService {
     }
 
     /**
+     *  这是用户 已经存在于数据库中 的时候
+     *  刷新缓存中对应用户的角色和权限
+     */
+    public Boolean refreshRedis(AuthUser user){
+        List<AuthRole> roleList = new LinkedList<>();
+        List<AuthPermission> permissionList = new LinkedList<>();
+
+        //找到用户的id
+        //这里的UserName是作为 传递邮箱参数的
+        user.setEmail(user.getUserName());
+        AuthUser rUser = this.queryByEmail(user);
+        if(rUser == null){
+            return false;
+        }
+        Long rUserId = rUser.getId();
+
+        //拿到roleId
+        List<AuthUserRole> userRoleList = authUserRoleService.queryListByUserId(rUserId);
+
+        userRoleList.stream().forEach(role ->{
+            //拿到roleId,去拿role表的信息
+            Long roleId = role.getRoleId();
+            AuthRole roleMessage = authRoleService.queryById(roleId);
+            roleList.add(roleMessage);
+
+            //根据roleId查权限
+//            AuthRolePermission authRolePermission = new AuthRolePermission();
+//            authRolePermission.setRoleId(roleId);
+//            List<AuthRolePermission> rolePermissionList = authRolePermissionService.
+//                    queryByCondition(authRolePermission);
+//
+//            List<Long> permissionIdList = rolePermissionList.stream()
+//                    .map(AuthRolePermission::getPermissionId).collect(Collectors.toList());
+//
+//            List<AuthPermission> permissionList = authPermissionService.queryByRoleList(permissionIdList);
+
+
+            AuthRolePermission rolePermission = new AuthRolePermission();
+            rolePermission.setRoleId(roleId);
+            List<AuthRolePermission> rolePermissionList = authRolePermissionService.queryByCondition(rolePermission);
+            rolePermissionList.stream().forEach(rolePermission2 -> {
+                //拿到permissionId
+                Long permissionId = rolePermission2.getPermissionId();
+                AuthPermission permissionMessage = authPermissionService.queryById(permissionId);
+                permissionList.add(permissionMessage);
+            });
+        });
+
+        //缓存角色信息
+        //todo：这里的List的所有数据都丢进redis去，不知道识别的到role的信息不？
+        String roleKey = redisUtil.buildKey(authRolePrefix, user.getEmail());
+        redisUtil.set(roleKey, new Gson().toJson(roleList));
+
+        String permissionKey = redisUtil.buildKey(authPermissionPrefix, user.getEmail());
+        redisUtil.set(permissionKey, new Gson().toJson(permissionList));
+
+
+        return true;
+    }
+
+    /**
      * 修改数据
      *
      * @param authUser 实例对象

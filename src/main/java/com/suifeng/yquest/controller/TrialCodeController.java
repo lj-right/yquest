@@ -1,5 +1,6 @@
 package com.suifeng.yquest.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.suifeng.yquest.api.common.PageResult;
 import com.suifeng.yquest.entity.TrialCode;
 import com.suifeng.yquest.service.TrialCodeService;
@@ -28,6 +29,7 @@ public class TrialCodeController {
      * @param trialCode   筛选条件
      * @return 查询结果
      */
+    @SaCheckPermission({"manage_user"})
     @PostMapping("/getPage")
     public Result<PageResult<TrialCode>> queryByPage(@RequestBody TrialCode trialCode) {
         return Result.ok(this.trialCodeService.queryByPage(trialCode));
@@ -58,6 +60,7 @@ public class TrialCodeController {
     /**
      * 编辑数据(批量)
      */
+    @SaCheckPermission({"manage_user"})
     @PutMapping("/edit")
     public Result<Boolean> edit(@RequestBody List<TrialCode> trialCodeList) {
         return Result.ok(this.trialCodeService.update(trialCodeList));
@@ -69,6 +72,7 @@ public class TrialCodeController {
      * @param id 主键
      * @return 删除是否成功
      */
+    @SaCheckPermission({"manage_user"})
     @DeleteMapping("/delete")
     public Result<Boolean> deleteById(@RequestParam("id") Integer id) {
         return Result.ok(this.trialCodeService.deleteById(id));

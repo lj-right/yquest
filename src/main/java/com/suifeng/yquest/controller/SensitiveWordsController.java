@@ -1,5 +1,6 @@
 package com.suifeng.yquest.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.base.Preconditions;
@@ -29,6 +30,7 @@ public class SensitiveWordsController {
     /**
      * 新增敏感词
      */
+    @SaCheckPermission({"manage_user"})
     @GetMapping(value = "/save")
     public Result<Boolean> save(String words, Integer type) {
         try {
@@ -53,6 +55,7 @@ public class SensitiveWordsController {
     /**
      * 删除敏感词
      */
+    @SaCheckPermission({"manage_user"})
     @GetMapping(value = "/remove")
     public Result<Boolean> remove(Long id) {
         try {
@@ -75,6 +78,7 @@ public class SensitiveWordsController {
     /**
      * 更新敏感词
      */
+    @SaCheckPermission({"manage_user"})
     @PostMapping(value = "/update")
     public Result<Boolean> update(@RequestBody SensitiveWords sensitiveWords) {
         try {
@@ -102,6 +106,8 @@ public class SensitiveWordsController {
     /**
      * 敏感词分页查询
      */
+
+    @SaCheckPermission({"manage_user"})
     @PostMapping(value = "/queryPage")
     public Result<PageResult<SensitiveWords>> queryPage(@RequestBody SensitiveWords sw) {
         try {

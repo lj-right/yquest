@@ -44,7 +44,9 @@ public class StpInterfaceImpl implements StpInterface {
         String authKey = redisUtil.buildKey(prefix, loginId.toString());
         String authValue = redisUtil.get(authKey);
         if (StringUtils.isBlank(authValue)){
+
             return Collections.emptyList();
+
         }
         List<String> authList = new LinkedList<>();
         if (authRolePrefix.equals(prefix)){
