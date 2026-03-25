@@ -33,7 +33,6 @@ public class ShareCircleController {
     /**
      * 圈子查询
      */
-    @SaCheckPermission({"manage_user"})
     @GetMapping(value = "/list")
     public Result<List<ShareCircleVO>> listResult() {
         try {

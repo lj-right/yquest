@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.suifeng.yquest.dao.InterviewRecordDao">
+
+    <resultMap type="com.suifeng.yquest.entity.InterviewRecord" id="InterviewRecordMap">
+        <result property="id" column="id" jdbcType="BIGINT" />
+        <result property="processId" column="process_id" jdbcType="BIGINT" />
+        <result property="resumeId" column="resume_id" jdbcType="BIGINT" />
+        <result property="jobId" column="job_id" jdbcType="BIGINT" />
+        <result property="stage" column="stage" jdbcType="TINYINT" />
+        <result property="interviewTime" column="interview_time" jdbcType="TIMESTAMP" />
+        <result property="interviewerId" column="interviewer_id" jdbcType="BIGINT" />
+        <result property="interviewerName" column="interviewer_name" jdbcType="VARCHAR" />
+        <result property="interviewType" column="interview_type" jdbcType="VARCHAR" />
+        <result property="location" column="location" jdbcType="VARCHAR" />
+        <result property="result" column="result" jdbcType="TINYINT" />
+        <result property="comments" column="comments" jdbcType="LONGVARCHAR" />
+        <result property="createdTime" column="created_time" jdbcType="TIMESTAMP" />
+        <result property="updatedTime" column="updated_time" jdbcType="TIMESTAMP" />
+        <result property="isDeleted" column="is_deleted" jdbcType="TINYINT" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, process_id, resume_id, job_id, stage, interview_time, interviewer_id, 
+        interviewer_name, interview_type, location, result, comments, created_time, updated_time, is_deleted
+    </sql>
+
+    <select id="queryById" resultMap="InterviewRecordMap">
+        select 
+        <include refid="Base_Column_List" />
+        from interview_record
+        where id = #{id} and is_deleted = 0
+    </select>
+
+    <select id="queryAllByLimit" resultMap="InterviewRecordMap">
+        select
+        <include refid="Base_Column_List" />
+        from interview_record
+        where is_deleted = 0
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="queryAll" resultMap="InterviewRecordMap">
+        select
+        <include refid="Base_Column_List" />
+        from interview_record
+        where is_deleted = 0
+        <if test="processId != null">
+            and process_id = #{processId}
+        </if>
+        <if test="jobId != null">
+            and job_id = #{jobId}
+        </if>
+        <if test="stage != null">
+            and stage = #{stage}
+        </if>
+        <if test="result != null">
+            and result = #{result}
+        </if>
+        order by created_time desc
+    </select>
+
+    <select id="queryPage" resultMap="InterviewRecordMap">
+        select
+        <include refid="Base_Column_List" />
+        from interview_record
+        where is_deleted = 0
+        <if test="processId != null">
+            and process_id = #{interviewRecord.processId}
+        </if>
+        <if test="jobId != null">
+            and job_id = #{interviewRecord.jobId}
+        </if>
+        <if test="stage != null">
+            and stage = #{interviewRecord.stage}
+        </if>
+        <if test="result != null">
+            and result = #{interviewRecord.result}
+        </if>
+        order by created_time desc
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="countByCondition" resultType="java.lang.Integer">
+        select count(*)
+        from interview_record
+        where is_deleted = 0
+        <if test="processId != null">
+            and process_id = #{processId}
+        </if>
+        <if test="jobId != null">
+            and job_id = #{jobId}
+        </if>
+        <if test="stage != null">
+            and stage = #{stage}
+        </if>
+        <if test="result != null">
+            and result = #{result}
+        </if>
+    </select>
+
+    <insert id="insert" parameterType="com.suifeng.yquest.entity.InterviewRecord" useGeneratedKeys="true" keyProperty="id">
+        insert into interview_record (
+        process_id, resume_id, job_id, stage, interview_time, interviewer_id, 
+        interviewer_name, interview_type, location, result, comments, created_time, updated_time, is_deleted
+        ) values (
+        #{processId}, #{resumeId}, #{jobId}, #{stage}, #{interviewTime}, #{interviewerId}, 
+        #{interviewerName}, #{interviewType}, #{location}, #{result}, #{comments}, #{createdTime}, #{updatedTime}, #{isDeleted}
+        )
+    </insert>
+
+    <insert id="insertBatch" parameterType="java.util.List">
+        insert into interview_record (
+        process_id, resume_id, job_id, stage, interview_time, interviewer_id, 
+        interviewer_name, interview_type, location, result, comments, created_time, updated_time, is_deleted
+        ) values
+        <foreach collection="entities" item="item" separator=",">
+            (
+            #{item.processId}, #{item.resumeId}, #{item.jobId}, #{item.stage}, #{item.interviewTime}, #{item.interviewerId}, 
+            #{item.interviewerName}, #{item.interviewType}, #{item.location}, #{item.result}, #{item.comments}, #{item.createdTime}, #{item.updatedTime}, #{item.isDeleted}
+            )
+        </foreach>
+    </insert>
+
+    <update id="update" parameterType="com.suifeng.yquest.entity.InterviewRecord">
+        update interview_record
+        <set>
+            <if test="processId != null">process_id = #{processId},</if>
+            <if test="resumeId != null">resume_id = #{resumeId},</if>
+            <if test="jobId != null">job_id = #{jobId},</if>
+            <if test="stage != null">stage = #{stage},</if>
+            <if test="interviewTime != null">interview_time = #{interviewTime},</if>
+            <if test="interviewerId != null">interviewer_id = #{interviewerId},</if>
+            <if test="interviewerName != null">interviewer_name = #{interviewerName},</if>
+            <if test="interviewType != null">interview_type = #{interviewType},</if>
+            <if test="location != null">location = #{location},</if>
+            <if test="result != null">result = #{result},</if>
+            <if test="comments != null">comments = #{comments},</if>
+            <if test="updatedTime != null">updated_time = #{updatedTime},</if>
+            <if test="isDeleted != null">is_deleted = #{isDeleted},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="java.lang.Long">
+        update interview_record set is_deleted = 1 where id = #{id}
+    </delete>
+
+    <select id="queryByProcessId" resultMap="InterviewRecordMap">
+        select
+        <include refid="Base_Column_List" />
+        from interview_record
+        where process_id = #{processId} and is_deleted = 0
+        order by stage asc
+    </select>
+
+    <select id="queryByJobId" resultMap="InterviewRecordMap">
+        select
+        <include refid="Base_Column_List" />
+        from interview_record
+        where job_id = #{jobId} and is_deleted = 0
+        order by created_time desc
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="countByJobId" resultType="java.lang.Integer">
+        select count(*)
+        from interview_record
+        where job_id = #{jobId} and is_deleted = 0
+    </select>
+
+    <select id="queryByInterviewerId" resultMap="InterviewRecordMap">
+        select
+        <include refid="Base_Column_List" />
+        from interview_record
+        where interviewer_id = #{interviewerId} and is_deleted = 0
+        order by created_time desc
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="countByInterviewerId" resultType="java.lang.Integer">
+        select count(*)
+        from interview_record
+        where interviewer_id = #{interviewerId} and is_deleted = 0
+    </select>
+
+    <select id="queryByProcessIdAndStage" resultMap="InterviewRecordMap">
+        select
+        <include refid="Base_Column_List" />
+        from interview_record
+        where process_id = #{processId} and stage = #{stage} and is_deleted = 0
+    </select>
+
+</mapper>

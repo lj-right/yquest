@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.suifeng.yquest.dao.InterviewProcessDao">
+
+    <resultMap type="com.suifeng.yquest.entity.InterviewProcess" id="InterviewProcessMap">
+        <result property="id" column="id" jdbcType="BIGINT" />
+        <result property="resumeId" column="resume_id" jdbcType="BIGINT" />
+        <result property="jobId" column="job_id" jdbcType="BIGINT" />
+        <result property="currentStage" column="current_stage" jdbcType="TINYINT" />
+        <result property="nextStageTime" column="next_stage_time" jdbcType="TIMESTAMP" />
+        <result property="interviewerId" column="interviewer_id" jdbcType="BIGINT" />
+        <result property="interviewerName" column="interviewer_name" jdbcType="VARCHAR" />
+        <result property="status" column="status" jdbcType="TINYINT" />
+        <result property="createdTime" column="created_time" jdbcType="TIMESTAMP" />
+        <result property="updatedTime" column="updated_time" jdbcType="TIMESTAMP" />
+        <result property="isDeleted" column="is_deleted" jdbcType="TINYINT" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, resume_id, job_id, current_stage, next_stage_time, interviewer_id, 
+        interviewer_name, status, created_time, updated_time, is_deleted
+    </sql>
+
+    <select id="queryById" resultMap="InterviewProcessMap">
+        select 
+        <include refid="Base_Column_List" />
+        from interview_process
+        where id = #{id} and is_deleted = 0
+    </select>
+
+    <select id="queryAllByLimit" resultMap="InterviewProcessMap">
+        select
+        <include refid="Base_Column_List" />
+        from interview_process
+        where is_deleted = 0
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="queryAll" resultMap="InterviewProcessMap">
+        select
+        <include refid="Base_Column_List" />
+        from interview_process
+        where is_deleted = 0
+        <if test="resumeId != null">
+            and resume_id = #{resumeId}
+        </if>
+        <if test="jobId != null">
+            and job_id = #{jobId}
+        </if>
+        <if test="currentStage != null">
+            and current_stage = #{currentStage}
+        </if>
+        <if test="status != null">
+            and status = #{status}
+        </if>
+        order by created_time desc
+    </select>
+
+    <select id="queryPage" resultMap="InterviewProcessMap">
+        select
+        <include refid="Base_Column_List" />
+        from interview_process
+        where is_deleted = 0
+        <if test="resumeId != null">
+            and resume_id = #{interviewProcess.resumeId}
+        </if>
+        <if test="jobId != null">
+            and job_id = #{interviewProcess.jobId}
+        </if>
+        <if test="currentStage != null">
+            and current_stage = #{interviewProcess.currentStage}
+        </if>
+        <if test="status != null">
+            and status = #{interviewProcess.status}
+        </if>
+        order by created_time desc
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="countByCondition" resultType="java.lang.Integer">
+        select count(*)
+        from interview_process
+        where is_deleted = 0
+        <if test="resumeId != null">
+            and resume_id = #{resumeId}
+        </if>
+        <if test="jobId != null">
+            and job_id = #{jobId}
+        </if>
+        <if test="currentStage != null">
+            and current_stage = #{currentStage}
+        </if>
+        <if test="status != null">
+            and status = #{status}
+        </if>
+    </select>
+
+    <insert id="insert" parameterType="com.suifeng.yquest.entity.InterviewProcess" useGeneratedKeys="true" keyProperty="id">
+        insert into interview_process (
+        resume_id, job_id, current_stage, next_stage_time, interviewer_id, 
+        interviewer_name, status, created_time, updated_time, is_deleted
+        ) values (
+        #{resumeId}, #{jobId}, #{currentStage}, #{nextStageTime}, #{interviewerId}, 
+        #{interviewerName}, #{status}, #{createdTime}, #{updatedTime}, #{isDeleted}
+        )
+    </insert>
+
+    <insert id="insertBatch" parameterType="java.util.List">
+        insert into interview_process (
+        resume_id, job_id, current_stage, next_stage_time, interviewer_id, 
+        interviewer_name, status, created_time, updated_time, is_deleted
+        ) values
+        <foreach collection="entities" item="item" separator=",">
+            (
+            #{item.resumeId}, #{item.jobId}, #{item.currentStage}, #{item.nextStageTime}, #{item.interviewerId}, 
+            #{item.interviewerName}, #{item.status}, #{item.createdTime}, #{item.updatedTime}, #{item.isDeleted}
+            )
+        </foreach>
+    </insert>
+
+    <update id="update" parameterType="com.suifeng.yquest.entity.InterviewProcess">
+        update interview_process
+        <set>
+            <if test="resumeId != null">resume_id = #{resumeId},</if>
+            <if test="jobId != null">job_id = #{jobId},</if>
+            <if test="currentStage != null">current_stage = #{currentStage},</if>
+            <if test="nextStageTime != null">next_stage_time = #{nextStageTime},</if>
+            <if test="interviewerId != null">interviewer_id = #{interviewerId},</if>
+            <if test="interviewerName != null">interviewer_name = #{interviewerName},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updatedTime != null">updated_time = #{updatedTime},</if>
+            <if test="isDeleted != null">is_deleted = #{isDeleted},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="java.lang.Long">
+        update interview_process set is_deleted = 1 where id = #{id}
+    </delete>
+
+    <select id="queryByResumeId" resultMap="InterviewProcessMap">
+        select 
+        <include refid="Base_Column_List" />
+        from interview_process
+        where resume_id = #{resumeId} and is_deleted = 0
+    </select>
+
+    <select id="queryByJobId" resultMap="InterviewProcessMap">
+        select
+        <include refid="Base_Column_List" />
+        from interview_process
+        where job_id = #{jobId} and is_deleted = 0
+        order by created_time desc
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="countByJobId" resultType="java.lang.Integer">
+        select count(*)
+        from interview_process
+        where job_id = #{jobId} and is_deleted = 0
+    </select>
+
+    <select id="queryByInterviewerId" resultMap="InterviewProcessMap">
+        select
+        <include refid="Base_Column_List" />
+        from interview_process
+        where interviewer_id = #{interviewerId} and is_deleted = 0
+        order by created_time desc
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="countByInterviewerId" resultType="java.lang.Integer">
+        select count(*)
+        from interview_process
+        where interviewer_id = #{interviewerId} and is_deleted = 0
+    </select>
+
+</mapper>
