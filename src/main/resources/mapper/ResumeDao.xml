@@ -11,7 +11,7 @@
         <result property="userPhone" column="user_phone" jdbcType="VARCHAR" />
         <result property="resumeFileUrl" column="resume_file_url" jdbcType="VARCHAR" />
         <result property="resumeFileName" column="resume_file_name" jdbcType="VARCHAR" />
-        <result property="selfIntroduction" column="self_introduction" jdbcType="TEXT" />
+        <result property="selfIntroduction" column="self_introduction" jdbcType="LONGVARCHAR" />
         <result property="status" column="status" jdbcType="TINYINT" />
         <result property="createdTime" column="created_time" jdbcType="TIMESTAMP" />
         <result property="updatedTime" column="updated_time" jdbcType="TIMESTAMP" />
@@ -43,14 +43,14 @@
         <include refid="Base_Column_List" />
         from resume
         where is_deleted = 0
-        <if test="jobId != null">
-            and job_id = #{jobId}
+        <if test="resume.jobId != null">
+            and job_id = #{resume.jobId}
         </if>
-        <if test="userId != null">
-            and user_id = #{userId}
+        <if test="resume.userId != null">
+            and user_id = #{resume.userId}
         </if>
-        <if test="status != null">
-            and status = #{status}
+        <if test="resume.status != null">
+            and status = #{resume.status}
         </if>
         order by created_time desc
     </select>
@@ -60,31 +60,31 @@
         <include refid="Base_Column_List" />
         from resume
         where is_deleted = 0
-        <if test="jobId != null">
+        <if test="resume.jobId != null">
             and job_id = #{resume.jobId}
         </if>
-        <if test="userId != null">
+        <if test="resume.userId != null">
             and user_id = #{resume.userId}
         </if>
-        <if test="status != null">
+        <if test="resume.status != null">
             and status = #{resume.status}
         </if>
         order by created_time desc
-        limit #{offset}, #{limit}
+        limit #{start}, #{pageSize}
     </select>
 
     <select id="countByCondition" resultType="java.lang.Integer">
         select count(*)
         from resume
         where is_deleted = 0
-        <if test="jobId != null">
-            and job_id = #{jobId}
+        <if test="resume.jobId != null">
+            and job_id = #{resume.jobId}
         </if>
-        <if test="userId != null">
-            and user_id = #{userId}
+        <if test="resume.userId != null">
+            and user_id = #{resume.userId}
         </if>
-        <if test="status != null">
-            and status = #{status}
+        <if test="resume.status != null">
+            and status = #{resume.status}
         </if>
     </select>
 

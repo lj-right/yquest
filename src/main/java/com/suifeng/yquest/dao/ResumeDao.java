@@ -35,17 +35,17 @@ public interface ResumeDao {
      * @param resume 查询条件
      * @return 对象列表
      */
-    List<Resume> queryAll(Resume resume);
+    List<Resume> queryAll(@Param("resume") Resume resume);
 
     /**
      * 分页查询
      *
      * @param resume 查询条件
-     * @param offset 偏移量
-     * @param limit 限制数量
+     * @param start 起始位置
+     * @param pageSize 每页大小
      * @return 分页数据
      */
-    List<Resume> queryPage(Resume resume, @Param("offset") int offset, @Param("limit") int limit);
+    List<Resume> queryPage(@Param("resume") Resume resume, @Param("start") int start, @Param("pageSize") Integer pageSize);
 
     /**
      * 计算总数
@@ -53,7 +53,7 @@ public interface ResumeDao {
      * @param resume 查询条件
      * @return 总数
      */
-    int countByCondition(Resume resume);
+    int countByCondition(@Param("resume") Resume resume);
 
     /**
      * 新增数据

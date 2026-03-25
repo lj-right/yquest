@@ -8,6 +8,7 @@ import com.suifeng.yquest.api.adapter.StorageAdapter;
 import com.suifeng.yquest.entity.Resume;
 import com.suifeng.yquest.service.JobService;
 import com.suifeng.yquest.service.ResumeService;
+import com.suifeng.yquest.api.common.Result;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -119,12 +120,12 @@ public class ResumeController {
     /**
      * 删除数据
      *
-     * @param id 主键
+     * @param resume 实体
      * @return 删除是否成功
      */
-    @DeleteMapping("/delete/{id}")
-    public Result<Boolean> deleteById(@PathVariable("id") Long id) {
-        return Result.ok(this.resumeService.deleteById(id));
+    @DeleteMapping("/deleteById")
+    public Result<Boolean> deleteById(@RequestBody Resume resume) {
+        return Result.ok(this.resumeService.deleteById(resume.getId()));
     }
 
     /**
@@ -140,31 +141,23 @@ public class ResumeController {
     /**
      * 根据职位ID查询简历
      *
-     * @param jobId 职位ID
-     * @param pageNo 页码
-     * @param pageSize 每页大小
+     * @param resume 查询条件
      * @return 分页结果
      */
-    @PostMapping("/byJob/{jobId}/{pageNo}/{pageSize}")
-    public Result<PageResult<Resume>> queryByJobId(@PathVariable("jobId") Long jobId, 
-                                                  @PathVariable("pageNo") int pageNo, 
-                                                  @PathVariable("pageSize") int pageSize) {
-        return Result.ok(this.resumeService.queryByJobId(jobId, pageNo, pageSize));
+    @PostMapping("/byJob")
+    public Result<PageResult<Resume>> queryByJobId(@RequestBody Resume resume) {
+        return Result.ok(this.resumeService.queryByJobId(resume.getJobId(), resume.getPageNo(), resume.getPageSize()));
     }
 
     /**
      * 根据用户ID查询简历
      *
-     * @param userId 用户ID
-     * @param pageNo 页码
-     * @param pageSize 每页大小
+     * @param resume 查询条件
      * @return 分页结果
      */
-    @PostMapping("/byUser/{userId}/{pageNo}/{pageSize}")
-    public Result<PageResult<Resume>> queryByUserId(@PathVariable("userId") Long userId, 
-                                                  @PathVariable("pageNo") int pageNo, 
-                                                  @PathVariable("pageSize") int pageSize) {
-        return Result.ok(this.resumeService.queryByUserId(userId, pageNo, pageSize));
+    @PostMapping("/byUser")
+    public Result<PageResult<Resume>> queryByUserId(@RequestBody Resume resume) {
+        return Result.ok(this.resumeService.queryByUserId(resume.getUserId(), resume.getPageNo(), resume.getPageSize()));
     }
 
     /**
