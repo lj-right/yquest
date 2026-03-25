@@ -77,12 +77,9 @@ public interface JobService {
     /**
      * 查询用户发布的职位
      *
-     * @param userId 用户ID
-     * @param pageNo 页码
-     * @param pageSize 每页大小
      * @return 分页结果
      */
-    PageResult<Job> queryByUserId(Long userId, int pageNo, int pageSize);
+    PageResult<Job> queryByUserId(Job job);
 
     /**
      * 审核职位
@@ -100,5 +97,12 @@ public interface JobService {
      * @return 是否成功
      */
     boolean closeJob(Long id);
+
+    /**
+     * 根据公司ID查询职位
+     *
+     * @return 分页结果
+     */
+    PageResult<Job> queryByCompanyId(Job job);
 
 }

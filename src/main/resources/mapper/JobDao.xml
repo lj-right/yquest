@@ -14,8 +14,8 @@
         <result property="experience" column="experience" jdbcType="VARCHAR" />
         <result property="education" column="education" jdbcType="VARCHAR" />
         <result property="jobType" column="job_type" jdbcType="VARCHAR" />
-        <result property="description" column="description" jdbcType="TEXT" />
-        <result property="requirements" column="requirements" jdbcType="TEXT" />
+        <result property="description" column="description" jdbcType="LONGVARCHAR" />
+        <result property="requirements" column="requirements" jdbcType="LONGVARCHAR" />
         <result property="publishUserId" column="publish_user_id" jdbcType="BIGINT" />
         <result property="publishUserName" column="publish_user_name" jdbcType="VARCHAR" />
         <result property="publishUserEmail" column="publish_user_email" jdbcType="VARCHAR" />
@@ -53,17 +53,17 @@
         <include refid="Base_Column_List" />
         from job
         where is_deleted = 0
-        <if test="companyName != null and companyName != ''">
-            and company_name like concat('%', #{companyName}, '%')
+        <if test="job.companyName != null and job.companyName != ''">
+            and company_name like concat('%', #{job.companyName}, '%')
         </if>
-        <if test="jobTitle != null and jobTitle != ''">
-            and job_title like concat('%', #{jobTitle}, '%')
+        <if test="job.jobTitle != null and job.jobTitle != ''">
+            and job_title like concat('%', #{job.jobTitle}, '%')
         </if>
-        <if test="location != null and location != ''">
-            and location like concat('%', #{location}, '%')
+        <if test="job.location != null and job.location != ''">
+            and location like concat('%', #{job.location}, '%')
         </if>
-        <if test="status != null">
-            and status = #{status}
+        <if test="job.status != null">
+            and status = #{job.status}
         </if>
         order by created_time desc
     </select>
@@ -73,37 +73,37 @@
         <include refid="Base_Column_List" />
         from job
         where is_deleted = 0
-        <if test="companyName != null and companyName != ''">
+        <if test="job.companyName != null and job.companyName != ''">
             and company_name like concat('%', #{job.companyName}, '%')
         </if>
-        <if test="jobTitle != null and jobTitle != ''">
+        <if test="job.jobTitle != null and job.jobTitle != ''">
             and job_title like concat('%', #{job.jobTitle}, '%')
         </if>
-        <if test="location != null and location != ''">
+        <if test="job.location != null and job.location != ''">
             and location like concat('%', #{job.location}, '%')
         </if>
-        <if test="status != null">
+        <if test="job.status != null">
             and status = #{job.status}
         </if>
         order by created_time desc
-        limit #{offset}, #{limit}
+        limit #{start}, #{pageSize}
     </select>
 
     <select id="countByCondition" resultType="java.lang.Integer">
         select count(*)
         from job
         where is_deleted = 0
-        <if test="companyName != null and companyName != ''">
-            and company_name like concat('%', #{companyName}, '%')
+        <if test="job.companyName != null and job.companyName != ''">
+            and company_name like concat('%', #{job.companyName}, '%')
         </if>
-        <if test="jobTitle != null and jobTitle != ''">
-            and job_title like concat('%', #{jobTitle}, '%')
+        <if test="job.jobTitle != null and job.jobTitle != ''">
+            and job_title like concat('%', #{job.jobTitle}, '%')
         </if>
-        <if test="location != null and location != ''">
-            and location like concat('%', #{location}, '%')
+        <if test="job.location != null and job.location != ''">
+            and location like concat('%', #{job.location}, '%')
         </if>
-        <if test="status != null">
-            and status = #{status}
+        <if test="job.status != null">
+            and status = #{job.status}
         </if>
     </select>
 
@@ -186,6 +186,21 @@
         select count(*)
         from job
         where publish_user_id = #{userId} and is_deleted = 0
+    </select>
+
+    <select id="queryByCompanyId" resultMap="JobMap">
+        select
+        <include refid="Base_Column_List" />
+        from job
+        where company_id = #{companyId} and is_deleted = 0
+        order by created_time desc
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="countByCompanyId" resultType="java.lang.Integer">
+        select count(*)
+        from job
+        where company_id = #{companyId} and is_deleted = 0
     </select>
 
 </mapper>

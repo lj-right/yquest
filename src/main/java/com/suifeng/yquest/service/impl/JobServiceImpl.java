@@ -38,6 +38,7 @@ public class JobServiceImpl implements JobService {
      */
     @Override
     public PageResult<Job> queryByPage(Job job) {
+        job.setIsDeleted(IsDeletedFlagEnum.UN_DELETED.getCode());
         PageResult<Job> pageResult = new PageResult<>();
         pageResult.setPageNo(job.getPageNo());
         pageResult.setPageSize(job.getPageSize());
@@ -89,7 +90,6 @@ public class JobServiceImpl implements JobService {
      */
     @Override
     public boolean update(Job job) {
-        job.setUpdatedTime(new Date());
         return this.jobDao.update(job) > 0;
     }
 
@@ -129,23 +129,20 @@ public class JobServiceImpl implements JobService {
     /**
      * 查询用户发布的职位
      *
-     * @param userId 用户ID
-     * @param pageNo 页码
-     * @param pageSize 每页大小
      * @return 分页结果
      */
     @Override
-    public PageResult<Job> queryByUserId(Long userId, int pageNo, int pageSize) {
+    public PageResult<Job> queryByUserId(Job job) {
         PageResult<Job> pageResult = new PageResult<>();
-        pageResult.setPageNo(pageNo);
-        pageResult.setPageSize(pageSize);
-        int start = (pageNo - 1) * pageSize;
+        pageResult.setPageNo(job.getPageNo());
+        pageResult.setPageSize(job.getPageSize());
+        int start = (job.getPageNo() - 1) * job.getPageSize();
 
-        int count = jobDao.countByUserId(userId);
+        int count = jobDao.countByUserId(job.getPublishUserId());
         if (count == 0) {
             return pageResult;
         }
-        List<Job> jobList = jobDao.queryByUserId(userId, start, pageSize);
+        List<Job> jobList = jobDao.queryByUserId(job.getPublishUserId(), start, job.getPageSize());
         pageResult.setRecords(jobList);
         pageResult.setTotal(count);
         return pageResult;
@@ -180,6 +177,28 @@ public class JobServiceImpl implements JobService {
         job.setStatus(2); // 已结束
         job.setUpdatedTime(new Date());
         return this.jobDao.update(job) > 0;
+    }
+
+    /**
+     * 根据公司ID查询职位
+     *
+     * @return 分页结果
+     */
+    @Override
+    public PageResult<Job> queryByCompanyId(Job job) {
+        PageResult<Job> pageResult = new PageResult<>();
+        pageResult.setPageNo(job.getPageNo());
+        pageResult.setPageSize(job.getPageSize());
+        int start = (job.getPageNo() - 1) * job.getPageSize();
+
+        int count = jobDao.countByCompanyId(job.getCompanyId());
+        if (count == 0) {
+            return pageResult;
+        }
+        List<Job> jobList = jobDao.queryByCompanyId(job.getCompanyId(), start, job.getPageSize());
+        pageResult.setRecords(jobList);
+        pageResult.setTotal(count);
+        return pageResult;
     }
 
 }

@@ -35,17 +35,17 @@ public interface JobDao {
      * @param job 查询条件
      * @return 对象列表
      */
-    List<Job> queryAll(Job job);
+    List<Job> queryAll(@Param("job") Job job);
 
     /**
      * 分页查询
      *
      * @param job 查询条件
-     * @param offset 偏移量
-     * @param limit 限制数量
+     * @param start 起始位置
+     * @param pageSize 每页大小
      * @return 分页数据
      */
-    List<Job> queryPage(Job job, @Param("offset") int offset, @Param("limit") int limit);
+    List<Job> queryPage(@Param("job") Job job, @Param("start") int start, @Param("pageSize") Integer pageSize);
 
     /**
      * 计算总数
@@ -53,7 +53,7 @@ public interface JobDao {
      * @param job 查询条件
      * @return 总数
      */
-    int countByCondition(Job job);
+    int countByCondition(@Param("job") Job job);
 
     /**
      * 新增数据
@@ -128,5 +128,23 @@ public interface JobDao {
      * @return 数量
      */
     int countByUserId(Long userId);
+
+    /**
+     * 查询公司发布的职位
+     *
+     * @param companyId 公司ID
+     * @param offset 偏移量
+     * @param limit 限制数量
+     * @return 职位列表
+     */
+    List<Job> queryByCompanyId(@Param("companyId") Long companyId, @Param("offset") int offset, @Param("limit") int limit);
+
+    /**
+     * 统计公司发布的职位数量
+     *
+     * @param companyId 公司ID
+     * @return 数量
+     */
+    int countByCompanyId(Long companyId);
 
 }
