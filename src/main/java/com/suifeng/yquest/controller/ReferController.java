@@ -108,7 +108,7 @@ public class ReferController {
      * @param refer
      * @return
      */
-    @SaCheckPermission({"manage_user"})
+    @SaCheckPermission({"manage"})
     @PostMapping("/manageReferPage")
     public Result<PageResult<Refer>> manageReferPage(@RequestBody Refer refer){
         try {

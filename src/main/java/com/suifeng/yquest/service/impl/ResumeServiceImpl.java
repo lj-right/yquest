@@ -104,24 +104,20 @@ public class ResumeServiceImpl implements ResumeService {
 
     /**
      * 根据职位ID查询简历
-     *
-     * @param jobId 职位ID
-     * @param pageNo 页码
-     * @param pageSize 每页大小
      * @return 分页结果
      */
     @Override
-    public PageResult<Resume> queryByJobId(Long jobId, int pageNo, int pageSize) {
+    public PageResult<Resume> queryByJobId(Resume resume) {
         PageResult<Resume> pageResult = new PageResult<>();
-        pageResult.setPageNo(pageNo);
-        pageResult.setPageSize(pageSize);
-        int start = (pageNo - 1) * pageSize;
+        pageResult.setPageNo(resume.getPageNo());
+        pageResult.setPageSize(resume.getPageSize());
+        int start = (resume.getPageNo() - 1) * resume.getPageSize();
 
-        int count = resumeDao.countByJobId(jobId);
+        int count = resumeDao.countByJobId(resume.getJobId());
         if (count == 0) {
             return pageResult;
         }
-        List<Resume> resumeList = resumeDao.queryByJobId(jobId, start, pageSize);
+        List<Resume> resumeList = resumeDao.queryByJobId(resume.getJobId(), start, resume.getPageSize());
         pageResult.setRecords(resumeList);
         pageResult.setTotal(count);
         return pageResult;
@@ -129,24 +125,20 @@ public class ResumeServiceImpl implements ResumeService {
 
     /**
      * 根据用户ID查询简历
-     *
-     * @param userId 用户ID
-     * @param pageNo 页码
-     * @param pageSize 每页大小
      * @return 分页结果
      */
     @Override
-    public PageResult<Resume> queryByUserId(Long userId, int pageNo, int pageSize) {
+    public PageResult<Resume> queryByUserId(Resume resume) {
         PageResult<Resume> pageResult = new PageResult<>();
-        pageResult.setPageNo(pageNo);
-        pageResult.setPageSize(pageSize);
-        int start = (pageNo - 1) * pageSize;
+        pageResult.setPageNo(resume.getPageNo());
+        pageResult.setPageSize(resume.getPageSize());
+        int start = (resume.getPageNo() - 1) * resume.getPageSize();
 
-        int count = resumeDao.countByUserId(userId);
+        int count = resumeDao.countByUserId(resume.getUserId());
         if (count == 0) {
             return pageResult;
         }
-        List<Resume> resumeList = resumeDao.queryByUserId(userId, start, pageSize);
+        List<Resume> resumeList = resumeDao.queryByUserId(resume.getUserId(), start, resume.getPageSize());
         pageResult.setRecords(resumeList);
         pageResult.setTotal(count);
         return pageResult;

@@ -61,22 +61,14 @@ public interface ResumeService {
     /**
      * 根据职位ID查询简历
      *
-     * @param jobId 职位ID
-     * @param pageNo 页码
-     * @param pageSize 每页大小
-     * @return 分页结果
      */
-    PageResult<Resume> queryByJobId(Long jobId, int pageNo, int pageSize);
+    PageResult<Resume> queryByJobId(Resume resume);
 
     /**
      * 根据用户ID查询简历
-     *
-     * @param userId 用户ID
-     * @param pageNo 页码
-     * @param pageSize 每页大小
      * @return 分页结果
      */
-    PageResult<Resume> queryByUserId(Long userId, int pageNo, int pageSize);
+    PageResult<Resume> queryByUserId(Resume resume);
 
     /**
      * 根据职位ID和用户ID查询简历

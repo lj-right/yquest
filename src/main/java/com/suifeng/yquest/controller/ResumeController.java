@@ -146,7 +146,7 @@ public class ResumeController {
      */
     @PostMapping("/byJob")
     public Result<PageResult<Resume>> queryByJobId(@RequestBody Resume resume) {
-        return Result.ok(this.resumeService.queryByJobId(resume.getJobId(), resume.getPageNo(), resume.getPageSize()));
+        return Result.ok(this.resumeService.queryByJobId(resume));
     }
 
     /**
@@ -157,7 +157,7 @@ public class ResumeController {
      */
     @PostMapping("/byUser")
     public Result<PageResult<Resume>> queryByUserId(@RequestBody Resume resume) {
-        return Result.ok(this.resumeService.queryByUserId(resume.getUserId(), resume.getPageNo(), resume.getPageSize()));
+        return Result.ok(this.resumeService.queryByUserId(resume));
     }
 
     /**
