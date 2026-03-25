@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.suifeng.yquest.dao.JobDao">
+
+    <resultMap type="com.suifeng.yquest.entity.Job" id="JobMap">
+        <result property="id" column="id" jdbcType="BIGINT" />
+        <result property="companyId" column="company_id" jdbcType="BIGINT" />
+        <result property="companyName" column="company_name" jdbcType="VARCHAR" />
+        <result property="jobTitle" column="job_title" jdbcType="VARCHAR" />
+        <result property="department" column="department" jdbcType="VARCHAR" />
+        <result property="location" column="location" jdbcType="VARCHAR" />
+        <result property="salaryMin" column="salary_min" jdbcType="DECIMAL" />
+        <result property="salaryMax" column="salary_max" jdbcType="DECIMAL" />
+        <result property="experience" column="experience" jdbcType="VARCHAR" />
+        <result property="education" column="education" jdbcType="VARCHAR" />
+        <result property="jobType" column="job_type" jdbcType="VARCHAR" />
+        <result property="description" column="description" jdbcType="TEXT" />
+        <result property="requirements" column="requirements" jdbcType="TEXT" />
+        <result property="publishUserId" column="publish_user_id" jdbcType="BIGINT" />
+        <result property="publishUserName" column="publish_user_name" jdbcType="VARCHAR" />
+        <result property="publishUserEmail" column="publish_user_email" jdbcType="VARCHAR" />
+        <result property="status" column="status" jdbcType="TINYINT" />
+        <result property="viewCount" column="view_count" jdbcType="INTEGER" />
+        <result property="applyCount" column="apply_count" jdbcType="INTEGER" />
+        <result property="createdTime" column="created_time" jdbcType="TIMESTAMP" />
+        <result property="updatedTime" column="updated_time" jdbcType="TIMESTAMP" />
+        <result property="isDeleted" column="is_deleted" jdbcType="TINYINT" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, company_id, company_name, job_title, department, location, salary_min, salary_max, 
+        experience, education, job_type, description, requirements, publish_user_id, publish_user_name, 
+        publish_user_email, status, view_count, apply_count, created_time, updated_time, is_deleted
+    </sql>
+
+    <select id="queryById" resultMap="JobMap">
+        select 
+        <include refid="Base_Column_List" />
+        from job
+        where id = #{id} and is_deleted = 0
+    </select>
+
+    <select id="queryAllByLimit" resultMap="JobMap">
+        select
+        <include refid="Base_Column_List" />
+        from job
+        where is_deleted = 0
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="queryAll" resultMap="JobMap">
+        select
+        <include refid="Base_Column_List" />
+        from job
+        where is_deleted = 0
+        <if test="companyName != null and companyName != ''">
+            and company_name like concat('%', #{companyName}, '%')
+        </if>
+        <if test="jobTitle != null and jobTitle != ''">
+            and job_title like concat('%', #{jobTitle}, '%')
+        </if>
+        <if test="location != null and location != ''">
+            and location like concat('%', #{location}, '%')
+        </if>
+        <if test="status != null">
+            and status = #{status}
+        </if>
+        order by created_time desc
+    </select>
+
+    <select id="queryPage" resultMap="JobMap">
+        select
+        <include refid="Base_Column_List" />
+        from job
+        where is_deleted = 0
+        <if test="companyName != null and companyName != ''">
+            and company_name like concat('%', #{job.companyName}, '%')
+        </if>
+        <if test="jobTitle != null and jobTitle != ''">
+            and job_title like concat('%', #{job.jobTitle}, '%')
+        </if>
+        <if test="location != null and location != ''">
+            and location like concat('%', #{job.location}, '%')
+        </if>
+        <if test="status != null">
+            and status = #{job.status}
+        </if>
+        order by created_time desc
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="countByCondition" resultType="java.lang.Integer">
+        select count(*)
+        from job
+        where is_deleted = 0
+        <if test="companyName != null and companyName != ''">
+            and company_name like concat('%', #{companyName}, '%')
+        </if>
+        <if test="jobTitle != null and jobTitle != ''">
+            and job_title like concat('%', #{jobTitle}, '%')
+        </if>
+        <if test="location != null and location != ''">
+            and location like concat('%', #{location}, '%')
+        </if>
+        <if test="status != null">
+            and status = #{status}
+        </if>
+    </select>
+
+    <insert id="insert" parameterType="com.suifeng.yquest.entity.Job" useGeneratedKeys="true" keyProperty="id">
+        insert into job (
+        company_id, company_name, job_title, department, location, salary_min, salary_max, 
+        experience, education, job_type, description, requirements, publish_user_id, publish_user_name, 
+        publish_user_email, status, view_count, apply_count, created_time, updated_time, is_deleted
+        ) values (
+        #{companyId}, #{companyName}, #{jobTitle}, #{department}, #{location}, #{salaryMin}, #{salaryMax}, 
+        #{experience}, #{education}, #{jobType}, #{description}, #{requirements}, #{publishUserId}, #{publishUserName}, 
+        #{publishUserEmail}, #{status}, #{viewCount}, #{applyCount}, #{createdTime}, #{updatedTime}, #{isDeleted}
+        )
+    </insert>
+
+    <insert id="insertBatch" parameterType="java.util.List">
+        insert into job (
+        company_id, company_name, job_title, department, location, salary_min, salary_max, 
+        experience, education, job_type, description, requirements, publish_user_id, publish_user_name, 
+        publish_user_email, status, view_count, apply_count, created_time, updated_time, is_deleted
+        ) values
+        <foreach collection="entities" item="item" separator=",">
+            (
+            #{item.companyId}, #{item.companyName}, #{item.jobTitle}, #{item.department}, #{item.location}, #{item.salaryMin}, #{item.salaryMax}, 
+            #{item.experience}, #{item.education}, #{item.jobType}, #{item.description}, #{item.requirements}, #{item.publishUserId}, #{item.publishUserName}, 
+            #{item.publishUserEmail}, #{item.status}, #{item.viewCount}, #{item.applyCount}, #{item.createdTime}, #{item.updatedTime}, #{item.isDeleted}
+            )
+        </foreach>
+    </insert>
+
+    <update id="update" parameterType="com.suifeng.yquest.entity.Job">
+        update job
+        <set>
+            <if test="companyId != null">company_id = #{companyId},</if>
+            <if test="companyName != null">company_name = #{companyName},</if>
+            <if test="jobTitle != null">job_title = #{jobTitle},</if>
+            <if test="department != null">department = #{department},</if>
+            <if test="location != null">location = #{location},</if>
+            <if test="salaryMin != null">salary_min = #{salaryMin},</if>
+            <if test="salaryMax != null">salary_max = #{salaryMax},</if>
+            <if test="experience != null">experience = #{experience},</if>
+            <if test="education != null">education = #{education},</if>
+            <if test="jobType != null">job_type = #{jobType},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="requirements != null">requirements = #{requirements},</if>
+            <if test="publishUserId != null">publish_user_id = #{publishUserId},</if>
+            <if test="publishUserName != null">publish_user_name = #{publishUserName},</if>
+            <if test="publishUserEmail != null">publish_user_email = #{publishUserEmail},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="viewCount != null">view_count = #{viewCount},</if>
+            <if test="applyCount != null">apply_count = #{applyCount},</if>
+            <if test="updatedTime != null">updated_time = #{updatedTime},</if>
+            <if test="isDeleted != null">is_deleted = #{isDeleted},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="java.lang.Long">
+        update job set is_deleted = 1 where id = #{id}
+    </delete>
+
+    <update id="incrementViewCount" parameterType="java.lang.Long">
+        update job set view_count = view_count + 1 where id = #{id}
+    </update>
+
+    <update id="incrementApplyCount" parameterType="java.lang.Long">
+        update job set apply_count = apply_count + 1 where id = #{id}
+    </update>
+
+    <select id="queryByUserId" resultMap="JobMap">
+        select
+        <include refid="Base_Column_List" />
+        from job
+        where publish_user_id = #{userId} and is_deleted = 0
+        order by created_time desc
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="countByUserId" resultType="java.lang.Integer">
+        select count(*)
+        from job
+        where publish_user_id = #{userId} and is_deleted = 0
+    </select>
+
+</mapper>

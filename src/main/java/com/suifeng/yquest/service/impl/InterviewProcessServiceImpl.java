@@ -73,6 +73,13 @@ public class InterviewProcessServiceImpl implements InterviewProcessService {
      */
     @Override
     public boolean insert(InterviewProcess interviewProcess) {
+        // 检查是否已存在相同resumeId的面试流程
+        InterviewProcess existingProcess = interviewProcessDao.queryByResumeId(interviewProcess.getResumeId());
+        if (existingProcess != null) {
+            // 已存在，返回false
+            return false;
+        }
+        
         interviewProcess.setStatus(0); // 进行中
         interviewProcess.setCreatedTime(new Date());
         interviewProcess.setUpdatedTime(new Date());

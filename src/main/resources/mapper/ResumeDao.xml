@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.suifeng.yquest.dao.ResumeDao">
+
+    <resultMap type="com.suifeng.yquest.entity.Resume" id="ResumeMap">
+        <result property="id" column="id" jdbcType="BIGINT" />
+        <result property="jobId" column="job_id" jdbcType="BIGINT" />
+        <result property="userId" column="user_id" jdbcType="BIGINT" />
+        <result property="userName" column="user_name" jdbcType="VARCHAR" />
+        <result property="userEmail" column="user_email" jdbcType="VARCHAR" />
+        <result property="userPhone" column="user_phone" jdbcType="VARCHAR" />
+        <result property="resumeFileUrl" column="resume_file_url" jdbcType="VARCHAR" />
+        <result property="resumeFileName" column="resume_file_name" jdbcType="VARCHAR" />
+        <result property="selfIntroduction" column="self_introduction" jdbcType="TEXT" />
+        <result property="status" column="status" jdbcType="TINYINT" />
+        <result property="createdTime" column="created_time" jdbcType="TIMESTAMP" />
+        <result property="updatedTime" column="updated_time" jdbcType="TIMESTAMP" />
+        <result property="isDeleted" column="is_deleted" jdbcType="TINYINT" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, job_id, user_id, user_name, user_email, user_phone, resume_file_url, 
+        resume_file_name, self_introduction, status, created_time, updated_time, is_deleted
+    </sql>
+
+    <select id="queryById" resultMap="ResumeMap">
+        select 
+        <include refid="Base_Column_List" />
+        from resume
+        where id = #{id} and is_deleted = 0
+    </select>
+
+    <select id="queryAllByLimit" resultMap="ResumeMap">
+        select
+        <include refid="Base_Column_List" />
+        from resume
+        where is_deleted = 0
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="queryAll" resultMap="ResumeMap">
+        select
+        <include refid="Base_Column_List" />
+        from resume
+        where is_deleted = 0
+        <if test="jobId != null">
+            and job_id = #{jobId}
+        </if>
+        <if test="userId != null">
+            and user_id = #{userId}
+        </if>
+        <if test="status != null">
+            and status = #{status}
+        </if>
+        order by created_time desc
+    </select>
+
+    <select id="queryPage" resultMap="ResumeMap">
+        select
+        <include refid="Base_Column_List" />
+        from resume
+        where is_deleted = 0
+        <if test="jobId != null">
+            and job_id = #{resume.jobId}
+        </if>
+        <if test="userId != null">
+            and user_id = #{resume.userId}
+        </if>
+        <if test="status != null">
+            and status = #{resume.status}
+        </if>
+        order by created_time desc
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="countByCondition" resultType="java.lang.Integer">
+        select count(*)
+        from resume
+        where is_deleted = 0
+        <if test="jobId != null">
+            and job_id = #{jobId}
+        </if>
+        <if test="userId != null">
+            and user_id = #{userId}
+        </if>
+        <if test="status != null">
+            and status = #{status}
+        </if>
+    </select>
+
+    <insert id="insert" parameterType="com.suifeng.yquest.entity.Resume" useGeneratedKeys="true" keyProperty="id">
+        insert into resume (
+        job_id, user_id, user_name, user_email, user_phone, resume_file_url, 
+        resume_file_name, self_introduction, status, created_time, updated_time, is_deleted
+        ) values (
+        #{jobId}, #{userId}, #{userName}, #{userEmail}, #{userPhone}, #{resumeFileUrl}, 
+        #{resumeFileName}, #{selfIntroduction}, #{status}, #{createdTime}, #{updatedTime}, #{isDeleted}
+        )
+    </insert>
+
+    <insert id="insertBatch" parameterType="java.util.List">
+        insert into resume (
+        job_id, user_id, user_name, user_email, user_phone, resume_file_url, 
+        resume_file_name, self_introduction, status, created_time, updated_time, is_deleted
+        ) values
+        <foreach collection="entities" item="item" separator=",">
+            (
+            #{item.jobId}, #{item.userId}, #{item.userName}, #{item.userEmail}, #{item.userPhone}, #{item.resumeFileUrl}, 
+            #{item.resumeFileName}, #{item.selfIntroduction}, #{item.status}, #{item.createdTime}, #{item.updatedTime}, #{item.isDeleted}
+            )
+        </foreach>
+    </insert>
+
+    <update id="update" parameterType="com.suifeng.yquest.entity.Resume">
+        update resume
+        <set>
+            <if test="jobId != null">job_id = #{jobId},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="userName != null">user_name = #{userName},</if>
+            <if test="userEmail != null">user_email = #{userEmail},</if>
+            <if test="userPhone != null">user_phone = #{userPhone},</if>
+            <if test="resumeFileUrl != null">resume_file_url = #{resumeFileUrl},</if>
+            <if test="resumeFileName != null">resume_file_name = #{resumeFileName},</if>
+            <if test="selfIntroduction != null">self_introduction = #{selfIntroduction},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updatedTime != null">updated_time = #{updatedTime},</if>
+            <if test="isDeleted != null">is_deleted = #{isDeleted},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="java.lang.Long">
+        update resume set is_deleted = 1 where id = #{id}
+    </delete>
+
+    <select id="queryByJobId" resultMap="ResumeMap">
+        select
+        <include refid="Base_Column_List" />
+        from resume
+        where job_id = #{jobId} and is_deleted = 0
+        order by created_time desc
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="countByJobId" resultType="java.lang.Integer">
+        select count(*)
+        from resume
+        where job_id = #{jobId} and is_deleted = 0
+    </select>
+
+    <select id="queryByUserId" resultMap="ResumeMap">
+        select
+        <include refid="Base_Column_List" />
+        from resume
+        where user_id = #{userId} and is_deleted = 0
+        order by created_time desc
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="countByUserId" resultType="java.lang.Integer">
+        select count(*)
+        from resume
+        where user_id = #{userId} and is_deleted = 0
+    </select>
+
+    <select id="queryByJobIdAndUserId" resultMap="ResumeMap">
+        select
+        <include refid="Base_Column_List" />
+        from resume
+        where job_id = #{jobId} and user_id = #{userId} and is_deleted = 0
+    </select>
+
+</mapper>

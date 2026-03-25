@@ -1,5 +1,6 @@
 package com.suifeng.yquest.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.suifeng.yquest.api.common.PageInfo;
 import lombok.Data;
 
@@ -36,6 +37,7 @@ public class InterviewProcess extends PageInfo implements Serializable {
     /**
      * 下一阶段时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
     private Date nextStageTime;
 
     /**
@@ -56,11 +58,13 @@ public class InterviewProcess extends PageInfo implements Serializable {
     /**
      * 创建时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
     private Date createdTime;
 
     /**
      * 更新时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
     private Date updatedTime;
 
     /**
