@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.suifeng.yquest.dao.CompanyDao">
+
+    <resultMap type="com.suifeng.yquest.entity.Company" id="CompanyMap">
+        <result property="id" column="id" jdbcType="BIGINT" />
+        <result property="companyName" column="company_name" jdbcType="VARCHAR" />
+        <result property="companySize" column="company_size" jdbcType="VARCHAR" />
+        <result property="companyDesc" column="company_desc" jdbcType="VARCHAR" />
+        <result property="companyAddress" column="company_address" jdbcType="VARCHAR" />
+        <result property="contactPhone" column="contact_phone" jdbcType="VARCHAR" />
+        <result property="contactPerson" column="contact_person" jdbcType="VARCHAR" />
+        <result property="auditStatus" column="audit_status" jdbcType="TINYINT" />
+        <result property="createdTime" column="created_time" jdbcType="TIMESTAMP" />
+        <result property="updatedTime" column="updated_time" jdbcType="TIMESTAMP" />
+        <result property="isDeleted" column="is_deleted" jdbcType="TINYINT" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, company_name, company_size, company_desc, 
+        company_address, contact_phone, contact_person, audit_status, 
+        created_time, updated_time, is_deleted
+    </sql>
+
+    <select id="queryById" resultMap="CompanyMap">
+        select 
+        <include refid="Base_Column_List" />
+        from company
+        where id = #{id} and is_deleted = 0
+    </select>
+
+    <select id="queryAllByLimit" resultMap="CompanyMap">
+        select
+        <include refid="Base_Column_List" />
+        from company
+        where is_deleted = 0
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="queryAll" resultMap="CompanyMap">
+        select
+        <include refid="Base_Column_List" />
+        from company
+        where is_deleted = 0
+        <if test="company.companyName != null">
+            and company_name like concat('%', #{company.companyName}, '%')
+        </if>
+        <if test="company.auditStatus != null">
+            and audit_status = #{company.auditStatus}
+        </if>
+        order by created_time desc
+    </select>
+
+    <select id="queryPage" resultMap="CompanyMap">
+        select
+        <include refid="Base_Column_List" />
+        from company
+        where is_deleted = 0
+        <if test="company.companyName != null">
+            and company_name like concat('%', #{company.companyName}, '%')
+        </if>
+        <if test="company.auditStatus != null">
+            and audit_status = #{company.auditStatus}
+        </if>
+        order by created_time desc
+        limit #{start}, #{pageSize}
+    </select>
+
+    <select id="countByCondition" resultType="java.lang.Integer">
+        select count(*)
+        from company
+        where is_deleted = 0
+        <if test="company.companyName != null">
+            and company_name like concat('%', #{company.companyName}, '%')
+        </if>
+        <if test="company.auditStatus != null">
+            and audit_status = #{company.auditStatus}
+        </if>
+    </select>
+
+    <insert id="insert" parameterType="com.suifeng.yquest.entity.Company" useGeneratedKeys="true" keyProperty="id">
+        insert into company (
+        company_name, company_size, company_desc, 
+        company_address, contact_phone, contact_person, audit_status, 
+        created_time, updated_time, is_deleted
+        ) values (
+        #{companyName}, #{companySize}, #{companyDesc}, 
+        #{companyAddress}, #{contactPhone}, #{contactPerson}, #{auditStatus}, 
+        #{createdTime}, #{updatedTime}, #{isDeleted}
+        )
+    </insert>
+
+    <insert id="insertBatch" parameterType="java.util.List">
+        insert into company (
+        company_name, company_size, company_desc, 
+        company_address, contact_phone, contact_person, audit_status, 
+        created_time, updated_time, is_deleted
+        ) values
+        <foreach collection="entities" item="item" separator=",">
+            (
+            #{item.companyName}, #{item.companySize}, #{item.companyDesc}, 
+            #{item.companyAddress}, #{item.contactPhone}, #{item.contactPerson}, #{item.auditStatus}, 
+            #{item.createdTime}, #{item.updatedTime}, #{item.isDeleted}
+            )
+        </foreach>
+    </insert>
+
+    <update id="update" parameterType="com.suifeng.yquest.entity.Company">
+        update company
+        <set>
+            <if test="companyName != null">company_name = #{companyName},</if>
+            <if test="companySize != null">company_size = #{companySize},</if>
+            <if test="companyDesc != null">company_desc = #{companyDesc},</if>
+            <if test="companyAddress != null">company_address = #{companyAddress},</if>
+            <if test="contactPhone != null">contact_phone = #{contactPhone},</if>
+            <if test="contactPerson != null">contact_person = #{contactPerson},</if>
+            <if test="auditStatus != null">audit_status = #{auditStatus},</if>
+            <if test="updatedTime != null">updated_time = #{updatedTime},</if>
+            <if test="isDeleted != null">is_deleted = #{isDeleted},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="java.lang.Long">
+        update company set is_deleted = 1 where id = #{id}
+    </delete>
+
+    <select id="queryByCompanyName" resultMap="CompanyMap">
+        select
+        <include refid="Base_Column_List" />
+        from company
+        where company_name = #{companyName} and is_deleted = 0
+    </select>
+
+</mapper>
