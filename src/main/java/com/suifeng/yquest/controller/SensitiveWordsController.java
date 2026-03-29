@@ -30,7 +30,7 @@ public class SensitiveWordsController {
     /**
      * 新增敏感词
      */
-    @SaCheckPermission({"manage_user"})
+    @SaCheckPermission({"manage"})
     @GetMapping(value = "/save")
     public Result<Boolean> save(String words, Integer type) {
         try {
@@ -55,7 +55,7 @@ public class SensitiveWordsController {
     /**
      * 删除敏感词
      */
-    @SaCheckPermission({"manage_user"})
+    @SaCheckPermission({"manage"})
     @GetMapping(value = "/remove")
     public Result<Boolean> remove(Long id) {
         try {
@@ -78,7 +78,7 @@ public class SensitiveWordsController {
     /**
      * 更新敏感词
      */
-    @SaCheckPermission({"manage_user"})
+    @SaCheckPermission({"manage"})
     @PostMapping(value = "/update")
     public Result<Boolean> update(@RequestBody SensitiveWords sensitiveWords) {
         try {
@@ -107,7 +107,7 @@ public class SensitiveWordsController {
      * 敏感词分页查询
      */
 
-    @SaCheckPermission({"manage_user"})
+    @SaCheckPermission({"manage"})
     @PostMapping(value = "/queryPage")
     public Result<PageResult<SensitiveWords>> queryPage(@RequestBody SensitiveWords sw) {
         try {

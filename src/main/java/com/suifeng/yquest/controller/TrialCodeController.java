@@ -29,7 +29,7 @@ public class TrialCodeController {
      * @param trialCode   筛选条件
      * @return 查询结果
      */
-    @SaCheckPermission({"manage_user"})
+    @SaCheckPermission({"manage"})
     @PostMapping("/getPage")
     public Result<PageResult<TrialCode>> queryByPage(@RequestBody TrialCode trialCode) {
         return Result.ok(this.trialCodeService.queryByPage(trialCode));
@@ -60,7 +60,7 @@ public class TrialCodeController {
     /**
      * 编辑数据(批量)
      */
-    @SaCheckPermission({"manage_user"})
+    @SaCheckPermission({"manage"})
     @PutMapping("/edit")
     public Result<Boolean> edit(@RequestBody List<TrialCode> trialCodeList) {
         return Result.ok(this.trialCodeService.update(trialCodeList));
@@ -72,7 +72,7 @@ public class TrialCodeController {
      * @param id 主键
      * @return 删除是否成功
      */
-    @SaCheckPermission({"manage_user"})
+    @SaCheckPermission({"manage"})
     @DeleteMapping("/delete")
     public Result<Boolean> deleteById(@RequestParam("id") Integer id) {
         return Result.ok(this.trialCodeService.deleteById(id));

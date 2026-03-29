@@ -35,17 +35,17 @@ public interface InterviewRecordDao {
      * @param interviewRecord 查询条件
      * @return 对象列表
      */
-    List<InterviewRecord> queryAll(InterviewRecord interviewRecord);
+    List<InterviewRecord> queryAll(@Param("interviewRecord") InterviewRecord interviewRecord);
 
     /**
      * 分页查询
      *
      * @param interviewRecord 查询条件
-     * @param offset 偏移量
-     * @param limit 限制数量
+     * @param start 起始位置
+     * @param pageSize 每页大小
      * @return 分页数据
      */
-    List<InterviewRecord> queryPage(InterviewRecord interviewRecord, @Param("offset") int offset, @Param("limit") int limit);
+    List<InterviewRecord> queryPage(@Param("interviewRecord") InterviewRecord interviewRecord, @Param("start") int start, @Param("pageSize") Integer pageSize);
 
     /**
      * 计算总数
@@ -53,7 +53,7 @@ public interface InterviewRecordDao {
      * @param interviewRecord 查询条件
      * @return 总数
      */
-    int countByCondition(InterviewRecord interviewRecord);
+    int countByCondition(@Param("interviewRecord") InterviewRecord interviewRecord);
 
     /**
      * 新增数据

@@ -35,17 +35,17 @@ public interface InterviewProcessDao {
      * @param interviewProcess 查询条件
      * @return 对象列表
      */
-    List<InterviewProcess> queryAll(InterviewProcess interviewProcess);
+    List<InterviewProcess> queryAll(@Param("interviewProcess") InterviewProcess interviewProcess);
 
     /**
      * 分页查询
      *
      * @param interviewProcess 查询条件
-     * @param offset 偏移量
-     * @param limit 限制数量
+     * @param start 起始位置
+     * @param pageSize 每页大小
      * @return 分页数据
      */
-    List<InterviewProcess> queryPage(InterviewProcess interviewProcess, @Param("offset") int offset, @Param("limit") int limit);
+    List<InterviewProcess> queryPage(@Param("interviewProcess") InterviewProcess interviewProcess, @Param("start") int start, @Param("pageSize") Integer pageSize);
 
     /**
      * 计算总数
@@ -53,7 +53,7 @@ public interface InterviewProcessDao {
      * @param interviewProcess 查询条件
      * @return 总数
      */
-    int countByCondition(InterviewProcess interviewProcess);
+    int countByCondition(@Param("interviewProcess") InterviewProcess interviewProcess);
 
     /**
      * 新增数据

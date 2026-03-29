@@ -3,8 +3,10 @@ package com.suifeng.yquest.service.impl;
 import com.suifeng.yquest.api.common.PageResult;
 import com.suifeng.yquest.api.enums.IsDeletedFlagEnum;
 import com.suifeng.yquest.entity.InterviewProcess;
+import com.suifeng.yquest.entity.Resume;
 import com.suifeng.yquest.dao.InterviewProcessDao;
 import com.suifeng.yquest.service.InterviewProcessService;
+import com.suifeng.yquest.service.ResumeService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -19,6 +21,9 @@ public class InterviewProcessServiceImpl implements InterviewProcessService {
 
     @Resource
     private InterviewProcessDao interviewProcessDao;
+    
+    @Resource
+    private ResumeService resumeService;
 
     /**
      * 通过ID查询单条数据
@@ -73,6 +78,13 @@ public class InterviewProcessServiceImpl implements InterviewProcessService {
      */
     @Override
     public boolean insert(InterviewProcess interviewProcess) {
+        // 检查简历是否存在
+        Resume resume = resumeService.queryById(interviewProcess.getResumeId());
+        if (resume == null) {
+            // 简历不存在，返回false
+            return false;
+        }
+        
         // 检查是否已存在相同resumeId的面试流程
         InterviewProcess existingProcess = interviewProcessDao.queryByResumeId(interviewProcess.getResumeId());
         if (existingProcess != null) {
@@ -221,6 +233,22 @@ public class InterviewProcessServiceImpl implements InterviewProcessService {
         process.setId(id);
         process.setCurrentStage(6); // 已拒绝
         process.setStatus(1); // 已完成
+        process.setUpdatedTime(new Date());
+        return this.interviewProcessDao.update(process) > 0;
+    }
+
+    /**
+     * 更新面试流程状态
+     *
+     * @param id 流程ID
+     * @param status 状态
+     * @return 是否成功
+     */
+    @Override
+    public boolean updateStatus(Long id, Integer status) {
+        InterviewProcess process = new InterviewProcess();
+        process.setId(id);
+        process.setStatus(status);
         process.setUpdatedTime(new Date());
         return this.interviewProcessDao.update(process) > 0;
     }

@@ -99,7 +99,7 @@ public class AuthUserController {
     /**
      * 分页查询用户
      */
-    @SaCheckPermission({"manage_user"})
+    @SaCheckPermission({"manage"})
     @PostMapping("/queryPage")
     public Result<PageResult<AuthUser>> queryPage(@RequestBody AuthUser authUser) {
         return Result.ok(authUserService.queryPage(authUser));

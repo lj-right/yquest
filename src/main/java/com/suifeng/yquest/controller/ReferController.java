@@ -6,7 +6,6 @@ import com.suifeng.yquest.api.common.PageResult;
 import com.suifeng.yquest.api.common.Result;
 import com.suifeng.yquest.entity.Refer;
 import com.suifeng.yquest.service.ReferService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -32,8 +31,8 @@ public class ReferController {
      * @return 单条数据
      */
     @GetMapping("{id}")
-    public ResponseEntity<Refer> queryById(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(this.referService.queryById(id));
+    public Result<Refer> queryById(@PathVariable("id") Long id) {
+        return Result.ok(this.referService.queryById(id));
     }
 
     /**
@@ -76,8 +75,8 @@ public class ReferController {
      * @return 编辑结果
      */
     @DeleteMapping("/deleteById")
-    public ResponseEntity<Boolean> deleteById(@RequestBody Refer refer) {
-        return ResponseEntity.ok(this.referService.deleteById(refer) > 0);
+    public Result<Boolean> deleteById(@RequestBody Refer refer) {
+        return Result.ok(this.referService.deleteById(refer) > 0);
     }
 
 

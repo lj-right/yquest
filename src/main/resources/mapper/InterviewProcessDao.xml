@@ -41,17 +41,17 @@
         <include refid="Base_Column_List" />
         from interview_process
         where is_deleted = 0
-        <if test="resumeId != null">
-            and resume_id = #{resumeId}
+        <if test="interviewProcess.resumeId != null">
+            and resume_id = #{interviewProcess.resumeId}
         </if>
-        <if test="jobId != null">
-            and job_id = #{jobId}
+        <if test="interviewProcess.jobId != null">
+            and job_id = #{interviewProcess.jobId}
         </if>
-        <if test="currentStage != null">
-            and current_stage = #{currentStage}
+        <if test="interviewProcess.currentStage != null">
+            and current_stage = #{interviewProcess.currentStage}
         </if>
-        <if test="status != null">
-            and status = #{status}
+        <if test="interviewProcess.status != null">
+            and status = #{interviewProcess.status}
         </if>
         order by created_time desc
     </select>
@@ -61,37 +61,37 @@
         <include refid="Base_Column_List" />
         from interview_process
         where is_deleted = 0
-        <if test="resumeId != null">
+        <if test="interviewProcess.resumeId != null">
             and resume_id = #{interviewProcess.resumeId}
         </if>
-        <if test="jobId != null">
+        <if test="interviewProcess.jobId != null">
             and job_id = #{interviewProcess.jobId}
         </if>
-        <if test="currentStage != null">
+        <if test="interviewProcess.currentStage != null">
             and current_stage = #{interviewProcess.currentStage}
         </if>
-        <if test="status != null">
+        <if test="interviewProcess.status != null">
             and status = #{interviewProcess.status}
         </if>
         order by created_time desc
-        limit #{offset}, #{limit}
+        limit #{start}, #{pageSize}
     </select>
 
     <select id="countByCondition" resultType="java.lang.Integer">
         select count(*)
         from interview_process
         where is_deleted = 0
-        <if test="resumeId != null">
-            and resume_id = #{resumeId}
+        <if test="interviewProcess.resumeId != null">
+            and resume_id = #{interviewProcess.resumeId}
         </if>
-        <if test="jobId != null">
-            and job_id = #{jobId}
+        <if test="interviewProcess.jobId != null">
+            and job_id = #{interviewProcess.jobId}
         </if>
-        <if test="currentStage != null">
-            and current_stage = #{currentStage}
+        <if test="interviewProcess.currentStage != null">
+            and current_stage = #{interviewProcess.currentStage}
         </if>
-        <if test="status != null">
-            and status = #{status}
+        <if test="interviewProcess.status != null">
+            and status = #{interviewProcess.status}
         </if>
     </select>
 

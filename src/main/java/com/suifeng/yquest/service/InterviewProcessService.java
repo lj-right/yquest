@@ -115,4 +115,13 @@ public interface InterviewProcessService {
      */
     boolean rejectProcess(Long id);
 
+    /**
+     * 更新面试流程状态
+     *
+     * @param id 流程ID
+     * @param status 状态
+     * @return 是否成功
+     */
+    boolean updateStatus(Long id, Integer status);
+
 }

@@ -1,20 +1,17 @@
 package com.suifeng.yquest.controller;
 
-
-import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.suifeng.yquest.api.common.PageResult;
 import com.suifeng.yquest.api.common.Result;
 import com.suifeng.yquest.entity.InterviewRecord;
 import com.suifeng.yquest.service.InterviewRecordService;
 import org.springframework.web.bind.annotation.*;
-
 import javax.annotation.Resource;
 
 /**
  * (InterviewRecord)表控制层
  */
 @RestController
-@RequestMapping("/interview/record")
+@RequestMapping("/interviewRecord")
 @CrossOrigin
 public class InterviewRecordController {
     /**
@@ -59,12 +56,12 @@ public class InterviewRecordController {
     /**
      * 删除数据
      *
-     * @param id 主键
+     * @param interviewRecord 实体
      * @return 删除是否成功
      */
-    @DeleteMapping("/delete/{id}")
-    public Result<Boolean> deleteById(@PathVariable("id") Long id) {
-        return Result.ok(this.interviewRecordService.deleteById(id));
+    @DeleteMapping("/deleteById")
+    public Result<Boolean> deleteById(@RequestBody InterviewRecord interviewRecord) {
+        return Result.ok(this.interviewRecordService.deleteById(interviewRecord.getId()));
     }
 
     /**
@@ -78,59 +75,14 @@ public class InterviewRecordController {
     }
 
     /**
-     * 根据流程ID查询面试记录
+     * 根据面试流程ID查询面试记录
      *
-     * @param processId 流程ID
-     * @return 面试记录列表
-     */
-    @GetMapping("/byProcess/{processId}")
-    public Result<java.util.List<InterviewRecord>> queryByProcessId(@PathVariable("processId") Long processId) {
-        return Result.ok(this.interviewRecordService.queryByProcessId(processId));
-    }
-
-    /**
-     * 根据职位ID查询面试记录
-     *
-     * @param jobId 职位ID
-     * @param pageNo 页码
-     * @param pageSize 每页大小
+     * @param interviewRecord 查询条件
      * @return 分页结果
      */
-    @PostMapping("/byJob/{jobId}/{pageNo}/{pageSize}")
-    public Result<PageResult<InterviewRecord>> queryByJobId(@PathVariable("jobId") Long jobId, 
-                                                         @PathVariable("pageNo") int pageNo, 
-                                                         @PathVariable("pageSize") int pageSize) {
-        return Result.ok(this.interviewRecordService.queryByJobId(jobId, pageNo, pageSize));
-    }
-
-    /**
-     * 根据面试官ID查询面试记录
-     *
-     * @param interviewerId 面试官ID
-     * @param pageNo 页码
-     * @param pageSize 每页大小
-     * @return 分页结果
-     */
-    @PostMapping("/byInterviewer/{interviewerId}/{pageNo}/{pageSize}")
-    public Result<PageResult<InterviewRecord>> queryByInterviewerId(@PathVariable("interviewerId") Long interviewerId, 
-                                                                   @PathVariable("pageNo") int pageNo, 
-                                                                   @PathVariable("pageSize") int pageSize) {
-        return Result.ok(this.interviewRecordService.queryByInterviewerId(interviewerId, pageNo, pageSize));
-    }
-
-    /**
-     * 评估面试结果
-     *
-     * @param id 记录ID
-     * @param result 结果（1：通过，2：未通过）
-     * @param comments 评语
-     * @return 操作结果
-     */
-    @PostMapping("/evaluate/{id}/{result}")
-    public Result<Boolean> evaluateInterview(@PathVariable("id") Long id, 
-                                           @PathVariable("result") Integer result, 
-                                           @RequestParam("comments") String comments) {
-        return Result.ok(this.interviewRecordService.evaluateInterview(id, result, comments));
+    @PostMapping("/byProcess")
+    public Result<PageResult<InterviewRecord>> queryByProcessId(@RequestBody InterviewRecord interviewRecord) {
+        return Result.ok(this.interviewRecordService.queryByProcessId(interviewRecord.getProcessId()));
     }
 
 }

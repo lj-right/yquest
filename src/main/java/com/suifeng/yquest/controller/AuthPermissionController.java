@@ -7,7 +7,7 @@ import com.suifeng.yquest.entity.AuthPermission;
 import com.suifeng.yquest.service.AuthPermissionService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.ResponseEntity;
+import com.suifeng.yquest.api.common.Result;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -33,8 +33,8 @@ public class AuthPermissionController {
      * @return 单条数据
      */
     @GetMapping("/{id}")
-    public ResponseEntity<AuthPermission> queryById(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(this.authPermissionService.queryById(id));
+    public Result<AuthPermission> queryById(@PathVariable("id") Long id) {
+        return Result.ok(this.authPermissionService.queryById(id));
     }
 
     /**

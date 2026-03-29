@@ -3,7 +3,6 @@ package com.suifeng.yquest.controller;
 import com.suifeng.yquest.api.common.Result;
 import com.suifeng.yquest.entity.AuthUserRole;
 import com.suifeng.yquest.service.AuthUserRoleService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,8 +27,8 @@ public class AuthUserRoleController {
      * @return 单条数据
      */
     @GetMapping("{id}")
-    public ResponseEntity<AuthUserRole> queryById(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(this.authUserRoleService.queryById(id));
+    public Result<AuthUserRole> queryById(@PathVariable("id") Long id) {
+        return Result.ok(this.authUserRoleService.queryById(id));
     }
 
     /**
@@ -48,8 +47,8 @@ public class AuthUserRoleController {
      */
     @DeleteMapping("/deleteById/{id}")
     @Transactional
-    public ResponseEntity<Boolean> deleteById(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(authUserRoleService.deleteById(id));
+    public Result<Boolean> deleteById(@PathVariable("id") Long id) {
+        return Result.ok(authUserRoleService.deleteById(id));
     }
 }
 

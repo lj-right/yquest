@@ -45,17 +45,17 @@
         <include refid="Base_Column_List" />
         from interview_record
         where is_deleted = 0
-        <if test="processId != null">
-            and process_id = #{processId}
+        <if test="interviewRecord.processId != null">
+            and process_id = #{interviewRecord.processId}
         </if>
-        <if test="jobId != null">
-            and job_id = #{jobId}
+        <if test="interviewRecord.jobId != null">
+            and job_id = #{interviewRecord.jobId}
         </if>
-        <if test="stage != null">
-            and stage = #{stage}
+        <if test="interviewRecord.stage != null">
+            and stage = #{interviewRecord.stage}
         </if>
-        <if test="result != null">
-            and result = #{result}
+        <if test="interviewRecord.result != null">
+            and result = #{interviewRecord.result}
         </if>
         order by created_time desc
     </select>
@@ -65,37 +65,37 @@
         <include refid="Base_Column_List" />
         from interview_record
         where is_deleted = 0
-        <if test="processId != null">
+        <if test="interviewRecord.processId != null">
             and process_id = #{interviewRecord.processId}
         </if>
-        <if test="jobId != null">
+        <if test="interviewRecord.jobId != null">
             and job_id = #{interviewRecord.jobId}
         </if>
-        <if test="stage != null">
+        <if test="interviewRecord.stage != null">
             and stage = #{interviewRecord.stage}
         </if>
-        <if test="result != null">
+        <if test="interviewRecord.result != null">
             and result = #{interviewRecord.result}
         </if>
         order by created_time desc
-        limit #{offset}, #{limit}
+        limit #{start}, #{pageSize}
     </select>
 
     <select id="countByCondition" resultType="java.lang.Integer">
         select count(*)
         from interview_record
         where is_deleted = 0
-        <if test="processId != null">
-            and process_id = #{processId}
+        <if test="interviewRecord.processId != null">
+            and process_id = #{interviewRecord.processId}
         </if>
-        <if test="jobId != null">
-            and job_id = #{jobId}
+        <if test="interviewRecord.jobId != null">
+            and job_id = #{interviewRecord.jobId}
         </if>
-        <if test="stage != null">
-            and stage = #{stage}
+        <if test="interviewRecord.stage != null">
+            and stage = #{interviewRecord.stage}
         </if>
-        <if test="result != null">
-            and result = #{result}
+        <if test="interviewRecord.result != null">
+            and result = #{interviewRecord.result}
         </if>
     </select>
 

@@ -3,7 +3,6 @@ package com.suifeng.yquest.controller;
 import com.suifeng.yquest.api.common.Result;
 import com.suifeng.yquest.entity.AuthRole;
 import com.suifeng.yquest.service.AuthRoleService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -28,8 +27,8 @@ public class AuthRoleController {
      * @return 单条数据
      */
     @GetMapping("{id}")
-    public ResponseEntity<AuthRole> queryById(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(this.authRoleService.queryById(id));
+    public Result<AuthRole> queryById(@PathVariable("id") Long id) {
+        return Result.ok(this.authRoleService.queryById(id));
     }
 
     /**

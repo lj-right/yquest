@@ -3,7 +3,7 @@ package com.suifeng.yquest.controller;
 import com.suifeng.yquest.api.common.Result;
 import com.suifeng.yquest.entity.AuthRolePermission;
 import com.suifeng.yquest.service.AuthRolePermissionService;
-import org.springframework.http.ResponseEntity;
+import com.suifeng.yquest.api.common.Result;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -27,8 +27,8 @@ public class AuthRolePermissionController {
      * @return 单条数据
      */
     @GetMapping("{id}")
-    public ResponseEntity<AuthRolePermission> queryById(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(this.authRolePermissionService.queryById(id));
+    public Result<AuthRolePermission> queryById(@PathVariable("id") Long id) {
+        return Result.ok(this.authRolePermissionService.queryById(id));
     }
 
     /**
