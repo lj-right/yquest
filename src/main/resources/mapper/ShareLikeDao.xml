@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.suifeng.yquest.dao.ShareLikeDao">
+
+    <resultMap type="com.suifeng.yquest.entity.ShareLike" id="ShareLikeMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="momentId" column="moment_id" jdbcType="INTEGER"/>
+        <result property="commentId" column="comment_id" jdbcType="INTEGER"/>
+        <result property="type" column="type" jdbcType="INTEGER"/>
+        <result property="account" column="account" jdbcType="INTEGER"/>
+        <result property="createdBy" column="created_by" jdbcType="VARCHAR"/>
+        <result property="createdTime" column="created_time" jdbcType="TIMESTAMP"/>
+        <result property="updatedBy" column="updated_by" jdbcType="VARCHAR"/>
+        <result property="updatedTime" column="updated_time" jdbcType="TIMESTAMP"/>
+        <result property="isDeleted" column="is_deleted" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="ShareLikeMap">
+        select
+id, moment_id, comment_id, type, account, created_by, created_time, updated_by, updated_time, is_deleted
+        from share_like
+        where id = #{id}
+        and is_deleted = 0
+    </select>
+
+    <!--查询单个-->
+    <select id="queryByMomentId" resultMap="ShareLikeMap">
+        select
+    id, moment_id, comment_id, type, account, created_by, created_time, updated_by, updated_time, is_deleted
+            from share_like
+            where moment_id = #{momentId}
+            and is_deleted = 0
+        </select>
+
+        <!--查询单个-->
+        <select id="queryByCommentId" resultMap="ShareLikeMap">
+            select
+    id, moment_id, comment_id, type, account, created_by, created_time, updated_by, updated_time, is_deleted
+            from share_like
+            where comment_id = #{commentId}
+            and is_deleted = 0
+        </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="ShareLikeMap">
+        select
+id, moment_id, comment_id, type, account, created_by, created_time, updated_by, updated_time, is_deleted
+        from share_like
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="momentId != null">
+                and moment_id = #{momentId}
+            </if>
+            <if test="commentId != null">
+                and comment_id = #{commentId}
+            </if>
+            <if test="type != null">
+                and `type` = #{type}
+            </if>
+            <if test="account != null">
+                and account = #{account}
+            </if>
+            <if test="createdBy != null and createdBy != ''">
+                and created_by = #{createdBy}
+            </if>
+            <if test="createdTime != null">
+                and created_time = #{createdTime}
+            </if>
+            <if test="updatedBy != null and updatedBy != ''">
+                and updated_by = #{updatedBy}
+            </if>
+            <if test="updatedTime != null">
+                and updated_time = #{updatedTime}
+            </if>
+            <if test="isDeleted != null">
+                and is_deleted = #{isDeleted}
+            </if>
+        </where>
+        limit #{pageable.offset}, #{pageable.pageSize}
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from share_like
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="momentId != null">
+                and moment_id = #{momentId}
+            </if>
+            <if test="commentId != null">
+                and comment_id = #{commentId}
+            </if>
+            <if test="type != null">
+                and `type` = #{type}
+            </if>
+            <if test="account != null">
+                and account = #{account}
+            </if>
+            <if test="createdBy != null and createdBy != ''">
+                and created_by = #{createdBy}
+            </if>
+            <if test="createdTime != null">
+                and created_time = #{createdTime}
+            </if>
+            <if test="updatedBy != null and updatedBy != ''">
+                and updated_by = #{updatedBy}
+            </if>
+            <if test="updatedTime != null">
+                and updated_time = #{updatedTime}
+            </if>
+            <if test="isDeleted != null">
+                and is_deleted = #{isDeleted}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into share_like(moment_id, comment_id, type, account, created_by, created_time, updated_by, updated_time, is_deleted)
+        values (#{momentId}, #{commentId}, #{type}, #{account}, #{createdBy}, #{createdTime}, #{updatedBy}, #{updatedTime}, #{isDeleted})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into share_like(moment_id, comment_id, type, account, created_by, created_time, updated_by, updated_time, is_deleted)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.momentId}, #{entity.commentId}, #{entity.type}, #{entity.account}, #{entity.createdBy}, #{entity.createdTime}, #{entity.updatedBy}, #{entity.updatedTime}, #{entity.isDeleted})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into share_like(moment_id, comment_id, type, account, created_by, created_time, updated_by, updated_time, is_deleted)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.momentId}, #{entity.commentId}, #{entity.type}, #{entity.account}, #{entity.createdBy}, #{entity.createdTime}, #{entity.updatedBy}, #{entity.updatedTime}, #{entity.isDeleted})
+        </foreach>
+        on duplicate key update
+moment_id = values(moment_id),
+comment_id = values(comment_id),
+`type` = values(type),
+account = values(account),
+created_by = values(created_by),
+created_time = values(created_time),
+updated_by = values(updated_by),
+updated_time = values(updated_time),
+is_deleted = values(is_deleted)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update share_like
+        <set>
+            <if test="momentId != null">
+                moment_id = #{momentId},
+            </if>
+            <if test="commentId != null">
+                comment_id = #{commentId},
+            </if>
+            <if test="type != null">
+                `type` = #{type},
+            </if>
+            <if test="account != null">
+                account = #{account},
+            </if>
+            <if test="createdBy != null and createdBy != ''">
+                created_by = #{createdBy},
+            </if>
+            <if test="createdTime != null">
+                created_time = #{createdTime},
+            </if>
+            <if test="updatedBy != null and updatedBy != ''">
+                updated_by = #{updatedBy},
+            </if>
+            <if test="updatedTime != null">
+                updated_time = #{updatedTime},
+            </if>
+            <if test="isDeleted != null">
+                is_deleted = #{isDeleted},
+            </if>
+        </set>
+            <where>
+                <if test="id != null">
+                    and id = #{id}
+                </if>
+                <if test="momentId != null">
+                     and moment_id = #{momentId}
+                </if>
+                <if test="commentId != null">
+                  and  comment_id = #{commentId}
+                </if>
+                <if test="type != null">
+                  and  `type` = #{type}
+                </if>
+            </where>
+        and is_deleted = 0
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        update share_like
+        set is_deleted = 1
+        where id = #{id}
+    </delete>
+
+</mapper>
+

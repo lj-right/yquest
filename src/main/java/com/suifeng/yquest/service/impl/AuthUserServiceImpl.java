@@ -191,7 +191,6 @@ public class AuthUserServiceImpl implements AuthUserService {
         });
 
         //缓存角色信息
-        //todo：这里的List的所有数据都丢进redis去，不知道识别的到role的信息不？
         String roleKey = redisUtil.buildKey(authRolePrefix, user.getEmail());
         redisUtil.set(roleKey, new Gson().toJson(roleList));
 
