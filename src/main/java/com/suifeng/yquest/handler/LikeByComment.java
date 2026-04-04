@@ -97,8 +97,8 @@ public class LikeByComment {
         return redisUtil.exist(detailKey);
     }
 
-    public Integer getAccount(ShareCommentReply shareCommentReply) {
-        String countKey = LIKE_COMMENT_COUNT_KEY + ":" + shareCommentReply.getId();
+    public Integer getAccount(Long id) {
+        String countKey = LIKE_COMMENT_COUNT_KEY + ":" + id;
         Integer count = redisUtil.getInt(countKey); //点赞数量
         return count;
     }

@@ -94,8 +94,8 @@ public class LikeByMoment {
         return redisUtil.exist(detailKey);
     }
 
-    public Integer getAccount(ShareMoment shareMoment) {
-        String countKey = LIKE_MOMENT_COUNT_KEY + ":" + shareMoment.getId();
+    public Integer getAccount(Long id) {
+        String countKey = LIKE_MOMENT_COUNT_KEY + ":" + id;
         Integer count = redisUtil.getInt(countKey); //点赞数量
         return count;
     }

@@ -70,6 +70,8 @@ public class ShareLikeServiceImpl implements ShareLikeService {
                 return likeByMoment.isLiked(shareLike.getMomentId());
             case COMMENT:
                 return likeByComment.isLiked(shareLike.getCommentId());
+            case REPLY:
+                return likeByComment.isLiked(shareLike.getCommentId());
             default:
                 return false;
         }
@@ -79,8 +81,28 @@ public class ShareLikeServiceImpl implements ShareLikeService {
      * 新增数据(持久化)
      */
     @Override
-    public Boolean add(ShareLike shareLike){
+    public Boolean add(ShareLike shareLike) {
         return shareLikeDao.insert(shareLike) > 0;
+    }
+
+    /**
+     * 获取点赞数量
+     *
+     * @param shareLike
+     * @return
+     */
+    @Override
+    public Integer getAccount(ShareLike shareLike) {
+        switch (LikeTypeEnum.getByCode(shareLike.getType())) {
+            case MOMENT:
+                return likeByMoment.getAccount(shareLike.getMomentId());
+            case COMMENT:
+                return likeByComment.getAccount(shareLike.getCommentId());
+            case REPLY:
+                return likeByComment.getAccount(shareLike.getCommentId());
+            default:
+                return 0;
+        }
     }
 
     /**
@@ -98,7 +120,7 @@ public class ShareLikeServiceImpl implements ShareLikeService {
             shareMoment.setId(momentId);
             shareMoment.setIsDeleted(IsDeletedFlagEnum.UN_DELETED.getCode());
             return likeByMoment.like(shareMoment);
-        } else if (commentId != null && commentId >0) {
+        } else if (commentId != null && commentId > 0) {
             ShareCommentReply shareCommentReply = new ShareCommentReply();
             shareCommentReply.setId(commentId);
             shareCommentReply.setReplyType(shareLike.getType());

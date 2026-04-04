@@ -50,7 +50,7 @@ public class ShareLikeController {
      * 查询评论/回复是否点赞
      */
     @PostMapping("/isLiked")
-    public Result<ShareLike> isLiked(@RequestBody ShareLike shareLike) {
+    public Result<Boolean> isLiked(@RequestBody ShareLike shareLike) {
         return Result.ok(this.shareLikeService.isLiked(shareLike));
     }
 
@@ -60,9 +60,18 @@ public class ShareLikeController {
      * @param shareLike 实体
      * @return 新增结果
      */
-    @PostMapping
+    @PostMapping("/add")
     public Result<Boolean> add(@RequestBody ShareLike shareLike) {
         return Result.ok(this.shareLikeService.insert(shareLike));
+    }
+
+    /**
+     * 获取点赞数量
+     *
+     */
+    @PostMapping("/getAccount")
+    public Result<Integer> getAccount(@RequestBody ShareLike shareLike) {
+        return Result.ok(this.shareLikeService.getAccount(shareLike));
     }
 
     /**
@@ -71,7 +80,7 @@ public class ShareLikeController {
      * @param shareLike 实体
      * @return 编辑结果
      */
-    @PutMapping
+    @PutMapping("/edit")
     public Result<Boolean> edit(@RequestBody ShareLike shareLike) {
         return Result.ok(this.shareLikeService.update(shareLike));
     }
@@ -82,7 +91,7 @@ public class ShareLikeController {
      * @param id 主键
      * @return 删除是否成功
      */
-    @DeleteMapping
+    @DeleteMapping("/deleteById")
     public Result<Boolean> deleteById(Long id) {
         return Result.ok(this.shareLikeService.deleteById(id));
     }

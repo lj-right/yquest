@@ -48,4 +48,6 @@ public interface ShareLikeService {
     Boolean isLiked(ShareLike shareLike);
 
     Boolean add(ShareLike shareLike);
+
+    Integer getAccount(ShareLike shareLike);
 }
