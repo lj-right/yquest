@@ -24,7 +24,7 @@ public class LikeByComment {
     private static final String LIKE_REPLY_STATUS_KEY = "like:reply:status";
     private static final String LIKE_REPLY_COUNT_KEY = "like:reply:count";
     private static final String LIKE_CHANGE_COUNT_KEY = "like:change:count";
-    private static final Integer Like_THRESHOLD = 3;  //点赞数量达到一定值进行持久化
+    private static Integer Like_THRESHOLD = 3;  //点赞数量达到一定值进行持久化
 
     @Resource
     private RedisUtil redisUtil;
@@ -56,10 +56,10 @@ public class LikeByComment {
 
         if (redisUtil.exist(detailKey)) {
             //存在点赞
-            if (Objects.isNull(count) || count <= 0) {
+            if (count <= 0) {
                 return false;
             }
-            if (Objects.isNull(changeCount) || changeCount <= 0) {
+            if (changeCount < 0) {
                 return false;
             }
             redisUtil.increment(countKey, -1);
@@ -80,14 +80,15 @@ public class LikeByComment {
         if (changeCount >= Like_THRESHOLD) {
             ShareLikedMessage message = new ShareLikedMessage();
             message.setCommentId(commentId);
-            message.setAccount(count.longValue());
+            message.setAccount((long) count);
             message.setType(replyType);
             //发送mq
             Message msg = MessageBuilder
                     .withBody(JSON.toJSONString(message).getBytes())
                     .build();
             rabbitTemplate.send("like_queue", msg);
-            redisUtil.increment(LIKE_CHANGE_COUNT_KEY, -Like_THRESHOLD);
+            Like_THRESHOLD += Like_THRESHOLD;
+
         }
         return true;
     }

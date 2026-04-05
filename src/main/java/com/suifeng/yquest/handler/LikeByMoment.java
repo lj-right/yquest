@@ -22,7 +22,7 @@ public class LikeByMoment {
     private static final String LIKE_MOMENT_STATUS_KEY = "like:moment:status";
     private static final String LIKE_MOMENT_COUNT_KEY = "like:moment:count";
     private static final String LIKE_CHANGE_COUNT_KEY = "like:change:count";
-    private static final Integer Like_THRESHOLD = 3;  //点赞数量达到一定值进行持久化
+    private static Integer Like_THRESHOLD = 3;  //点赞数量达到一定值进行持久化
 
     @Resource
     private RedisUtil redisUtil;
@@ -47,10 +47,10 @@ public class LikeByMoment {
 
         if (redisUtil.exist(detailKey)) {
             //存在点赞
-            if (Objects.isNull(count) || count < 0) {
+            if (count <= 0) {
                 return false;
             }
-            if (Objects.isNull(changeCount) || changeCount <= 0) {
+            if (changeCount < 0) {
                 return false;
             }
             redisUtil.increment(countKey, -1);
@@ -78,8 +78,8 @@ public class LikeByMoment {
                     .withBody(JSON.toJSONString(message).getBytes())
                     .build();
 
-            rabbitTemplate.send("like_queue",msg);
-            redisUtil.increment(LIKE_CHANGE_COUNT_KEY, -Like_THRESHOLD);
+            rabbitTemplate.send("like_queue", msg);
+            Like_THRESHOLD += Like_THRESHOLD;
         }
         return true;
     }
@@ -90,7 +90,7 @@ public class LikeByMoment {
     }
 
     public Boolean isLiked(Long id) {
-        String detailKey = LIKE_MOMENT_STATUS_KEY + ":" +id + ":" + LoginContextHolder.getLoginId();
+        String detailKey = LIKE_MOMENT_STATUS_KEY + ":" + id + ":" + LoginContextHolder.getLoginId();
         return redisUtil.exist(detailKey);
     }
 
