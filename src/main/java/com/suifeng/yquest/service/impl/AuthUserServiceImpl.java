@@ -329,7 +329,7 @@ public class AuthUserServiceImpl implements AuthUserService {
         redisUtil.setNx(codeKey, String.valueOf(verificationCode), 5L, TimeUnit.MINUTES);
         String CodeContent = "【yquest】您的注册验证码为：" + verificationCode + ",该验证码5分钟内有效，请及时验证。";
 
-        Set EmailSet = new HashSet<>();
+        Set<String> EmailSet = new HashSet<>();
         EmailSet.add(email);
         EmailUtil.sendEmailUtil(EmailSet, "【yquest】验证您的电子邮件地址", CodeContent);
         return true;
@@ -388,7 +388,7 @@ public class AuthUserServiceImpl implements AuthUserService {
         redisUtil.setNx(codeKey, String.valueOf(verificationCode), 5L, TimeUnit.MINUTES);
         String CodeContent = "【yquest】您的登录验证码为：" + verificationCode + ",该验证码5分钟内有效，请及时验证。";
 
-        Set EmailSet = new HashSet<>();
+        Set<String> EmailSet = new HashSet<>();
         EmailSet.add(email);
         EmailUtil.sendEmailUtil(EmailSet, "【yquest】验证您的电子邮件地址", CodeContent);
         return true;
