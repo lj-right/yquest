@@ -405,7 +405,8 @@ public class AuthUserServiceImpl implements AuthUserService {
     @Override
     public Boolean getLoginEmailCaptcha(AuthUser user) {
         String result = redisUtil.get(redisUtil.buildKey(LOGIN_PREFIX, String.valueOf(user.getEmail())));
-        return result.equals(user.getExtJson());
+        Boolean fre = this.refreshRedis(user);
+        return result.equals(user.getExtJson()) && fre;
     }
 
     /**
