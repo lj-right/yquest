@@ -78,7 +78,7 @@ public class WordContext {
             }
         };
         // 定时执行任务，初始延迟0，之后每分钟执行一次
-        scheduler.scheduleAtFixedRate(task, 0, 1, TimeUnit.MINUTES);
+        scheduler.scheduleWithFixedDelay(task, 0, 1, TimeUnit.MINUTES);
 
     }
 
