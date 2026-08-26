@@ -43,7 +43,8 @@ public class LoginByUserName implements LoginTypeHandler{
             StpUtil.login(result.getEmail()); //以email作为唯一的标识
             SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
             log.info("登录成功！token{}", tokenInfo.getTokenValue());
-            authUserService.refreshRedis(user);
+            //传DB完整用户（含email）刷新角色缓存；登录入参只有明文userName，会导致缓存查询失败
+            authUserService.refreshRedis(result);
             return tokenInfo;
         }
         return null;

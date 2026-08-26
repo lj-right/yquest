@@ -11,7 +11,7 @@ import java.util.Arrays;
 @Getter
 public enum ReferApplyEventEnum {
     /**
-     * 求职者撤回申请
+     * 求职者撤回申请（各阶段均可撤回，统一流转至"已撤回"终态）
      */
     WITHDRAW(new ReferApplyStatusEnum[]{
             ReferApplyStatusEnum.SUBMITTED,
@@ -19,7 +19,7 @@ public enum ReferApplyEventEnum {
             ReferApplyStatusEnum.FIRST_INTERVIEW,
             ReferApplyStatusEnum.SECOND_INTERVIEW,
             ReferApplyStatusEnum.FINAL_INTERVIEW,
-            ReferApplyStatusEnum.OFFERED}, null, ReferConstant.ROLES_SEEKER, false),
+            ReferApplyStatusEnum.OFFERED}, ReferApplyStatusEnum.WITHDRAWN, ReferConstant.ROLES_SEEKER, false),
 
     /**
      * 内推人受理申请，进入简历筛选

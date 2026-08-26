@@ -13,7 +13,7 @@ import java.io.Serializable;
 public class SaveReferApplyReq implements Serializable {
 
     /**
-     * 内推码ID
+     * 内推码ID（可选：通过内推码投递时必传；官方职位大厅投递无需传，内推人默认为职位发布人）
      */
     private Long referId;
 

@@ -151,8 +151,10 @@ public class AuthUserServiceImpl implements AuthUserService {
         List<AuthPermission> permissionList = new LinkedList<>();
 
         //找到用户的id
-        //这里的UserName是作为 传递邮箱参数的
-        user.setEmail(user.getUserName());
+        //兼容历史调用：入参未携带email时，用userName充当email查询（Sa-Token登录ID统一为email）
+        if (StringUtils.isBlank(user.getEmail())) {
+            user.setEmail(user.getUserName());
+        }
         AuthUser rUser = this.queryByEmail(user);
         if(rUser == null){
             return false;
