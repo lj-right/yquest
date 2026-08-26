@@ -64,5 +64,11 @@ public class MinioStorageAdapter implements StorageAdapter {
         return url + "/" +bucketName + "/" + objectName;
     }
 
+    @Override
+    @SneakyThrows
+    public String getPresignedFileUrl(String bucketName, String objectName) {
+        return minioUtil.getPreviewFileUrl(bucketName, objectName);
+    }
+
 
 }

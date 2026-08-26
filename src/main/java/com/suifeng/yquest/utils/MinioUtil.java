@@ -38,7 +38,7 @@ public class MinioUtil {
      */
     public void uploadFile(InputStream inputStream, String bucket, String objectName) throws Exception {
         // 确保 InputStream 支持 mark/reset，并提供足够的缓冲区大小
-        BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream, 1024*1024);
+        BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream, 10*1024*1024);
         minioClient.putObject(PutObjectArgs.builder().bucket(bucket).object(objectName)
                 .stream(bufferedInputStream, -1, Integer.MAX_VALUE).build());
     }
@@ -79,12 +79,26 @@ public class MinioUtil {
     }
 
     /**
-     * 获取文件url
+     * 获取文件预签名URL（默认1小时有效）
      */
     public String getPreviewFileUrl(String bucketName, String objectName) throws Exception{
+        return getPreviewFileUrl(bucketName, objectName, 3600);
+    }
+
+    /**
+     * 获取文件预签名URL（临时授权访问，适用于私有桶）
+     *
+     * @param bucketName 桶名
+     * @param objectName 对象键
+     * @param expirySeconds 有效期（秒，最大7天）
+     * @return 带签名的临时访问URL
+     */
+    public String getPreviewFileUrl(String bucketName, String objectName, int expirySeconds) throws Exception{
         GetPresignedObjectUrlArgs args = GetPresignedObjectUrlArgs.builder()
                 .method(Method.GET)
-                .bucket(bucketName).object(objectName).build();
+                .bucket(bucketName).object(objectName)
+                .expiry(expirySeconds)
+                .build();
         return minioClient.getPresignedObjectUrl(args);
     }
 }
