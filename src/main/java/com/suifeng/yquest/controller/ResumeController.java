@@ -2,6 +2,7 @@ package com.suifeng.yquest.controller;
 
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import com.google.common.base.Preconditions;
 import com.suifeng.yquest.api.common.PageResult;
 import com.suifeng.yquest.api.common.Result;
 import com.suifeng.yquest.api.adapter.StorageAdapter;
@@ -9,11 +10,14 @@ import com.suifeng.yquest.entity.Resume;
 import com.suifeng.yquest.service.JobService;
 import com.suifeng.yquest.service.ResumeService;
 import com.suifeng.yquest.api.common.Result;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -36,6 +40,17 @@ public class ResumeController {
     private StorageAdapter storageAdapter;
 
     /**
+     * minio服务地址（用于从存储的文件URL中解析对象键）
+     */
+    @Value("${minio.url}")
+    private String minioUrl;
+
+    /**
+     * 简历文件桶名
+     */
+    private static final String RESUME_BUCKET = "resumes";
+
+    /**
      * 通过主键查询单条数据
      *
      * @param id 主键
@@ -56,30 +71,30 @@ public class ResumeController {
      * @param userEmail 用户邮箱
      * @param userPhone 用户电话
      * @param selfIntroduction 自我介绍
-     * @return 上传结果
+     * @return 上传结果（新简历ID）
      */
     @PostMapping("/upload")
-    public Result<Boolean> uploadResume(@RequestParam("file") MultipartFile file, 
-                                      @RequestParam("jobId") Long jobId, 
-                                      @RequestParam("userId") Long userId, 
-                                      @RequestParam("userName") String userName, 
-                                      @RequestParam("userEmail") String userEmail, 
-                                      @RequestParam("userPhone") String userPhone, 
+    public Result<Long> uploadResume(@RequestParam("file") MultipartFile file,
+                                      @RequestParam("jobId") Long jobId,
+                                      @RequestParam("userId") Long userId,
+                                      @RequestParam("userName") String userName,
+                                      @RequestParam("userEmail") String userEmail,
+                                      @RequestParam("userPhone") String userPhone,
                                       @RequestParam(value = "selfIntroduction", required = false) String selfIntroduction) {
         try {
             // 生成唯一文件名
             String originalFilename = file.getOriginalFilename();
             String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
             String fileName = UUID.randomUUID().toString() + extension;
-            
+
             // 上传文件到MinIO
-            String bucketName = "resumes";
+            String bucketName = RESUME_BUCKET;
             storageAdapter.createBucket(bucketName);
             storageAdapter.uploadFile(file, bucketName, fileName);
-            
-            // 获取文件URL
-            String fileUrl = storageAdapter.getUrl(bucketName, fileName);
-            
+
+            // 获取文件URL（实际对象键为 fileName/原始文件名，与Adapter上传逻辑保持一致）
+            String fileUrl = storageAdapter.getUrl(bucketName, fileName + "/" + originalFilename);
+
             // 创建简历记录
             Resume resume = new Resume();
             resume.setJobId(jobId);
@@ -90,19 +105,49 @@ public class ResumeController {
             resume.setResumeFileUrl(fileUrl);
             resume.setResumeFileName(originalFilename);
             resume.setSelfIntroduction(selfIntroduction);
-            
+
             // 保存简历
             boolean result = resumeService.insert(resume);
-            
+
             // 增加职位申请次数
             if (result) {
                 jobService.incrementApplyCount(jobId);
             }
-            
-            return Result.ok(result);
+
+            return Result.ok(result ? resume.getId() : null);
         } catch (Exception e) {
             e.printStackTrace();
             return Result.fail("上传失败：" + e.getMessage());
+        }
+    }
+
+    /**
+     * 获取简历文件的预签名下载URL
+     * 私有桶文件无法直接访问（AccessDenied），需通过带签名的临时授权URL下载/预览
+     *
+     * @param resume 简历（ID必填）
+     * @return 预签名URL（1小时内有效）
+     */
+    @PostMapping("/getDownloadUrl")
+    public Result<String> getDownloadUrl(@RequestBody Resume resume) {
+        try {
+            Preconditions.checkArgument(Objects.nonNull(resume) && Objects.nonNull(resume.getId()), "简历ID不能为空！");
+            Resume dbResume = this.resumeService.queryById(resume.getId());
+            Preconditions.checkArgument(Objects.nonNull(dbResume), "简历不存在！");
+            String fileUrl = dbResume.getResumeFileUrl();
+            Preconditions.checkArgument(StringUtils.isNotBlank(fileUrl), "该简历没有附件文件！");
+            // 从存储的URL中解析对象键：{minio.url}/{bucket}/{objectName}
+            String objectKey = fileUrl.replace(minioUrl + "/" + RESUME_BUCKET + "/", "");
+            // 兼容历史数据：旧数据URL缺少"/原始文件名"段，真实对象键为 {uuid.ext}/{原始文件名}
+            if (!objectKey.contains("/")) {
+                objectKey = objectKey + "/" + dbResume.getResumeFileName();
+            }
+            return Result.ok(storageAdapter.getPresignedFileUrl(RESUME_BUCKET, objectKey));
+        } catch (IllegalArgumentException e) {
+            return Result.fail(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.fail("获取下载链接失败：" + e.getMessage());
         }
     }
 

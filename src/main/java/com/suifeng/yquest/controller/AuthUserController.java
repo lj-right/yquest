@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * 用户信息表(AuthUser)表控制层
@@ -283,6 +284,22 @@ public class AuthUserController {
     @GetMapping("/auth/isLogin")
     public Result<Boolean> isLogin(){
        return Result.ok(authUserService.isLogin());
+    }
+
+    /**
+     * 查询当前登录用户的角色标识列表（用于前端权限划分：求职者/招聘者/管理员）
+     */
+    @PostMapping("/auth/getMyRoles")
+    public Result<List<String>> getMyRoles() {
+        try {
+            return Result.ok(authUserService.queryMyRoleKeys());
+        } catch (IllegalArgumentException e) {
+            log.error("查询当前用户角色参数异常！错误原因{}", e.getMessage(), e);
+            return Result.fail(e.getMessage());
+        } catch (Exception e) {
+            log.error("查询当前用户角色异常！错误原因{}", e.getMessage(), e);
+            return Result.fail("查询当前用户角色异常！");
+        }
     }
 }
 

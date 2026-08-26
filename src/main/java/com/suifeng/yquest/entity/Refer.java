@@ -17,6 +17,14 @@ public class Refer extends PageInfo implements Serializable {
      */
     private Long id;
     /**
+     * 公司ID
+     */
+    private Long companyId;
+    /**
+     * 内推人用户ID
+     */
+    private Long referUserId;
+    /**
      * 公司名称
      */
     private String company;

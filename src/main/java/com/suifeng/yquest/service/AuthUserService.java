@@ -75,4 +75,9 @@ public interface AuthUserService {
     Boolean forgetPwd(AuthUser user);
 
     Boolean refreshRedis(AuthUser user);
+
+    /**
+     * 查询当前登录用户的角色标识列表（auth_role.role_key，用于前端权限划分）
+     */
+    List<String> queryMyRoleKeys();
 }

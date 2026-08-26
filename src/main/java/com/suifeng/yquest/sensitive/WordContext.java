@@ -66,51 +66,51 @@ public class WordContext {
     }
 
     private void reloadWord(SensitiveWordsService service) {
-//
-//        // 创建一个单线程的定时线程池
-//        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-//        // 创建一个Runnable任务
-//        Runnable task = () -> {
-//            try {
-//                addNewWords(service);
-//                removeDelWords(service);
-//            } catch (Exception e) {
-//                log.error("Sensitive words task error", e);
-//            }
-//        };
-//        // 定时执行任务，初始延迟0，之后每分钟执行一次
-//        scheduler.scheduleWithFixedDelay(task, 0, 1, TimeUnit.MINUTES);
+
+        // 创建一个单线程的定时线程池
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        // 创建一个Runnable任务
+        Runnable task = () -> {
+            try {
+                addNewWords(service);
+                removeDelWords(service);
+            } catch (Exception e) {
+                log.error("Sensitive words task error", e);
+            }
+        };
+        // 定时执行任务，初始延迟0，之后每分钟执行一次
+        scheduler.scheduleAtFixedRate(task, 0, 1, TimeUnit.HOURS);
 
         //弃用上面的定时任务，会导致cpu飙高问题
         //改为系统新增 / 修改 / 删除敏感词保存完毕后，主动触发一次全量重建 DFA 树。
-        try {
-            // 1、构建一颗全新的完整字典树
-            Map newWordMap = new HashMap(1024);
-
-            // 查询全部有效敏感词
-            Set<String> black = new HashSet<>();
-            Set<String> white = new HashSet<>();
-            List<SensitiveWords> list = service.list(Wrappers.<SensitiveWords>lambdaQuery()
-                    .eq(SensitiveWords::getIsDeleted, IsDeletedFlagEnum.UN_DELETED.getCode()));
-
-            for (SensitiveWords words : list) {
-                if (words.getType() == 1) {
-                    black.add(words.getWords());
-                } else {
-                    white.add(words.getWords());
-                }
-            }
-
-            addWord(newWordMap, black, WordType.BLACK);
-            addWord(newWordMap, white, WordType.WHITE);
-
-            // 2、全部构建完成，再切换volatile引用，原子替换
-            this.wordMap = newWordMap;
-            log.info("敏感词DFA树全量重载完成");
-
-        } catch (Exception e) {
-            log.error("敏感词重载失败，继续使用旧树", e);
-        }
+//        try {
+//            // 1、构建一颗全新的完整字典树
+//            Map newWordMap = new HashMap(1024);
+//
+//            // 查询全部有效敏感词
+//            Set<String> black = new HashSet<>();
+//            Set<String> white = new HashSet<>();
+//            List<SensitiveWords> list = service.list(Wrappers.<SensitiveWords>lambdaQuery()
+//                    .eq(SensitiveWords::getIsDeleted, IsDeletedFlagEnum.UN_DELETED.getCode()));
+//
+//            for (SensitiveWords words : list) {
+//                if (words.getType() == 1) {
+//                    black.add(words.getWords());
+//                } else {
+//                    white.add(words.getWords());
+//                }
+//            }
+//
+//            addWord(newWordMap, black, WordType.BLACK);
+//            addWord(newWordMap, white, WordType.WHITE);
+//
+//            // 2、全部构建完成，再切换volatile引用，原子替换
+//            this.wordMap = newWordMap;
+//            log.info("敏感词DFA树全量重载完成");
+//
+//        } catch (Exception e) {
+//            log.error("敏感词重载失败，继续使用旧树", e);
+//        }
 
     }
 

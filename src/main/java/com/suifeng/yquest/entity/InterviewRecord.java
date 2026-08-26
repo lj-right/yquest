@@ -25,6 +25,11 @@ public class InterviewRecord extends PageInfo implements Serializable {
     private Long processId;
 
     /**
+     * 内推申请ID
+     */
+    private Long referApplyId;
+
+    /**
      * 简历ID
      */
     private Long resumeId;

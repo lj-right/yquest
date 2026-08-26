@@ -43,4 +43,13 @@ public interface StorageAdapter {
     void deleteObject(String bucket, String objectName);
 
     String getUrl(String bucketName, String objectName);
+
+    /**
+     * 获取文件预签名访问URL（临时授权，适用于私有桶，无法直接访问的场景）
+     *
+     * @param bucketName 桶名
+     * @param objectName 对象键
+     * @return 带签名的临时访问URL
+     */
+    String getPresignedFileUrl(String bucketName, String objectName);
 }
