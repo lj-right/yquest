@@ -15,6 +15,7 @@ import com.suifeng.yquest.api.req.GetReferApplyReq;
 import com.suifeng.yquest.api.req.SaveReferApplyReq;
 import com.suifeng.yquest.api.vo.ReferApplyVO;
 import com.suifeng.yquest.api.vo.ReferFlowRecordVO;
+import com.suifeng.yquest.constants.AuthConstant;
 import com.suifeng.yquest.constants.ReferConstant;
 import com.suifeng.yquest.dao.ReferApplyMapper;
 import com.suifeng.yquest.entity.AuthUser;
@@ -31,6 +32,7 @@ import com.suifeng.yquest.service.ReferApplyService;
 import com.suifeng.yquest.service.ReferFlowRecordService;
 import com.suifeng.yquest.service.ReferService;
 import com.suifeng.yquest.service.ResumeService;
+import com.suifeng.yquest.service.ShareMessageService;
 import com.suifeng.yquest.utils.LoginUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -68,6 +70,9 @@ public class ReferApplyServiceImpl extends ServiceImpl<ReferApplyMapper, ReferAp
 
     @Resource
     private ResumeService resumeService;
+
+    @Resource
+    private ShareMessageService shareMessageService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -129,6 +134,14 @@ public class ReferApplyServiceImpl extends ServiceImpl<ReferApplyMapper, ReferAp
                 currentUser.getId(), currentUser.getNickName(), null, null);
         // 9. 职位申请次数+1
         jobService.incrementApplyCount(req.getJobId());
+        // 10. 通知管理员有新的内推申请待审核（通知失败不影响主流程）
+        try {
+            String msg = String.format("【%s】提交了职位【%s】的内推申请，请及时审核！",
+                    currentUser.getNickName(), job.getJobTitle());
+            shareMessageService.referApply(currentUser.getEmail(), AuthConstant.SUPER_ADMIN_EMAIL, apply.getId(), msg);
+        } catch (Exception e) {
+            log.error("内推申请通知管理员失败，申请ID{}，错误原因{}", apply.getId(), e.getMessage(), e);
+        }
         if (log.isInfoEnabled()) {
             log.info("内推申请提交成功，申请ID{}，职位ID{}", apply.getId(), req.getJobId());
         }

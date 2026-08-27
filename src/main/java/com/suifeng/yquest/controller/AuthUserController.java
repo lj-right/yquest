@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -287,18 +288,16 @@ public class AuthUserController {
     }
 
     /**
-     * 查询当前登录用户的角色标识列表（用于前端权限划分：求职者/招聘者/管理员）
+     * 获取当前登录用户的角色 key 列表（基于 Sa-Token 登录态）
+     * 用于前端按角色渲染菜单/标签页（如招聘者的"我收到的申请"）
      */
-    @PostMapping("/auth/getMyRoles")
-    public Result<List<String>> getMyRoles() {
+    @GetMapping("/auth/roles")
+    public Result<List<String>> roles() {
         try {
             return Result.ok(authUserService.queryMyRoleKeys());
-        } catch (IllegalArgumentException e) {
-            log.error("查询当前用户角色参数异常！错误原因{}", e.getMessage(), e);
-            return Result.fail(e.getMessage());
         } catch (Exception e) {
-            log.error("查询当前用户角色异常！错误原因{}", e.getMessage(), e);
-            return Result.fail("查询当前用户角色异常！");
+            log.error("获取角色列表错误原因{}", e.getMessage(), e);
+            return Result.ok(Collections.emptyList());
         }
     }
 }

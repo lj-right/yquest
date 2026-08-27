@@ -130,6 +130,28 @@ public class ShareMessageServiceImpl extends ServiceImpl<ShareMessageMapper, Sha
     }
 
     @Override
+    public void referApply(String fromId, String toId, Long targetId, String msg) {
+        JSONObject message = new JSONObject();
+        // 3=内推申请
+        message.put("msgType", "REFER_APPLY");
+        message.put("msg", msg);
+        message.put("targetId", targetId);
+        ShareMessage shareMessage = new ShareMessage();
+        shareMessage.setFromId(fromId);
+        shareMessage.setToId(toId);
+        shareMessage.setContent(message.toJSONString());
+        shareMessage.setIsRead(2);
+        shareMessage.setCreatedBy(fromId);
+        shareMessage.setCreatedTime(new Date());
+        shareMessage.setIsDeleted(IsDeletedFlagEnum.UN_DELETED.getCode());
+        ChickenSocket socket = chickenSocket.getChickenSocket(toId);
+        if (Objects.nonNull(socket)) {
+            chickenSocket.sendMessage(shareMessage.getContent(), socket.getSession());
+        }
+        super.save(shareMessage);
+    }
+
+    @Override
     public Boolean unRead() {
         LambdaQueryWrapper<ShareMessage> query = Wrappers.<ShareMessage>lambdaQuery()
                 .eq(ShareMessage::getToId, LoginUtil.getLoginId())

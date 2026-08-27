@@ -52,7 +52,7 @@ public class ReferApplyController {
             return Result.fail(e.getMessage());
         } catch (Exception e) {
             log.error("提交内推申请异常！错误原因{}", e.getMessage(), e);
-            return Result.fail("提交内推申请异常！");
+            return Result.fail("提交内推申请异常！"+e.getMessage());
         }
     }
 

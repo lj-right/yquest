@@ -7,9 +7,7 @@ import com.suifeng.yquest.api.common.PageResult;
 import com.suifeng.yquest.api.common.Result;
 import com.suifeng.yquest.api.adapter.StorageAdapter;
 import com.suifeng.yquest.entity.Resume;
-import com.suifeng.yquest.service.JobService;
 import com.suifeng.yquest.service.ResumeService;
-import com.suifeng.yquest.api.common.Result;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -32,9 +30,6 @@ public class ResumeController {
      */
     @Resource
     private ResumeService resumeService;
-
-    @Resource
-    private JobService jobService;
 
     @Resource
     private StorageAdapter storageAdapter;
@@ -71,30 +66,30 @@ public class ResumeController {
      * @param userEmail 用户邮箱
      * @param userPhone 用户电话
      * @param selfIntroduction 自我介绍
-     * @return 上传结果（新简历ID）
+     * @return 上传结果
      */
     @PostMapping("/upload")
     public Result<Long> uploadResume(@RequestParam("file") MultipartFile file,
-                                      @RequestParam("jobId") Long jobId,
-                                      @RequestParam("userId") Long userId,
-                                      @RequestParam("userName") String userName,
-                                      @RequestParam("userEmail") String userEmail,
-                                      @RequestParam("userPhone") String userPhone,
+                                      @RequestParam("jobId") Long jobId, 
+                                      @RequestParam("userId") Long userId, 
+                                      @RequestParam("userName") String userName, 
+                                      @RequestParam("userEmail") String userEmail, 
+                                      @RequestParam("userPhone") String userPhone, 
                                       @RequestParam(value = "selfIntroduction", required = false) String selfIntroduction) {
         try {
             // 生成唯一文件名
             String originalFilename = file.getOriginalFilename();
             String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
             String fileName = UUID.randomUUID().toString() + extension;
-
+            
             // 上传文件到MinIO
-            String bucketName = RESUME_BUCKET;
+            String bucketName = "resumes";
             storageAdapter.createBucket(bucketName);
             storageAdapter.uploadFile(file, bucketName, fileName);
-
+            
             // 获取文件URL（实际对象键为 fileName/原始文件名，与Adapter上传逻辑保持一致）
-            String fileUrl = storageAdapter.getUrl(bucketName, fileName + "/" + originalFilename);
-
+            String fileUrl = storageAdapter.getUrl(RESUME_BUCKET, fileName + "/" + originalFilename);
+            
             // 创建简历记录
             Resume resume = new Resume();
             resume.setJobId(jobId);
@@ -105,16 +100,15 @@ public class ResumeController {
             resume.setResumeFileUrl(fileUrl);
             resume.setResumeFileName(originalFilename);
             resume.setSelfIntroduction(selfIntroduction);
-
-            // 保存简历
+            
+            // 保存简历（MyBatis-Plus插入后回填自增ID）
             boolean result = resumeService.insert(resume);
 
-            // 增加职位申请次数
+            // 返回简历ID（前端用它提交内推申请）；职位申请次数由 /refer/apply/save 统一计数，此处不重复累加
             if (result) {
-                jobService.incrementApplyCount(jobId);
+                return Result.ok(resume.getId());
             }
-
-            return Result.ok(result ? resume.getId() : null);
+            return Result.fail("简历保存失败！");
         } catch (Exception e) {
             e.printStackTrace();
             return Result.fail("上传失败：" + e.getMessage());
