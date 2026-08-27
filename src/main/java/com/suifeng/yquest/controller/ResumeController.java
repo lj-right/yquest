@@ -13,7 +13,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -39,6 +44,11 @@ public class ResumeController {
     private static final String RESUME_BUCKET = "resumes";
 
     /**
+     * 下载接口路径前缀（Nginx将 /api/ 反代到本服务，前端拿相对路径基于当前origin即可访问）
+     */
+    private static final String DOWNLOAD_URL_PREFIX = "/api/resume/download/";
+
+    /**
      * 通过主键查询单条数据
      *
      * @param id 主键
@@ -47,13 +57,9 @@ public class ResumeController {
     @GetMapping("{id}")
     public Result<Resume> queryById(@PathVariable("id") Long id) {
         Resume resume = this.resumeService.queryById(id);
-        // 每次返回重新生成预签名URL，避免前端拿到持久化的旧地址（裸URL不可直连）
+        // 浏览器不可直连MinIO内网地址，统一改指后端流式下载接口
         if (Objects.nonNull(resume) && StringUtils.isNotBlank(resume.getResumeFileUrl())) {
-            try {
-                resume.setResumeFileUrl(buildPresignedUrl(resume));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            resume.setResumeFileUrl(DOWNLOAD_URL_PREFIX + resume.getId());
         }
         return Result.ok(resume);
     }
@@ -118,11 +124,11 @@ public class ResumeController {
     }
 
     /**
-     * 获取简历文件的预签名下载URL
-     * 私有桶文件无法直接访问（AccessDenied），需通过带签名的临时授权URL下载/预览
+     * 获取简历文件的下载地址
+     * MinIO仅Docker内网可达，浏览器无法直连，下载统一走后端流式转发接口
      *
      * @param resume 简历（ID必填）
-     * @return 预签名URL（1小时内有效）
+     * @return 下载接口地址（相对路径，浏览器基于当前origin访问）
      */
     @PostMapping("/getDownloadUrl")
     public Result<String> getDownloadUrl(@RequestBody Resume resume) {
@@ -130,8 +136,9 @@ public class ResumeController {
             Preconditions.checkArgument(Objects.nonNull(resume) && Objects.nonNull(resume.getId()), "简历ID不能为空！");
             Resume dbResume = this.resumeService.queryById(resume.getId());
             Preconditions.checkArgument(Objects.nonNull(dbResume), "简历不存在！");
-            // 每次调用重新生成预签名URL，不返回数据库持久化的旧地址
-            return Result.ok(buildPresignedUrl(dbResume));
+            // 提前校验附件存在，避免返回不可用的下载地址
+            extractObjectKey(dbResume);
+            return Result.ok(DOWNLOAD_URL_PREFIX + dbResume.getId());
         } catch (IllegalArgumentException e) {
             return Result.fail(e.getMessage());
         } catch (Exception e) {
@@ -141,10 +148,48 @@ public class ResumeController {
     }
 
     /**
-     * 生成简历文件的预签名访问URL
-     * 数据库持久化的仅是上传时的完整URL（作为对象键来源），预签名URL始终基于当前minio端点现场生成
+     * 简历文件流式下载（后端经Docker内网从MinIO取流转发给浏览器）
+     *
+     * @param id 简历ID
      */
-    private String buildPresignedUrl(Resume resume) throws Exception {
+    @GetMapping("/download/{id}")
+    public void download(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
+        Resume dbResume = this.resumeService.queryById(id);
+        if (Objects.isNull(dbResume)) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+        String objectKey;
+        try {
+            objectKey = extractObjectKey(dbResume);
+        } catch (IllegalArgumentException e) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+        String fileName = StringUtils.defaultIfBlank(dbResume.getResumeFileName(), "resume");
+        String contentType = URLConnection.guessContentTypeFromName(fileName);
+        response.setContentType(contentType != null ? contentType : "application/octet-stream");
+        // 文件名URL编码，兼容中文；attachment 触发浏览器下载
+        String encodedFileName = URLEncoder.encode(fileName, "UTF-8").replace("+", "%20");
+        response.setHeader("Content-Disposition", "attachment; filename*=UTF-8''" + encodedFileName);
+        try (InputStream in = storageAdapter.downLoad(RESUME_BUCKET, objectKey);
+             OutputStream out = response.getOutputStream()) {
+            byte[] buffer = new byte[8192];
+            int len;
+            while ((len = in.read(buffer)) != -1) {
+                out.write(buffer, 0, len);
+            }
+            out.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 从数据库持久化的文件URL中解析MinIO对象键
+     * 数据库持久化的仅是上传时的完整URL，对象键解析不依赖当前minio.url配置
+     */
+    private String extractObjectKey(Resume resume) {
         String fileUrl = resume.getResumeFileUrl();
         Preconditions.checkArgument(StringUtils.isNotBlank(fileUrl), "该简历没有附件文件！");
         // 按"/{bucket}/"段截取对象键，不依赖当前minio.url配置（历史数据可能存有不同环境的地址）
@@ -162,7 +207,7 @@ public class ResumeController {
         if (!objectKey.contains("/")) {
             objectKey = objectKey + "/" + resume.getResumeFileName();
         }
-        return storageAdapter.getPresignedFileUrl(RESUME_BUCKET, objectKey);
+        return objectKey;
     }
 
     /**

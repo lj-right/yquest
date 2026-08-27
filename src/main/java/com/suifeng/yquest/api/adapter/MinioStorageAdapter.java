@@ -67,6 +67,7 @@ public class MinioStorageAdapter implements StorageAdapter {
     @Override
     @SneakyThrows
     public String getPresignedFileUrl(String bucketName, String objectName) {
+        // 基于内部minio endpoint签名，仅适用于服务端/Docker内网场景；浏览器下载请走后端流式转发接口
         return minioUtil.getPreviewFileUrl(bucketName, objectName);
     }
 

@@ -87,6 +87,7 @@ public class MinioUtil {
 
     /**
      * 获取文件预签名URL（临时授权访问，适用于私有桶）
+     * 基于内部endpoint签名，仅适用于服务端/Docker内网场景；浏览器下载请走后端流式转发接口
      *
      * @param bucketName 桶名
      * @param objectName 对象键
