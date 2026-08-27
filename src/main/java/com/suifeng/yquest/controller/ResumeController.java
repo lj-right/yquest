@@ -9,7 +9,6 @@ import com.suifeng.yquest.api.adapter.StorageAdapter;
 import com.suifeng.yquest.entity.Resume;
 import com.suifeng.yquest.service.ResumeService;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,12 +34,6 @@ public class ResumeController {
     private StorageAdapter storageAdapter;
 
     /**
-     * minio服务地址（用于从存储的文件URL中解析对象键）
-     */
-    @Value("${minio.url}")
-    private String minioUrl;
-
-    /**
      * 简历文件桶名
      */
     private static final String RESUME_BUCKET = "resumes";
@@ -53,7 +46,16 @@ public class ResumeController {
      */
     @GetMapping("{id}")
     public Result<Resume> queryById(@PathVariable("id") Long id) {
-        return Result.ok(this.resumeService.queryById(id));
+        Resume resume = this.resumeService.queryById(id);
+        // 每次返回重新生成预签名URL，避免前端拿到持久化的旧地址（裸URL不可直连）
+        if (Objects.nonNull(resume) && StringUtils.isNotBlank(resume.getResumeFileUrl())) {
+            try {
+                resume.setResumeFileUrl(buildPresignedUrl(resume));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return Result.ok(resume);
     }
 
     /**
@@ -128,21 +130,39 @@ public class ResumeController {
             Preconditions.checkArgument(Objects.nonNull(resume) && Objects.nonNull(resume.getId()), "简历ID不能为空！");
             Resume dbResume = this.resumeService.queryById(resume.getId());
             Preconditions.checkArgument(Objects.nonNull(dbResume), "简历不存在！");
-            String fileUrl = dbResume.getResumeFileUrl();
-            Preconditions.checkArgument(StringUtils.isNotBlank(fileUrl), "该简历没有附件文件！");
-            // 从存储的URL中解析对象键：{minio.url}/{bucket}/{objectName}
-            String objectKey = fileUrl.replace(minioUrl + "/" + RESUME_BUCKET + "/", "");
-            // 兼容历史数据：旧数据URL缺少"/原始文件名"段，真实对象键为 {uuid.ext}/{原始文件名}
-            if (!objectKey.contains("/")) {
-                objectKey = objectKey + "/" + dbResume.getResumeFileName();
-            }
-            return Result.ok(storageAdapter.getPresignedFileUrl(RESUME_BUCKET, objectKey));
+            // 每次调用重新生成预签名URL，不返回数据库持久化的旧地址
+            return Result.ok(buildPresignedUrl(dbResume));
         } catch (IllegalArgumentException e) {
             return Result.fail(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return Result.fail("获取下载链接失败：" + e.getMessage());
         }
+    }
+
+    /**
+     * 生成简历文件的预签名访问URL
+     * 数据库持久化的仅是上传时的完整URL（作为对象键来源），预签名URL始终基于当前minio端点现场生成
+     */
+    private String buildPresignedUrl(Resume resume) throws Exception {
+        String fileUrl = resume.getResumeFileUrl();
+        Preconditions.checkArgument(StringUtils.isNotBlank(fileUrl), "该简历没有附件文件！");
+        // 按"/{bucket}/"段截取对象键，不依赖当前minio.url配置（历史数据可能存有不同环境的地址）
+        String objectKey = fileUrl;
+        int bucketIdx = fileUrl.indexOf("/" + RESUME_BUCKET + "/");
+        if (bucketIdx >= 0) {
+            objectKey = fileUrl.substring(bucketIdx + RESUME_BUCKET.length() + 2);
+        }
+        // 防御：剥离可能携带的查询参数（历史数据存过带签名的URL）
+        int queryIdx = objectKey.indexOf("?");
+        if (queryIdx >= 0) {
+            objectKey = objectKey.substring(0, queryIdx);
+        }
+        // 兼容历史数据：旧数据URL缺少"/原始文件名"段，真实对象键为 {uuid.ext}/{原始文件名}
+        if (!objectKey.contains("/")) {
+            objectKey = objectKey + "/" + resume.getResumeFileName();
+        }
+        return storageAdapter.getPresignedFileUrl(RESUME_BUCKET, objectKey);
     }
 
     /**
