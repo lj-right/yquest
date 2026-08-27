@@ -76,4 +76,9 @@ public interface AuthUserService {
 
     Boolean refreshRedis(AuthUser user);
 
+    /**
+     * 查询当前登录用户的角色标识列表（auth_role.role_key）
+     * 优先读取 Sa-Token 缓存（登录时 refreshRedis 已写入），未命中则回源数据库
+     */
+    List<String> queryMyRoleKeys();
 }
