@@ -4,7 +4,6 @@ import cn.dev33.satoken.secure.SaSecureUtil;
 import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import com.suifeng.yquest.api.common.PageResult;
 import com.suifeng.yquest.api.enums.AuthUserStatusEnum;
@@ -151,10 +150,8 @@ public class AuthUserServiceImpl implements AuthUserService {
         List<AuthPermission> permissionList = new LinkedList<>();
 
         //找到用户的id
-        //兼容历史调用：入参未携带email时，用userName充当email查询（Sa-Token登录ID统一为email）
-        if (StringUtils.isBlank(user.getEmail())) {
-            user.setEmail(user.getUserName());
-        }
+        //这里的UserName是作为 传递邮箱参数的
+        user.setEmail(user.getUserName());
         AuthUser rUser = this.queryByEmail(user);
         if(rUser == null){
             return false;
@@ -256,34 +253,6 @@ public class AuthUserServiceImpl implements AuthUserService {
     public AuthUser queryByName(AuthUser authUser) {
         authUser.setIsDeleted(IsDeletedFlagEnum.UN_DELETED.getCode());
         return userDao.queryByName(authUser);
-    }
-
-    /**
-     * 查询当前登录用户的角色标识列表（auth_role.role_key，用于前端权限划分）
-     * 优先读取 Sa-Token 缓存（登录时 refreshRedis 已写入），未命中则回源数据库
-     */
-    @Override
-    public List<String> queryMyRoleKeys() {
-        // 1. 优先读取 Sa-Token 缓存
-        List<String> roleList = StpUtil.getRoleList();
-        if (!CollectionUtils.isEmpty(roleList)) {
-            return roleList;
-        }
-        // 2. 缓存未命中，回源数据库（loginId 即邮箱）
-        String email = StpUtil.getLoginIdAsString();
-        AuthUser query = new AuthUser();
-        query.setEmail(email);
-        AuthUser user = this.queryByEmail(query);
-        Preconditions.checkArgument(Objects.nonNull(user), "当前用户不存在！");
-        List<AuthUserRole> userRoleList = authUserRoleService.queryListByUserId(user.getId());
-        return userRoleList.stream()
-                .map(AuthUserRole::getRoleId)
-                .map(authRoleService::queryById)
-                .filter(Objects::nonNull)
-                .map(AuthRole::getRoleKey)
-                .filter(StringUtils::isNotBlank)
-                .map(String::toLowerCase)
-                .collect(Collectors.toList());
     }
     /**
      * 根据邮箱查询用户别名 NickName
